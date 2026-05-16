@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    function isValidChildProfile(data) {
+      return data.keys().hasAll(['userId', 'name', 'ageInMonths', 'heightCm', 'weightKg', 'gender', 'updatedAt']) 
+        && data.userId == request.auth.uid
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.ageInMonths is number && data.ageInMonths >= 0
+        && data.heightCm is number && data.heightCm >= 0
+        && data.weightKg is number && data.weightKg >= 0
+        && (data.gender == 'Laki-laki' || data.gender == 'Perempuan')
+        && data.updatedAt == request.time;
+    }
+
+    function isValidQuestionnaireResult(data) {
+      return data.keys().hasAll(['userId', 'profileId', 'ageCategory', 'answers', 'totalScore', 'createdAt'])
+        && data.userId == request.auth.uid
+        && data.profileId is string && data.profileId.size() > 0
+        && data.ageCategory is string
+        && data.answers is map
+        && data.totalScore is number
+        && data.createdAt == request.time;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /childProfiles/{profileId} {
+      allow read: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(profileId) && isValidChildProfile(incoming());
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && isValidChildProfile(incoming());
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+    
+    match /questionnaireResults/{resultId} {
+      allow read: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(resultId) && isValidQuestionnaireResult(incoming());
+      allow update: if isSignedIn() && existing().userId == request.auth.uid 
+        && incoming().diff(existing()).affectedKeys().hasOnly(['aiAnalysis'])
+        && incoming().aiAnalysis is string && incoming().aiAnalysis.size() <= 10000;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && userId == request.auth.uid;
+    }
+  }
+}
+

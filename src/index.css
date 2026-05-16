@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+body {
+  @apply bg-slate-100 text-slate-800 antialiased font-sans;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+}
