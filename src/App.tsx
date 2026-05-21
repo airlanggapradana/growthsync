@@ -120,8 +120,8 @@ export default function App() {
 
   if (loadingUser || loadingProfile) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center font-sans">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen bg-[#FCFCFD] flex items-center justify-center font-sans">
+        <Loader2 className="w-6 h-6 animate-spin text-slate-700" />
       </div>
     );
   }
@@ -131,48 +131,112 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 selection:bg-blue-100 selection:text-blue-900 flex flex-col font-sans">
-      <header className="h-[72px] bg-white border-b border-slate-200 sticky top-0 z-30 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
-        <div className="max-w-5xl mx-auto px-6 sm:px-10 h-full flex items-center justify-between">
+    <div className="flex h-screen bg-[#F4F5F7] font-sans text-slate-900 overflow-hidden">
+      {/* Sidebar (Hidden on mobile) */}
+      <aside className="w-[260px] hidden lg:flex flex-col pt-8 pb-6 px-5 shrink-0 overflow-y-auto">
+        <div className="flex items-center gap-3 px-3 mb-10">
+           <div className="w-10 h-10 bg-[#1b4332] rounded-xl flex items-center justify-center shadow-sm">
+             <Baby className="w-6 h-6 text-white" />
+           </div>
+           <div className="font-bold tracking-tight text-slate-900 text-xl">
+              Kuisioner<span className="text-emerald-700">Anak</span>
+           </div>
+        </div>
+
+        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Menu</div>
+        <nav className="space-y-1.5 mb-8">
+           <button 
+             onClick={() => setView('DASHBOARD')}
+             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' ? "bg-white text-slate-900 shadow-sm border border-slate-100" : "text-slate-500 hover:bg-slate-200/50 hover:text-slate-900")}
+           >
+             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' ? "text-[#1b4332]" : "text-slate-400")} />
+             Dashboard
+           </button>
+           <button 
+             disabled
+             className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 font-semibold rounded-xl text-sm cursor-not-allowed"
+           >
+             <CheckCircle2 className="w-5 h-5" />
+             Tugas <span className="ml-auto text-[9px] bg-slate-200 text-slate-500 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
+           </button>
+           <button 
+             onClick={() => setView('ONBOARDING')}
+             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-white text-slate-900 shadow-sm border border-slate-100" : "text-slate-500 hover:bg-slate-200/50 hover:text-slate-900")}
+           >
+             <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1b4332]" : "text-slate-400")} />
+             Tambah Anak
+           </button>
+        </nav>
+
+        <div className="mt-auto">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Pengaturan</div>
+          <button 
+             onClick={handleLogout}
+             className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-sm font-semibold"
+          >
+             <LogOut className="w-5 h-5" />
+             Keluar
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Wrapper */}
+      <main className="flex-1 lg:my-3 lg:mr-3 bg-white lg:rounded-[32px] shadow-[0_2px_24px_-8px_rgba(0,0,0,0.05)] border border-slate-200/50 flex flex-col overflow-hidden relative w-full h-full lg:h-[calc(100vh-24px)]">
+        
+        {/* Mobile Header */}
+        <header className="lg:hidden h-16 flex items-center justify-between px-6 border-b border-slate-100 shrink-0 bg-white shadow-sm z-30">
           <div className="flex items-center gap-2">
-            <div>
-              <span className="text-[20px] font-extrabold text-blue-500 tracking-tight">Kuisioner</span>
-              <span className="text-[20px] font-extrabold text-slate-900 tracking-tight">Anak</span>
+            <div className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center">
+              <Baby className="w-5 h-5 text-white" />
             </div>
+            <div className="font-semibold tracking-tight text-slate-900 text-lg">Kuisioner<span className="text-emerald-700">Anak</span></div>
           </div>
-          <div className="flex gap-4 items-center">
-            {view === 'QUESTIONNAIRE' && (
-              <>
-                <div className="text-right hidden sm:block">
-                  <div className="text-[14px] font-semibold text-slate-800">Orang Tua</div>
-                  <div className="text-[12px] text-slate-500 font-medium tracking-wide leading-none mt-0.5">USIA: {age === '3_bulan' ? '3' : '6'} BULAN</div>
-                </div>
-                <div className="w-10 h-10 bg-slate-200 rounded-full hidden sm:flex items-center justify-center text-lg shadow-inner">
-                  {activeProfile?.gender === 'Perempuan' ? '👧' : '👦'}
-                </div>
+          <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-slate-900 bg-slate-50 rounded-lg">
+             <LogOut className="w-4 h-4" />
+          </button>
+        </header>
+
+        {/* Desktop Topbar */}
+        <header className="hidden lg:flex h-[88px] items-center justify-between px-10 shrink-0 bg-white border-b border-slate-100/50 z-30">
+           {/* Search Placeholder */}
+           <div className="flex items-center bg-slate-50 border border-slate-100 rounded-full px-5 py-3 w-[360px] text-slate-400 text-sm font-medium hover:bg-slate-100 transition-colors cursor-text">
+              <span className="opacity-70">Cari data anak...</span>
+           </div>
+           
+           <div className="flex items-center gap-8">
+              {view === 'QUESTIONNAIRE' && (
                 <button
                   onClick={handleResetToDashboard}
-                  className="sm:ml-2 text-sm font-bold text-slate-400 hover:text-slate-700 transition-colors uppercase tracking-wider"
+                  className="text-sm font-semibold text-slate-500 hover:text-rose-600 transition-colors"
                 >
-                  Batal
+                  Batalkan Skrining
                 </button>
-              </>
-            )}
-            <div className="w-[1px] h-6 bg-slate-200 mx-2 hidden sm:block"></div>
-            <button
-               onClick={handleLogout}
-               className="text-slate-500 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-slate-100"
-               title="Logout"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
+              )}
+              {view === 'ONBOARDING' && activeProfile && (
+                <button
+                  onClick={() => setView('DASHBOARD')}
+                  className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+                >
+                  Kembali ke Dashboard
+                </button>
+              )}
+              
+              {/* Profile Display Box */}
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full pl-2 pr-6 py-2 shadow-sm">
+                 <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-sm shadow-inner uppercase font-bold">
+                    {user.email?.charAt(0) || 'U'}
+                 </div>
+                 <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-900 leading-none mb-1">{user.email?.split('@')[0]}</span>
+                    <span className="text-[10px] text-slate-500 font-medium leading-none">{user.email}</span>
+                 </div>
+              </div>
+           </div>
+        </header>
 
-      <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-10 lg:p-10">
-        <AnimatePresence mode="wait">
-          {view === 'ONBOARDING' && (
+        <div className="flex-1 overflow-y-auto px-6 py-8 lg:px-10 lg:py-10 bg-white">
+          <AnimatePresence mode="wait">
+            {view === 'ONBOARDING' && (
             <ChildOnboardingView key="onboarding" user={user} onComplete={handleProfileComplete} />
           )}
           {view === 'DASHBOARD' && activeProfile && (
@@ -233,6 +297,7 @@ export default function App() {
             />
           )}
         </AnimatePresence>
+        </div>
       </main>
     </div>
   );
@@ -275,20 +340,23 @@ const QuestionnaireView: React.FC<{
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      className="max-w-3xl mx-auto space-y-8 pb-[140px]" 
+      initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="max-w-3xl mx-auto space-y-8 pb-32" 
     >
-      <div className="bg-white p-6 sm:p-8 rounded-[20px] border border-slate-200 shadow-sm sticky top-[88px] z-20">
-        <div className="text-[11px] uppercase tracking-[0.1em] font-bold text-slate-500 mb-2">Progres Pengerjaan</div>
-        <div className="flex justify-between items-end mb-4">
-          <span className="text-[24px] sm:text-[32px] font-extrabold text-slate-900 leading-none">{answeredCount}/{questions.length}</span>
-          <span className="text-[14px] sm:text-[15px] text-slate-500 font-bold">{Math.round(progress)}% Selesai</span>
+      <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm sticky top-[80px] z-20">
+        <div className="flex justify-between items-end mb-3">
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Progres Pengerjaan</span>
+            <span className="text-2xl font-bold text-slate-900 leading-none">{answeredCount}<span className="text-slate-400">/{questions.length}</span></span>
+          </div>
+          <span className="text-sm text-slate-500 font-medium">{Math.round(progress)}% Selesai</span>
         </div>
-        <div className="h-2 sm:h-2.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-blue-500 rounded-full"
+            className="h-full bg-[#1b4332] rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ ease: "easeOut", duration: 0.3 }}
@@ -296,91 +364,89 @@ const QuestionnaireView: React.FC<{
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         <AnimatePresence mode="wait">
           <motion.div 
             key={currentQuestion.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white p-8 sm:p-12 rounded-[24px] border border-slate-200 shadow-sm flex flex-col justify-center"
+            initial={{ opacity: 0, x: 20, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: -20, filter: 'blur(4px)' }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-center"
           >
-            <span className="inline-block px-[14px] py-[6px] rounded-full bg-sky-50 text-sky-700 text-[13px] font-bold uppercase tracking-[0.05em] mb-6 self-start">
+            <span className="inline-flex px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider rounded-md mb-6 self-start">
               {currentQuestion.kategori}
             </span>
-            <h3 className="text-[24px] sm:text-[32px] font-semibold leading-[1.3] text-slate-900 mb-8 sm:mb-12">
-              <span className="text-slate-300 mr-3.5 font-bold">{currentIndex + 1}.</span>
+            <h3 className="text-xl sm:text-2xl font-medium leading-relaxed text-slate-900 mb-10">
+              <span className="text-slate-300 font-normal mr-3">{currentIndex + 1}.</span>
               {currentQuestion.pertanyaan}
             </h3>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => handleAnswerClick(1)}
                 className={cn(
-                  "p-6 sm:p-8 rounded-[20px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 outline-none cursor-pointer",
+                  "p-6 rounded-xl border transition-all duration-200 flex flex-col items-center justify-center gap-2 cursor-pointer",
                   currentAnswer === 1
-                    ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50"
+                    ? "border-[#1b4332] bg-[#1b4332] text-white shadow-md shadow-[#1b4332]/10"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                 )}
               >
-                <span className="block text-[22px] sm:text-[24px] font-bold">IYA</span>
-                <span className={cn("text-[13px] sm:text-[14px] font-medium", currentAnswer === 1 ? "text-blue-100" : "text-slate-500")}>Skor: 1</span>
+                <span className="text-lg font-bold">IYA</span>
+                <span className={cn("text-xs font-medium", currentAnswer === 1 ? "text-emerald-100" : "text-slate-500")}>Skor: 1</span>
               </button>
               <button
                 onClick={() => handleAnswerClick(0)}
                 className={cn(
-                  "p-6 sm:p-8 rounded-[20px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 outline-none cursor-pointer",
+                  "p-6 rounded-xl border transition-all duration-200 flex flex-col items-center justify-center gap-2 cursor-pointer",
                   currentAnswer === 0
-                    ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50"
+                    ? "border-[#1b4332] bg-[#1b4332] text-white shadow-md shadow-[#1b4332]/10"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                 )}
               >
-                <span className="block text-[22px] sm:text-[24px] font-bold">TIDAK</span>
-                <span className={cn("text-[13px] sm:text-[14px] font-medium", currentAnswer === 0 ? "text-blue-100" : "text-slate-500")}>Skor: 0</span>
+                <span className="text-lg font-bold">TIDAK</span>
+                <span className={cn("text-xs font-medium", currentAnswer === 0 ? "text-emerald-100" : "text-slate-500")}>Skor: 0</span>
               </button>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-md border-t border-slate-200 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex gap-3">
-             <button
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                className={cn(
-                   "p-4 rounded-xl border-2 transition-all flex items-center justify-center",
-                   currentIndex === 0 ? "border-slate-100 text-slate-300 cursor-not-allowed" : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                )}
-             >
-                <ArrowLeft className="w-6 h-6" />
-             </button>
-             <button
-                onClick={handleNext}
-                disabled={currentIndex === questions.length - 1}
-                className={cn(
-                   "p-4 rounded-xl border-2 transition-all flex items-center justify-center",
-                   currentIndex === questions.length - 1 ? "border-slate-100 text-slate-300 cursor-not-allowed" : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                )}
-             >
-               <ArrowRight className="w-6 h-6" />
-             </button>
-          </div>
-          <button
-            disabled={!isComplete}
-            onClick={onSubmit}
-            className={cn(
-              "w-full sm:w-[300px] py-4 sm:py-5 px-8 rounded-[16px] font-extrabold text-[15px] sm:text-[16px] transition-all tracking-wider ml-auto",
-              isComplete 
-                ? "bg-emerald-500 text-white shadow-[0_10px_15px_-3px_rgba(16,185,129,0.3)] hover:bg-emerald-600 hover:-translate-y-0.5 cursor-pointer" 
-                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent font-bold"
-            )}
-          >
-            {isComplete ? "SUBMIT SEKARANG" : "JAWAB SEMUA (10)"}
-          </button>
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-3xl glass-dark text-white p-2.5 rounded-2xl z-30 shadow-2xl flex items-center justify-between gap-4">
+        <div className="flex gap-2.5">
+           <button
+              onClick={handlePrev}
+              disabled={currentIndex === 0}
+              className={cn(
+                 "p-3 rounded-xl transition-all flex items-center justify-center",
+                 currentIndex === 0 ? "text-slate-600 cursor-not-allowed" : "text-slate-300 hover:bg-white/10 hover:text-white"
+              )}
+           >
+              <ArrowLeft className="w-5 h-5" />
+           </button>
+           <button
+              onClick={handleNext}
+              disabled={currentIndex === questions.length - 1}
+              className={cn(
+                 "p-3 rounded-xl transition-all flex items-center justify-center",
+                 currentIndex === questions.length - 1 ? "text-slate-600 cursor-not-allowed" : "text-slate-300 hover:bg-white/10 hover:text-white"
+              )}
+           >
+             <ArrowRight className="w-5 h-5" />
+           </button>
         </div>
+        <button
+          disabled={!isComplete}
+          onClick={onSubmit}
+          className={cn(
+            "py-3 px-6 rounded-xl font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-white/20",
+            isComplete 
+              ? "bg-white text-slate-900 hover:bg-slate-100 shadow-sm" 
+              : "bg-white/10 text-slate-400 cursor-not-allowed"
+          )}
+        >
+          {isComplete ? "Kirim Hasil" : "Jawab Semua (10)"}
+        </button>
       </div>
     </motion.div>
   );
@@ -460,50 +526,59 @@ const ResultView: React.FC<{
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto space-y-12"
+      initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="max-w-3xl mx-auto space-y-8 pb-10"
     >
-      <div className={cn("p-10 sm:p-14 rounded-[32px] border text-center flex flex-col justify-center shadow-sm", resultColor)}>
-        <div className="flex justify-center mb-6">
-          <div className="p-5 bg-white/70 rounded-full shadow-sm backdrop-blur-md">
+      <div className={cn("p-8 sm:p-12 rounded-2xl border flex flex-col justify-center shadow-sm relative overflow-hidden", resultColor)}>
+        <div className="absolute top-0 right-0 p-8 opacity-20">
+          <div className="scale-[4] origin-top-right mix-blend-overlay">{resultIcon}</div>
+        </div>
+        <div className="flex justify-center mb-6 relative z-10">
+          <div className="p-4 bg-white/70 rounded-full shadow-sm backdrop-blur-md">
             {resultIcon}
           </div>
         </div>
-        <div className="text-[80px] font-black leading-none tracking-tighter mb-4 text-slate-800">{totalScore}<span className="text-[32px] font-bold text-slate-400 opacity-60">/10</span></div>
-        <div className="text-[11px] font-bold uppercase tracking-widest opacity-70 mb-2">Kesimpulan Hasil</div>
-        <h2 className="text-[28px] sm:text-[36px] font-extrabold mb-4 leading-tight">{resultCategory}</h2>
-        <p className="text-[16px] sm:text-[18px] opacity-80 max-w-xl mx-auto font-medium leading-relaxed">{resultDescription}</p>
+        <div className="text-center relative z-10">
+          <div className="text-6xl sm:text-7xl font-bold tracking-tight mb-4 text-slate-800">
+            {totalScore}<span className="text-3xl font-medium text-slate-400">/10</span>
+          </div>
+          <div className="text-xs font-semibold uppercase tracking-wider opacity-70 mb-2">Kesimpulan Hasil</div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight">{resultCategory}</h2>
+          <p className="text-sm sm:text-base opacity-80 max-w-xl mx-auto font-medium leading-relaxed">{resultDescription}</p>
+        </div>
       </div>
 
-      <div className="bg-white rounded-[24px] border border-slate-200 shadow-sm mt-8 border-t-4 border-t-purple-400">
-        <div className="p-6 sm:p-8 bg-purple-50/50 border-b border-slate-100 rounded-t-[24px] flex items-center gap-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <Sparkles className="w-5 h-5 text-purple-600" />
+      <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="p-6 bg-purple-50 flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg shadow-sm border border-purple-200/50">
+            <Sparkles className="w-4 h-4 text-purple-600" />
           </div>
-          <h3 className="font-bold text-[18px] sm:text-[20px] text-slate-800">
+          <h3 className="font-semibold text-lg text-slate-900 tracking-tight">
             Analisis & Saran
           </h3>
         </div>
         <div className="p-6 sm:p-8">
           {loadingAi ? (
-            <div className="flex flex-col items-center justify-center py-6 text-slate-400 space-y-3">
+            <div className="flex flex-col items-center justify-center py-10 text-slate-400 space-y-4">
               <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-              <span className="text-[14px] font-medium">AI sedang menyusun analisis untuk Anda...</span>
+              <span className="text-sm font-medium">Menyusun analisis...</span>
             </div>
           ) : aiAnalysis ? (
-            <div className="markdown-body prose prose-slate prose-p:leading-relaxed prose-li:marker:text-purple-400 prose-a:text-purple-600 max-w-none">
+            <div className="markdown-body prose prose-slate prose-sm sm:prose-base prose-p:leading-relaxed prose-a:text-purple-600 max-w-none">
               <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
             </div>
           ) : (
-             <div className="text-center py-6 text-slate-400 italic">Gagal memuat analisis.</div>
+             <div className="text-center py-8 text-slate-400 text-sm">Gagal memuat analisis.</div>
           )}
         </div>
       </div>
 
-      <div className="bg-white rounded-[24px] border border-slate-200 shadow-sm mt-8">
-        <div className="p-6 sm:p-8 bg-slate-50/50 border-b border-slate-200 rounded-t-[24px]">
-          <h3 className="font-bold text-[18px] sm:text-[20px] text-slate-800">
+      <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="p-6 bg-slate-50 border-b border-slate-100">
+          <h3 className="font-semibold text-lg text-slate-900 tracking-tight">
             Rekapitulasi Jawaban
           </h3>
         </div>
@@ -511,16 +586,16 @@ const ResultView: React.FC<{
           {questions.map((q, i) => {
             const score = answers[q.id];
             return (
-              <div key={q.id} className="p-6 sm:p-8 flex gap-5 sm:gap-6 items-start hover:bg-slate-50/50 transition-colors">
-                <span className="font-extrabold text-[20px] text-slate-300 shrink-0 select-none">{i + 1}.</span>
+              <div key={q.id} className="p-6 sm:p-8 flex gap-4 sm:gap-6 items-start hover:bg-slate-50/50 transition-subtle">
+                <span className="font-bold text-lg text-slate-300 shrink-0 select-none w-6">{i + 1}.</span>
                 <div className="flex-1">
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">{q.kategori}</span>
-                  <p className="text-slate-800 text-[15px] sm:text-[16px] font-medium leading-relaxed mb-4">{q.pertanyaan}</p>
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">{q.kategori}</span>
+                  <p className="text-slate-800 text-sm sm:text-base font-medium leading-relaxed mb-4">{q.pertanyaan}</p>
                   <span className={cn(
-                    "inline-flex items-center px-3 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider",
+                    "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold",
                     score === 1
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-slate-100 text-slate-600"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                      : "bg-slate-100 text-slate-600 border border-slate-200"
                   )}>
                     {score === 1 ? 'Iya (Skor: 1)' : 'Tidak (Skor: 0)'}
                   </span>
@@ -534,17 +609,17 @@ const ResultView: React.FC<{
       <div className="flex justify-center pt-8">
         <button
           onClick={onClose}
-          className="flex items-center justify-center min-w-[240px] gap-3 px-8 py-4 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 font-extrabold rounded-[16px] transition-all shadow-sm"
+          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 font-semibold rounded-xl transition-subtle shadow-sm text-sm"
         >
           {isHistoryMode ? (
             <>
-              <ArrowLeft className="w-5 h-5" />
-              KEMBALI KE DASHBOARD
+              <ArrowLeft className="w-4 h-4" />
+              Kembali ke Dashboard
             </>
           ) : (
             <>
-              <RefreshCcw className="w-5 h-5" />
-              KUESIONER BARU
+              <RefreshCcw className="w-4 h-4" />
+              Kuisioner Baru
             </>
           )}
         </button>
