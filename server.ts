@@ -19,7 +19,12 @@ async function startServer() {
       const prompt = `Anda adalah asisten AI ahli tumbuh kembang anak.
 Berdasarkan data kuesioner berikut, berikan analisis yang mendukung dan suportif kepada orang tua dengan format Markdown.
 Gunakan pengetahuan berikut secara mutlak:
-1. Jika kesimpulan hasil menunjukkan Perkembangan Anak Meragukan (skor < 9) maka sarankan intervensi stimulasi anak sebagai berikut: Stimulasi Fisik & Motorik: Kontrol kepala dengan menggendong bayi dalam posisi tegak, Latih duduk bertahap (dengan sandaran, lalu tanpa sandaran), Latih berdiri dengan pegangi ketiak bayi dan latih kakinya menapak/menyangga berat badan, Latih tangan menggenggam kuat, memegang benda dengan kedua tangan, meraih mainan, dan menjumput benda kecil (seperti biskuit). Stimulasi Interaksi & Komunikasi: Latih bayi menengok ke arah sumber suara, Latih bicara dengan merespons dan tirukan ocehan bayi (misal: "ma-ma", "pa-pa"), Ajak main cilukba dan melihat pantulan diri di cermin. Stimulasi Emosi & Perawatan: Beri rasa aman lewat tatapan mata, senyuman, pelukan, dan ciuman, Biasakan jadwal tidur dan makan yang teratur, Perhatikan hal yang disukai dan tidak disukai bayi untuk memahami kebutuhannya.
+1. Jika kesimpulan hasil menunjukkan Perkembangan Anak Meragukan (skor < 9) maka sarankan intervensi stimulasi anak sebagai berikut:
+- Stimulasi Motorik Kasar: Merangkak menuju mainan, Berdiri dengan bantuan/tarikan tangan, Berjalan sambil berpegangan.
+- Stimulasi Motorik Halus: Memegang mainan dengan kedua tangan, Memegang alat tulis dan mencoret-coret, Memasukkan dan mengeluarkan benda dari wadah.
+- Stimulasi Bahasa: Mengajak bicara dan memanggil nama bayi, Membacakan buku cerita bergambar, Mengajarkan kata-kata sederhana dari suara bayi.
+- Stimulasi Sosial dan Emosional: Memberikan pelukan dan senyuman, Mengenalkan suasana hati bayi, Bermain sosial sederhana (misalnya tepuk tangan).
+- Stimulasi Kognitif: Mengajarkan konsep sebab-akibat, Melatih mencari dan menemukan mainan, Melatih membuat bunyi-bunyian dari benda/mainan.
 2. Jika kesimpulan hasil menunjukkan Perkembangan Anak Sesuai (skor >= 9) maka sarankan dan ingatkan orang tua melakukan pengecekan tumbuh kembang anak di bulan selanjutnya.
 
 Data anak: Usia ${ageCategory === '3_bulan' ? '3 Bulan' : '6 Bulan'}

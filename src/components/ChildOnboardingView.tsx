@@ -59,33 +59,33 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
       className="max-w-2xl mx-auto space-y-8 mt-6"
     >
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 text-slate-700 shadow-sm border border-slate-200/60 mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm border border-slate-200 dark:border-slate-700/60 mb-2">
           <Baby className="w-8 h-8" />
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
           Profil Anak
         </h2>
-        <p className="text-slate-500 font-medium">
+        <p className="text-slate-500 dark:text-slate-400 font-medium">
           Silakan isi data anak untuk menyesuaikan informasi perkembangan.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-200/60 shadow-sm space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-6">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Nama Lengkap Anak</label>
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nama Lengkap Anak</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle font-medium text-slate-900 placeholder:text-slate-400"
+            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
             placeholder="e.g. Arjuna Putra"
             maxLength={100}
           />
         </div>
 
         <div className="space-y-3">
-           <label className="text-sm font-medium text-slate-700">Jenis Kelamin</label>
+           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Jenis Kelamin</label>
            <div className="grid grid-cols-2 gap-4">
              <button
                 type="button"
@@ -94,7 +94,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                   "py-4 rounded-xl border-2 font-semibold text-sm transition-subtle flex items-center justify-center gap-2",
                   gender === 'Laki-laki' 
                     ? "border-blue-500 bg-blue-50 text-blue-700" 
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300"
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
                 )}
              >
                 <span className="text-xl">👦</span> Laki-laki
@@ -106,7 +106,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                   "py-4 rounded-xl border-2 font-semibold text-sm transition-subtle flex items-center justify-center gap-2",
                   gender === 'Perempuan' 
                     ? "border-pink-500 bg-pink-50 text-pink-700" 
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300"
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
                 )}
              >
                 <span className="text-xl">👧</span> Perempuan
@@ -116,19 +116,19 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Usia (Bulan)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Usia (Bulan)</label>
             <input
               type="number"
               required
               min="0"
               value={age}
               onChange={(e) => setAge(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
               placeholder="0"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Tinggi Badan (cm)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tinggi Badan (cm)</label>
             <input
               type="number"
               required
@@ -136,12 +136,12 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
               step="0.1"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
               placeholder="0.0"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Berat Badan (kg)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Berat Badan (kg)</label>
             <input
               type="number"
               required
@@ -149,7 +149,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
               step="0.1"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
               placeholder="0.0"
             />
           </div>

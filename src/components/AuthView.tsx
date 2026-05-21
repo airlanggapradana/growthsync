@@ -65,7 +65,7 @@ export default function AuthView() {
       {/* Left Side Content (Logo & Text) */}
       <div className="hidden lg:flex flex-col justify-between absolute inset-0 z-10 p-12 xl:p-16 w-[calc(100%-540px)] pointer-events-none">
           <div className="flex items-center gap-2 pointer-events-auto">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-sm">
               <Baby className="w-6 h-6 text-white" />
             </div>
             <div className="font-semibold tracking-tight text-white text-xl">
@@ -84,7 +84,7 @@ export default function AuthView() {
 
       {/* Mobile Header */}
       <header className="lg:hidden absolute top-0 left-0 w-full p-6 z-30 flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+        <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900/10 backdrop-blur-md flex items-center justify-center border border-white/20">
           <Baby className="w-5 h-5 text-white" />
         </div>
         <div className="font-semibold tracking-tight text-white text-lg drop-shadow-sm">
@@ -97,14 +97,14 @@ export default function AuthView() {
         initial={{ opacity: 0, x: 20, filter: 'blur(4px)' }}
         animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className="w-full lg:max-w-[480px] xl:max-w-[520px] bg-white lg:rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.3)] relative z-20 min-h-screen lg:min-h-0 lg:h-[calc(100vh-48px)] flex flex-col px-8 py-10 sm:p-12 overflow-y-auto"
+        className="w-full lg:max-w-[480px] xl:max-w-[520px] bg-white dark:bg-slate-900 lg:rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.3)] relative z-20 min-h-screen lg:min-h-0 lg:h-[calc(100vh-48px)] flex flex-col px-8 py-10 sm:p-12 overflow-y-auto"
       >
         <div className="my-auto pt-16 lg:pt-0">
           <div className="flex flex-col items-start mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-50 tracking-tight mb-2">
               {isLogin ? 'Selamat Datang' : 'Buat Akun'}
             </h2>
-            <p className="text-slate-500 text-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               {isLogin ? 'Masuk ke akun Anda untuk melanjutkan.' : 'Daftar untuk mengakses kuisioner perkembangan.'}
             </p>
           </div>
@@ -117,26 +117,26 @@ export default function AuthView() {
             )}
             
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Email Address</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
                 placeholder="email@contoh.com"
                 required
               />
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Password</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={isLogin ? "current-password" : "new-password"}
-                className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
                 placeholder="Minimal 6 karakter"
                 required
                 minLength={6}
@@ -145,13 +145,13 @@ export default function AuthView() {
 
             {!isLogin && (
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Konfirmasi Password</label>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Konfirmasi Password</label>
                 <input 
                   type="password" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 bg-white border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
                   placeholder="Ulangi password"
                   required
                   minLength={6}
@@ -173,7 +173,7 @@ export default function AuthView() {
           </form>
 
           <div className="mt-8 text-center text-sm">
-            <span className="text-slate-500">
+            <span className="text-slate-500 dark:text-slate-400">
               {isLogin ? 'Belum punya akun? ' : 'Sudah punya akun? '}
             </span>
             <button 
@@ -183,15 +183,15 @@ export default function AuthView() {
                 setPassword('');
                 setConfirmPassword('');
               }}
-              className="text-slate-900 font-semibold hover:underline transition-all ml-1"
+              className="text-slate-900 dark:text-slate-50 font-semibold hover:underline transition-all ml-1"
             >
               {isLogin ? 'Daftar sekarang' : 'Masuk sekarang'}
             </button>
           </div>
           
-          <div className="mt-8 flex gap-3 items-start p-4 bg-slate-50/80 rounded-xl border border-slate-100">
+          <div className="mt-8 flex gap-3 items-start p-4 bg-slate-50/80 rounded-xl border border-slate-100 dark:border-slate-800">
             <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
               Aplikasi ini membutuhkan fitur otentikasi melalui Firebase. Pastikan opsi 'Email/Password' telah diaktifkan pada konsol Firebase Anda.
             </p>
           </div>
