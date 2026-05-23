@@ -557,96 +557,132 @@ const ResultView: React.FC<{
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="max-w-3xl mx-auto space-y-8 pb-10"
+      className="max-w-5xl mx-auto pb-10"
     >
-      <div className={cn("p-8 sm:p-12 rounded-2xl border flex flex-col justify-center shadow-sm relative overflow-hidden", resultColor)}>
-        <div className="absolute top-0 right-0 p-8 opacity-20">
-          <div className="scale-[4] origin-top-right mix-blend-overlay">{resultIcon}</div>
-        </div>
-        <div className="flex justify-center mb-6 relative z-10">
-          <div className="p-4 bg-white dark:bg-slate-900/70 rounded-full shadow-sm backdrop-blur-md">
-            {resultIcon}
+      <motion.div 
+        variants={{
+          hidden: { opacity: 0 },
+          show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+        }}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 md:grid-cols-12 gap-6"
+      >
+        
+        {/* Bento Box: Hasil Utama */}
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 20, scale: 0.95 },
+            show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+          }}
+          className={cn("col-span-1 md:col-span-5 p-8 rounded-3xl border flex flex-col items-center justify-center text-center shadow-sm relative overflow-hidden", resultColor)}
+        >
+          <div className="absolute -top-10 -right-10 opacity-10 pointer-events-none">
+            <div className="scale-[5] rotate-12">{resultIcon}</div>
           </div>
-        </div>
-        <div className="text-center relative z-10">
-          <div className="text-6xl sm:text-7xl font-bold tracking-tight mb-4 text-slate-800 dark:text-slate-200">
-            {totalScore}<span className="text-3xl font-medium text-slate-400">/10</span>
-          </div>
-          <div className="text-xs font-semibold uppercase tracking-wider opacity-70 mb-2">Kesimpulan Hasil</div>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight">{resultCategory}</h2>
-          <p className="text-sm sm:text-base opacity-80 max-w-xl mx-auto font-medium leading-relaxed">{resultDescription}</p>
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
-        <div className="p-6 bg-purple-50 flex items-center gap-3">
-          <div className="p-2 bg-purple-100 rounded-lg shadow-sm border border-purple-200/50">
-            <Sparkles className="w-4 h-4 text-purple-600" />
-          </div>
-          <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
-            Analisis & Saran
-          </h3>
-        </div>
-        <div className="p-6 sm:p-8">
-          {loadingAi ? (
-            <div className="flex flex-col items-center justify-center py-10 text-slate-400 space-y-4">
-              <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-              <span className="text-sm font-medium">Menyusun analisis...</span>
+          <div className="relative z-10 mb-6">
+            <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-full shadow-sm backdrop-blur-md inline-flex">
+              {resultIcon}
             </div>
-          ) : aiAnalysis ? (
-            <div className="markdown-body prose prose-slate prose-sm sm:prose-base prose-p:leading-relaxed prose-a:text-purple-600 max-w-none">
-              <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+          </div>
+          <div className="relative z-10">
+            <div className="text-sm font-semibold uppercase tracking-wider opacity-70 mb-3">Skor Anda</div>
+            <div className="text-7xl font-extrabold tracking-tight mb-2 text-slate-800 dark:text-slate-100">
+              {totalScore}<span className="text-3xl font-medium text-slate-400 opacity-60">/10</span>
             </div>
-          ) : (
-             <div className="text-center py-8 text-slate-400 text-sm">Gagal memuat analisis.</div>
-          )}
-        </div>
-      </div>
+            <h2 className="text-2xl font-bold mt-6 mb-3 tracking-tight">{resultCategory}</h2>
+            <p className="text-sm opacity-80 max-w-sm mx-auto font-medium leading-relaxed">{resultDescription}</p>
+          </div>
+        </motion.div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
-        <div className="p-6 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
-            Rekapitulasi Jawaban
-          </h3>
-        </div>
-        <div className="divide-y divide-slate-100">
-          {questions.map((q, i) => {
-            const score = answers[q.id];
-            return (
-              <div key={q.id} className="p-6 sm:p-8 flex gap-4 sm:gap-6 items-start hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-subtle">
-                <span className="font-bold text-lg text-slate-300 shrink-0 select-none w-6">{i + 1}.</span>
-                <div className="flex-1">
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">{q.kategori}</span>
-                  <p className="text-slate-800 dark:text-slate-200 text-sm sm:text-base font-medium leading-relaxed mb-4">{q.pertanyaan}</p>
-                  <span className={cn(
-                    "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold",
-                    score === 1
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
-                  )}>
-                    {score === 1 ? 'Iya (Skor: 1)' : 'Tidak (Skor: 0)'}
-                  </span>
-                </div>
+        {/* Bento Box: Analisis AI */}
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 20, scale: 0.95 },
+            show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+          }}
+          className="col-span-1 md:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden relative"
+        >
+          <div className="p-6 bg-purple-50/50 dark:bg-purple-900/10 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 shrink-0">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl border border-purple-200/50 dark:border-purple-800/50 text-purple-600 dark:text-purple-400">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
+              Analisis & Saran Ahli
+            </h3>
+          </div>
+          <div className="p-6 sm:p-8 flex-1 overflow-y-auto min-h-[300px]">
+            {loadingAi ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                <span className="text-sm font-medium">Menyusun analisis khusus untuk anak Anda...</span>
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ) : aiAnalysis ? (
+              <div className="markdown-body prose prose-slate prose-sm sm:prose-base dark:prose-invert prose-p:leading-relaxed prose-a:text-purple-600 dark:prose-a:text-purple-400 max-w-none">
+                <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+              </div>
+            ) : (
+               <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">Gagal memuat analisis.</div>
+            )}
+          </div>
+        </motion.div>
 
-      <div className="flex justify-center pt-8">
+        {/* Bento Box: Rekapitulasi */}
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 20, scale: 0.95 },
+            show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+          }}
+          className="col-span-1 md:col-span-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden"
+        >
+          <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700/60 flex items-center gap-3">
+            <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
+              Rekapitulasi Jawaban
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:gap-px bg-slate-100 dark:bg-slate-800">
+            {questions.map((q, i) => {
+              const score = answers[q.id];
+              return (
+                <div key={q.id} className="p-6 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors flex flex-col">
+                  <div className="flex items-start gap-4 mb-4 flex-1">
+                    <span className="font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-lg w-8 h-8 flex items-center justify-center shrink-0 shadow-sm text-sm">{i + 1}</span>
+                    <div>
+                      <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{q.kategori}</span>
+                      <p className="text-slate-700 dark:text-slate-200 text-sm font-medium leading-relaxed">{q.pertanyaan}</p>
+                    </div>
+                  </div>
+                  <div className="mt-auto pl-12">
+                    <span className={cn(
+                      "inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold transition-colors",
+                      score === 1
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
+                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                    )}>
+                      {score === 1 ? 'Iya (Skor: 1)' : 'Tidak (Skor: 0)'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      </motion.div>
+
+      <div className="flex justify-center pt-10">
         <button
           onClick={onClose}
-          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300 text-slate-700 dark:text-slate-300 font-semibold rounded-xl transition-subtle shadow-sm text-sm"
+          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-slate-900 dark:bg-white border rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all shadow-md text-sm"
         >
           {isHistoryMode ? (
             <>
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-5 h-5" />
               Kembali ke Dashboard
             </>
           ) : (
             <>
-              <RefreshCcw className="w-4 h-4" />
-              Kuisioner Baru
+              <Check className="w-5 h-5" />
+              Selesai & Kembali
             </>
           )}
         </button>

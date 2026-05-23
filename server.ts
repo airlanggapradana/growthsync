@@ -52,8 +52,8 @@ Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poi
       const { lat, lng } = req.body;
       
       const prompt = `Carikan daftar puskesmas terdekat dari koordinat lokasi ini: Latitude ${lat}, Longitude ${lng}. 
-Berikan rekomendasi sekitar 3-5 puskesmas beserta detail alamat lengkap dan nomor telepon/HP jika tersedia.
-Sajikan dalam format Markdown ringkas yang mudah dibaca. Tidak perlu menyebutkan ulang koordinasi secara teknis.`;
+Berikan rekomendasi sekitar 3-5 puskesmas beserta detail estimasi jarak dari lokasi saya, alamat lengkap, dan nomor telepon/HP jika tersedia.
+Sajikan dalam format Markdown ringkas yang mudah dibaca. Tidak perlu menyebutkan ulang koordinat secara teknis.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',

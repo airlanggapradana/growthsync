@@ -86,7 +86,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
           initial={{ opacity: 0, scale: 0.95, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          className="relative bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl md:rounded-[32px] shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+          className="relative bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl md:rounded-[32px] shadow-xl overflow-hidden flex flex-col h-[85vh] md:h-[700px] max-h-[95vh]"
         >
           <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
@@ -108,7 +108,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
 
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
             {/* Sidebar list (Gemini recommendation) */}
-            <div className="w-full md:w-2/5 bg-slate-50/50 dark:bg-slate-900 overflow-y-auto border-r border-slate-100 dark:border-slate-800">
+            <div className="w-full md:w-[45%] h-1/2 md:h-full bg-slate-50/50 dark:bg-slate-900 overflow-y-auto border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 flex-shrink-0">
               {locationError ? (
                 <div className="p-8 flex flex-col items-center justify-center text-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
@@ -154,7 +154,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
             </div>
 
             {/* Map Area */}
-            <div className="w-full md:w-3/5 h-[300px] md:h-[500px] relative bg-slate-100 dark:bg-slate-800">
+            <div className="w-full md:w-[55%] flex-1 relative bg-slate-100 dark:bg-slate-800">
               {!API_KEY || API_KEY === 'YOUR_API_KEY' ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm">
                   <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Google Maps API Key Required</h3>
