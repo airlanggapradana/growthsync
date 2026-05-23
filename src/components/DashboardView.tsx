@@ -4,10 +4,11 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { ChildProfile, AgeCategory, QuestionnaireResult } from '../types';
-import { Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, Bell, AlertTriangle } from 'lucide-react';
+import { Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, Bell, AlertTriangle, Map as MapIcon } from 'lucide-react';
 import { format, differenceInMonths } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '../lib/utils';
+import PuskesmasMapModal from './PuskesmasMapModal';
 
 export default function DashboardView({ 
   profiles, 
@@ -28,6 +29,7 @@ export default function DashboardView({
   const [history, setHistory] = useState<QuestionnaireResult[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const profile = profiles.find(p => p.id === activeProfileId);
 
@@ -147,6 +149,12 @@ export default function DashboardView({
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1.5">Pantau, prioritaskan, dan capai perkembangan optimal anak Anda.</p>
          </div>
          <div className="flex items-center gap-3">
+             <button 
+               onClick={() => setIsMapOpen(true)}
+               className="px-5 py-2.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 rounded-full text-sm font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-800/50 transition-colors shadow-sm flex items-center gap-2"
+             >
+               <MapIcon className="w-4 h-4" /> Cari Puskesmas
+             </button>
              <button 
                onClick={() => {
                   if (profile.ageInMonths <= 4) onStartQuestionnaire('3_bulan');
@@ -360,6 +368,7 @@ export default function DashboardView({
             </div>
          </div>
       </div>
+      <PuskesmasMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
     </motion.div>
   );
 }
