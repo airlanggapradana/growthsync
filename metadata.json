@@ -1,7 +1,9 @@
 {
   "name": "Kuesioner Tumbuh Kembang Anak",
   "description": "Aplikasi skrining perkembangan anak (KPSP) untuk usia 3 & 6 bulan dengan antarmuka yang ramah orang tua.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": [
+    "geolocation"
+  ],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]

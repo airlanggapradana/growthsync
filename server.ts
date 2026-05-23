@@ -47,6 +47,29 @@ Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poi
     }
   });
 
+  app.post("/api/nearby-puskesmas", async (req, res) => {
+    try {
+      const { lat, lng } = req.body;
+      
+      const prompt = `Carikan daftar puskesmas terdekat dari koordinat lokasi ini: Latitude ${lat}, Longitude ${lng}. 
+Berikan rekomendasi sekitar 3-5 puskesmas beserta detail alamat lengkap dan nomor telepon/HP jika tersedia.
+Sajikan dalam format Markdown ringkas yang mudah dibaca. Tidak perlu menyebutkan ulang koordinasi secara teknis.`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          tools: [{ googleSearch: {} }],
+        }
+      });
+
+      res.json({ result: response.text });
+    } catch (error) {
+      console.error('Error finding puskesmas:', error);
+      res.status(500).json({ error: 'Failed to find puskesmas' });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
