@@ -1,3 +1,12 @@
+export type UserRole = 'orang_tua' | 'nakes';
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  role: UserRole;
+  assignedNakesId?: string | null;
+}
+
 export type AgeCategory = '3_bulan' | '6_bulan';
 export type DevelopmentCategory = 'Gerak Kasar' | 'Gerak Halus' | 'Sosialisasi dan Kemandirian' | 'Bicara dan Bahasa';
 

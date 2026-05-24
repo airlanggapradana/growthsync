@@ -1,21 +1,26 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AgeCategory, Answer, ChildProfile } from './types';
+import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
 import AuthView from './components/AuthView';
 import ChildOnboardingView from './components/ChildOnboardingView';
 import DashboardView from './components/DashboardView';
+import NakesDashboardView from './components/NakesDashboardView';
+import ChatView from './components/ChatView';
+import ParentChatList from './components/ParentChatList';
 import ReactMarkdown from 'react-markdown';
 
-type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL';
+type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [targetChatUser, setTargetChatUser] = useState<any>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -39,7 +44,7 @@ export default function App() {
 
   const [view, setView] = useState<ViewState>('HOME');
   const [age, setAge] = useState<AgeCategory | null>(null);
-  const [answers, setAnswers] = useState<Record<string, number>>({}); // questionId -> score (0 or 1)
+  const [answers, setAnswers] = useState<Record<string, number>>({});
   const [selectedHistory, setSelectedHistory] = useState<any>(null);
   const [currentResultId, setCurrentResultId] = useState<string | null>(null);
 
@@ -49,25 +54,43 @@ export default function App() {
       if (currentUser) {
         setLoadingProfile(true);
         try {
-          const q = query(collection(db, 'childProfiles'), where('userId', '==', currentUser.uid));
-          const querySnapshot = await getDocs(q);
-          const profiles: ChildProfile[] = [];
-          querySnapshot.forEach((docSnap) => {
-            profiles.push({ id: docSnap.id, ...docSnap.data() } as ChildProfile);
-          });
-          setChildProfiles(profiles);
-          if (profiles.length > 0) {
-            setActiveProfileId(profiles[0].id || null);
-            setView('DASHBOARD');
+          // Fetch user profile to get role
+          const userDocSnap = await getDoc(doc(db, 'users', currentUser.uid));
+          let currentRole = 'orang_tua'; // default
+          if (userDocSnap.exists()) {
+            const data = userDocSnap.data();
+            currentRole = data.role || 'orang_tua';
+            setUserProfile(data as UserProfile);
           } else {
-            setView('ONBOARDING');
+            // Provide a default user profile if none exists
+            const fallbackProfile: UserProfile = { uid: currentUser.uid, email: currentUser.email || '', role: 'orang_tua' };
+            setUserProfile(fallbackProfile);
+          }
+
+          if (currentRole === 'nakes') {
+             setView('NAKES_DASHBOARD');
+          } else {
+            const q = query(collection(db, 'childProfiles'), where('userId', '==', currentUser.uid));
+            const querySnapshot = await getDocs(q);
+            const profiles: ChildProfile[] = [];
+            querySnapshot.forEach((docSnap) => {
+              profiles.push({ id: docSnap.id, ...docSnap.data() } as ChildProfile);
+            });
+            setChildProfiles(profiles);
+            if (profiles.length > 0) {
+              setActiveProfileId(profiles[0].id || null);
+              setView('DASHBOARD');
+            } else {
+              setView('ONBOARDING');
+            }
           }
         } catch (err) {
-          console.error("Error fetching child profiles", err);
+          console.error("Error fetching user data", err);
         } finally {
           setLoadingProfile(false);
         }
       } else {
+        setUserProfile(null);
         setChildProfiles([]);
         setActiveProfileId(null);
       }
@@ -156,10 +179,10 @@ export default function App() {
         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Menu</div>
         <nav className="space-y-1.5 mb-8">
            <button 
-             onClick={() => setView('DASHBOARD')}
-             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+             onClick={() => setView(userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
+             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
            >
-             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
              Dashboard
            </button>
            <button 
@@ -169,13 +192,24 @@ export default function App() {
              <CheckCircle2 className="w-5 h-5" />
              Tugas <span className="ml-auto text-[9px] bg-slate-200 text-slate-500 dark:text-slate-400 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
            </button>
-           <button 
-             onClick={() => setView('ONBOARDING')}
-             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
-           >
-             <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
-             Tambah Anak
-           </button>
+           {userProfile?.role !== 'nakes' && (
+             <button 
+               onClick={() => setView('ONBOARDING')}
+               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+             >
+               <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+               Tambah Anak
+             </button>
+           )}
+           {userProfile?.role === 'orang_tua' && (
+             <button 
+               onClick={() => setView('PARENT_CHAT_LIST')}
+               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+             >
+               <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+               Konsultasi Nakes
+             </button>
+           )}
         </nav>
 
         <div className="mt-auto">
@@ -246,7 +280,12 @@ export default function App() {
                     {user.email?.charAt(0) || 'U'}
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-900 dark:text-slate-50 leading-none mb-1">{user.email?.split('@')[0]}</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-50 leading-none mb-1 flex items-center gap-2">
+                      {user.email?.split('@')[0]}
+                      {userProfile?.role === 'nakes' && (
+                        <span className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider">Nakes</span>
+                      )}
+                    </span>
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-none">{user.email}</span>
                  </div>
               </div>
@@ -314,6 +353,42 @@ export default function App() {
               }}
               isHistoryMode={true}
             />
+          )}
+          {view === 'NAKES_DASHBOARD' && userProfile && (
+             <NakesDashboardView 
+               key="nakes_dashboard"
+               userProfile={userProfile}
+               onOpenChat={(targetParent) => {
+                 setTargetChatUser(targetParent);
+                 setView('NAKES_CHAT');
+               }}
+             />
+          )}
+          {view === 'NAKES_CHAT' && userProfile && targetChatUser && (
+             <ChatView 
+               key="nakes_chat"
+               currentUser={userProfile}
+               targetUser={targetChatUser}
+               onBack={() => setView('NAKES_DASHBOARD')}
+             />
+          )}
+          {view === 'PARENT_CHAT_LIST' && userProfile && (
+             <ParentChatList 
+               key="parent_chat_list"
+               userProfile={userProfile}
+               onOpenChat={(nakes) => {
+                 setTargetChatUser(nakes);
+                 setView('PARENT_CHAT');
+               }}
+             />
+          )}
+          {view === 'PARENT_CHAT' && userProfile && targetChatUser && (
+             <ChatView 
+               key="parent_chat"
+               currentUser={userProfile}
+               targetUser={targetChatUser}
+               onBack={() => setView('PARENT_CHAT_LIST')}
+             />
           )}
         </AnimatePresence>
         </div>

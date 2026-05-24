@@ -31,24 +31,30 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && userId == request.auth.uid;
+      allow update: if isSignedIn() && (userId == request.auth.uid || incoming().diff(existing()).affectedKeys().hasOnly(['assignedNakesId']));
+      allow delete: if isSignedIn() && userId == request.auth.uid;
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if isSignedIn();
+    }
+
     match /childProfiles/{profileId} {
-      allow read: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isSignedIn() && isValidId(profileId) && isValidChildProfile(incoming());
       allow update: if isSignedIn() && existing().userId == request.auth.uid && isValidChildProfile(incoming());
-      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
     }
     
     match /questionnaireResults/{resultId} {
-      allow read: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isSignedIn() && isValidId(resultId) && isValidQuestionnaireResult(incoming());
       allow update: if isSignedIn() && existing().userId == request.auth.uid 
         && incoming().diff(existing()).affectedKeys().hasOnly(['aiAnalysis'])
         && incoming().aiAnalysis is string && incoming().aiAnalysis.size() <= 10000;
-      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
-    }
-
-    match /users/{userId} {
-      allow read, write: if isSignedIn() && userId == request.auth.uid;
     }
   }
 }
