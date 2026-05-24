@@ -35,10 +35,11 @@ function RouteDisplay({ origin, destination }: {
     }
     
     routesLib.Route.computeRoutes({
-      origin,
-      destination,
+      origin: { lat: origin.lat, lng: origin.lng },
+      destination: { lat: destination.lat, lng: destination.lng },
       travelMode: 'DRIVING',
       fields: ['path', 'distanceMeters', 'durationMillis', 'viewport'],
+      routingPreference: 'TRAFFIC_AWARE'
     }).then(({ routes }) => {
       polylinesRef.current.forEach(p => p.setMap(null));
       if (routes?.[0]) {
@@ -47,7 +48,9 @@ function RouteDisplay({ origin, destination }: {
         polylinesRef.current = newPolylines;
         if (routes[0].viewport) map.fitBounds(routes[0].viewport);
       }
-    }).catch(console.error);
+    }).catch(error => {
+      console.error("Directions routing failed:", error);
+    });
 
     return () => polylinesRef.current.forEach(p => p.setMap(null));
   }, [routesLib, map, origin, destination]);
