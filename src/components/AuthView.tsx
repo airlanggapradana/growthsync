@@ -64,13 +64,8 @@ export default function AuthView() {
       
       {/* Left Side Content (Logo & Text) */}
       <div className="hidden lg:flex flex-col justify-between absolute inset-0 z-10 p-12 xl:p-16 w-[calc(100%-540px)] pointer-events-none">
-          <div className="flex items-center gap-2 pointer-events-auto">
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-sm">
-              <Baby className="w-6 h-6 text-white" />
-            </div>
-            <div className="font-semibold tracking-tight text-white text-xl">
-              Kuisioner<span className="text-white/60">Anak</span>
-            </div>
+          <div className="flex items-center pointer-events-auto">
+            <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-12 w-auto object-contain" />
           </div>
           <div className="pointer-events-auto max-w-xl">
                <h1 className="text-5xl xl:text-6xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
@@ -83,13 +78,8 @@ export default function AuthView() {
       </div>
 
       {/* Mobile Header */}
-      <header className="lg:hidden absolute top-0 left-0 w-full p-6 z-30 flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-          <Baby className="w-5 h-5 text-white" />
-        </div>
-        <div className="font-semibold tracking-tight text-white text-lg drop-shadow-sm">
-          Kuisioner<span className="text-white/80">Anak</span>
-        </div>
+      <header className="lg:hidden absolute top-0 left-0 w-full p-6 z-30 flex items-center">
+        <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain" />
       </header>
 
       {/* Right Side Card Form */}

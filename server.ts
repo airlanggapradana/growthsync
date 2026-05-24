@@ -52,18 +52,41 @@ Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poi
       const { lat, lng } = req.body;
       
       const prompt = `Carikan daftar puskesmas terdekat dari koordinat lokasi ini: Latitude ${lat}, Longitude ${lng}. 
-Berikan rekomendasi sekitar 3-5 puskesmas beserta detail estimasi jarak dari lokasi saya, alamat lengkap, dan nomor telepon/HP jika tersedia.
-Sajikan dalam format Markdown ringkas yang mudah dibaca. Tidak perlu menyebutkan ulang koordinat secara teknis.`;
+Berikan rekomendasi 3-5 puskesmas beserta detail estimasi jarak, alamat lengkap, nomor telepon, dan koordinat marker (latitude, longitude).
+Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesmas" yang berisi array of objects. Setiap object harus memiliki tipe data dan key berikut persis:
+{
+  "puskesmas": [
+    {
+      "name": "Nama Puskesmas",
+      "address": "Alamat Lengkap",
+      "distance": "Jarak (misal 2.5 km)",
+      "phone": "Nomor Telepon",
+      "lat": -6.213,
+      "lng": 106.845
+    }
+  ]
+}`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
-          tools: [{ googleSearch: {} }],
+          tools: [{ googleSearch: {} }]
         }
       });
 
-      res.json({ result: response.text });
+      let parsedResult;
+      try {
+        const text = response.text || "{}";
+        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        const jsonString = jsonMatch ? jsonMatch[1] : text;
+        parsedResult = JSON.parse(jsonString);
+      } catch (e) {
+        console.error("JSON parse error:", response.text);
+        parsedResult = { puskesmas: [] };
+      }
+
+      res.json({ result: parsedResult });
     } catch (error) {
       console.error('Error finding puskesmas:', error);
       res.status(500).json({ error: 'Failed to find puskesmas' });

@@ -149,13 +149,8 @@ export default function App() {
     <div className="flex h-screen bg-[#F4F5F7] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
       {/* Sidebar (Hidden on mobile) */}
       <aside className="w-[260px] hidden lg:flex flex-col pt-8 pb-6 px-5 shrink-0 overflow-y-auto">
-        <div className="flex items-center gap-3 px-3 mb-10">
-           <div className="w-10 h-10 bg-[#1b4332] rounded-xl flex items-center justify-center shadow-sm">
-             <Baby className="w-6 h-6 text-white" />
-           </div>
-           <div className="font-bold tracking-tight text-slate-900 dark:text-slate-50 text-xl">
-              Kuisioner<span className="text-emerald-700">Anak</span>
-           </div>
+        <div className="flex items-center px-3 mb-5">
+           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-16 w-auto object-contain" />
         </div>
 
         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Menu</div>
@@ -207,11 +202,8 @@ export default function App() {
         
         {/* Mobile Header */}
         <header className="lg:hidden h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 shadow-sm z-30">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center">
-              <Baby className="w-5 h-5 text-white" />
-            </div>
-            <div className="font-semibold tracking-tight text-slate-900 dark:text-slate-50 text-lg">Kuisioner<span className="text-emerald-700">Anak</span></div>
+          <div className="flex items-center">
+            <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 bg-slate-50 dark:bg-slate-800 rounded-lg">
