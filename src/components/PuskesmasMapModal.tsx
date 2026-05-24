@@ -61,6 +61,16 @@ function RouteDisplay({ origin, destination, onError }: {
   return null;
 }
 
+function MapUpdater({ center }: { center: google.maps.LatLngLiteral }) {
+  const map = useMap();
+  useEffect(() => {
+    if (map) {
+      map.panTo(center);
+    }
+  }, [map, center]);
+  return null;
+}
+
 export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModalProps) {
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -216,7 +226,10 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                     {aiResult.map((p, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setSelectedPuskesmas(p)}
+                        onClick={() => {
+                          setSelectedPuskesmas(p);
+                          setMapCenter({ lat: p.lat, lng: p.lng });
+                        }}
                         className={`w-full text-left p-4 rounded-xl border transition-all ${selectedPuskesmas?.name === p.name ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                       >
                          <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-start justify-between gap-2">
@@ -263,15 +276,14 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
               ) : (
                 <APIProvider apiKey={API_KEY} version="weekly">
                   <Map
-                    center={selectedPuskesmas ? { lat: selectedPuskesmas.lat, lng: selectedPuskesmas.lng } : mapCenter}
+                    defaultCenter={{ lat: -6.2088, lng: 106.8456 }} // Default Jakarta
                     zoom={14}
                     mapId="PUSKESMAS_MAP_ID"
                     internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
                     style={{width: '100%', height: '100%'}}
-                    onCenterChanged={(e) => {
-                      if (!selectedPuskesmas) setMapCenter(e.detail.center);
-                    }}
+                    gestureHandling="greedy"
                   >
+                    <MapUpdater center={mapCenter} />
                     {userLocation && (
                       <AdvancedMarker position={userLocation} title="Lokasi Anda" zIndex={10}>
                         <div className="w-5 h-5 bg-blue-500 rounded-full border-[3px] border-white shadow-[0_0_0_4px_rgba(59,130,246,0.2)]" />
@@ -283,7 +295,10 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                          key={idx} 
                          position={{ lat: p.lat, lng: p.lng }}
                          title={p.name}
-                         onClick={() => setSelectedPuskesmas(p)}
+                         onClick={() => {
+                           setSelectedPuskesmas(p);
+                           setMapCenter({ lat: p.lat, lng: p.lng });
+                         }}
                          zIndex={selectedPuskesmas?.name === p.name ? 5 : 1}
                        >
                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white shadow-md border-2 border-white transition-transform ${selectedPuskesmas?.name === p.name ? 'bg-emerald-500 scale-110' : 'bg-slate-400 scale-100 hover:scale-110'}`}>
