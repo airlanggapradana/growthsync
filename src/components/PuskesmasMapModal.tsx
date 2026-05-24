@@ -19,9 +19,10 @@ interface Puskesmas {
   lng: number;
 }
 
-function RouteDisplay({ origin, destination }: {
+function RouteDisplay({ origin, destination, onError }: {
   origin?: google.maps.LatLngLiteral | null;
   destination?: google.maps.LatLngLiteral | null;
+  onError: (error: string | null) => void;
 }) {
   const map = useMap();
   const routesLib = useMapsLibrary('routes');
@@ -34,6 +35,7 @@ function RouteDisplay({ origin, destination }: {
       return;
     }
     
+    onError(null);
     routesLib.Route.computeRoutes({
       origin: { lat: origin.lat, lng: origin.lng },
       destination: { lat: destination.lat, lng: destination.lng },
@@ -50,10 +52,11 @@ function RouteDisplay({ origin, destination }: {
       }
     }).catch(error => {
       console.error("Directions routing failed:", error);
+      onError("Fitur rute (Routes API) belum diaktifkan pada project Google Cloud Platform (API Key) yang Anda gunakan.");
     });
 
     return () => polylinesRef.current.forEach(p => p.setMap(null));
-  }, [routesLib, map, origin, destination]);
+  }, [routesLib, map, origin, destination, onError]);
 
   return null;
 }
@@ -67,6 +70,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
   const [aiError, setAiError] = useState<string | null>(null);
   const [selectedPuskesmas, setSelectedPuskesmas] = useState<Puskesmas | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   const requestLocation = () => {
     setLocationError(null);
@@ -94,6 +98,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
     setAiResult(null);
     setAiError(null);
     setSelectedPuskesmas(null);
+    setRouteError(null);
     try {
       const res = await fetch('/api/nearby-puskesmas', {
         method: 'POST',
@@ -225,8 +230,15 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                             </div>
                          )}
                          {selectedPuskesmas?.name === p.name && (
-                            <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 py-1.5 px-3 rounded-lg w-max">
-                              <Navigation className="w-3.5 h-3.5" /> Rute Ditampilkan
+                            <div className="mt-3">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 py-1.5 px-3 rounded-lg w-max">
+                                <Navigation className="w-3.5 h-3.5" /> Rute Ditampilkan
+                              </div>
+                              {routeError && (
+                                <div className="mt-2 text-[10px] text-rose-500 bg-rose-50 dark:bg-rose-900/20 p-2 text-left rounded-lg border border-rose-100 dark:border-rose-800/50 font-medium line-clamp-3">
+                                  {routeError}
+                                </div>
+                              )}
                             </div>
                          )}
                       </button>
@@ -284,6 +296,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                        <RouteDisplay 
                          origin={userLocation} 
                          destination={{ lat: selectedPuskesmas.lat, lng: selectedPuskesmas.lng }} 
+                         onError={setRouteError}
                        />
                     )}
                   </Map>
