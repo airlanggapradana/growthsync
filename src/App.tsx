@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
@@ -13,6 +13,8 @@ import DashboardView from './components/DashboardView';
 import NakesDashboardView from './components/NakesDashboardView';
 import ChatView from './components/ChatView';
 import ParentChatList from './components/ParentChatList';
+import { toJpeg } from 'html-to-image';
+import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
 
 type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT';
@@ -325,6 +327,7 @@ export default function App() {
               key="result"
               age={age}
               answers={answers}
+              profile={activeProfile}
               onClose={handleResetToDashboard}
               isHistoryMode={false}
               onAnalysisGenerated={async (analysis) => {
@@ -346,6 +349,7 @@ export default function App() {
               key="history_detail"
               age={selectedHistory.ageCategory as AgeCategory}
               answers={selectedHistory.answers}
+              profile={childProfiles.find(p => p.id === selectedHistory.profileId) || activeProfile}
               existingAnalysis={selectedHistory.aiAnalysis}
               onClose={() => {
                 setSelectedHistory(null);
@@ -551,13 +555,24 @@ const ResultView: React.FC<{
   answers: Record<string, number>;
   onClose: () => void;
   isHistoryMode: boolean;
+  profile?: ChildProfile;
   existingAnalysis?: string;
   onAnalysisGenerated?: (analysis: string) => void;
-}> = ({ age, answers, onClose, isHistoryMode, existingAnalysis, onAnalysisGenerated }) => {
+}> = ({ age, answers, onClose, isHistoryMode, profile, existingAnalysis, onAnalysisGenerated }) => {
   const questions = QUESTIONS_DATA[age];
   const totalScore = useMemo(() => {
     return Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
   }, [answers]);
+
+  const categoryScores = useMemo(() => {
+    const scores: Record<string, { total: number, max: number }> = {};
+    questions.forEach(q => {
+      if (!scores[q.kategori]) scores[q.kategori] = { total: 0, max: 0 };
+      scores[q.kategori].max += 1;
+      scores[q.kategori].total += answers[q.id] || 0;
+    });
+    return scores;
+  }, [answers, questions]);
 
   let resultCategory = "";
   let resultColor = "";
@@ -566,6 +581,47 @@ const ResultView: React.FC<{
 
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(existingAnalysis || null);
   const [loadingAi, setLoadingAi] = useState(!existingAnalysis);
+  
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPdf = async () => {
+    try {
+      setExportingPdf(true);
+
+      setTimeout(async () => {
+        const element = pdfRef.current;
+        if (!element) {
+          setExportingPdf(false);
+          return;
+        }
+
+        try {
+          const dataUrl = await toJpeg(element, { quality: 0.98, backgroundColor: '#ffffff', pixelRatio: 2 });
+          
+          const pdfWidthIn = 8.27; // A4 width in inches
+          const pdfHeightIn = (element.offsetHeight * pdfWidthIn) / element.offsetWidth;
+          
+          const pdf = new jsPDF({
+            orientation: pdfHeightIn > pdfWidthIn ? 'portrait' : 'landscape',
+            unit: 'in',
+            format: [pdfWidthIn, pdfHeightIn]
+          });
+
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidthIn, pdfHeightIn);
+          pdf.save(`Laporan_Perkembangan_${profile?.name || 'Anak'}.pdf`);
+        } catch(e) {
+             console.error("PDF generation error: ", e);
+        } finally {
+            setExportingPdf(false);
+        }
+      }, 500);
+
+    } catch (err) {
+      console.error(err);
+      setExportingPdf(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -736,7 +792,20 @@ const ResultView: React.FC<{
         </motion.div>
       </motion.div>
 
-      <div className="flex justify-center pt-10">
+      <div className="flex justify-center gap-4 pt-10">
+        <button
+          onClick={handleExportPdf}
+          disabled={exportingPdf}
+          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {exportingPdf ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Download className="w-5 h-5" />
+          )}
+          {exportingPdf ? 'Menyiapkan PDF...' : 'Export PDF'}
+        </button>
+
         <button
           onClick={onClose}
           className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-slate-900 dark:bg-white border rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all shadow-md text-sm"
@@ -753,6 +822,121 @@ const ResultView: React.FC<{
             </>
           )}
         </button>
+      </div>
+
+      {/* Hidden PDF Template */}
+      <div className="absolute top-[9999px] left-[9999px] z-[-1] pointer-events-none overflow-hidden">
+        <div ref={pdfRef} className="p-8 w-[800px] print-container font-sans" style={{ backgroundColor: '#ffffff', color: '#0f172a', display: 'block' }}>
+           <div className="flex items-center gap-4 mb-8 pb-6 border-b" style={{ borderColor: '#e2e8f0' }}>
+             <div className="p-3 rounded-xl" style={{ backgroundColor: '#ecfdf5' }}>
+               <Activity className="w-8 h-8" style={{ color: '#059669' }} />
+             </div>
+             <div>
+               <h1 className="text-2xl font-bold" style={{ color: '#0f172a' }}>Laporan Hasil Skrining Perkembangan</h1>
+               <p style={{ color: '#64748b' }}>Aplikasi Kuisioner Tumbuh Kembang Anak</p>
+             </div>
+           </div>
+
+           <div className="grid grid-cols-2 gap-6 mb-8">
+             <div className="p-5 rounded-xl border" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#64748b' }}>Data Anak</h3>
+                <div className="space-y-3">
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Nama Lengkap</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.name || '-'}</span></div>
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Usia</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.ageInMonths || '-'} Bulan</span></div>
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Jenis Kelamin</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.gender || '-'}</span></div>
+                  <div className="flex gap-4">
+                     <div><span className="block text-xs" style={{ color: '#64748b' }}>Tinggi Badan</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.heightCm || '-'} cm</span></div>
+                     <div><span className="block text-xs" style={{ color: '#64748b' }}>Berat Badan</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.weightKg || '-'} kg</span></div>
+                     {profile?.headCircumferenceCm && (
+                       <div><span className="block text-xs" style={{ color: '#64748b' }}>Lingkar Kepala</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile.headCircumferenceCm} cm</span></div>
+                     )}
+                  </div>
+                </div>
+             </div>
+             <div className="p-5 rounded-xl border flex flex-col justify-center items-center text-center" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>Hasil Skrining (Usia {age === '3_bulan' ? '3' : '6'} Bulan)</h3>
+                <div className="text-5xl font-extrabold mb-2" style={{ color: '#1e293b' }}>{totalScore}<span className="text-xl" style={{ color: '#94a3b8' }}>/10</span></div>
+                <div className="font-bold text-lg mb-1" style={{ color: '#059669' }}>{resultCategory}</div>
+                <p className="text-xs px-4" style={{ color: '#475569' }}>{resultDescription}</p>
+             </div>
+           </div>
+
+           <div className="mb-8">
+             <h3 className="text-base font-bold mb-4 flex items-center gap-2 border-b pb-2" style={{ color: '#0f172a', borderColor: '#e2e8f0' }}>
+               Rincian Parameter Skrining
+             </h3>
+             <div className="grid grid-cols-2 gap-4">
+               {Object.entries(categoryScores).map(([cat, score]) => (
+                 <div key={cat} className="p-4 rounded-lg border flex justify-between items-center" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
+                   <div className="text-xs font-bold uppercase" style={{ color: '#64748b' }}>{cat}</div>
+                   <div className="font-bold text-lg" style={{ color: score.total === score.max ? '#059669' : '#d97706' }}>{score.total} / {score.max}</div>
+                 </div>
+               ))}
+             </div>
+           </div>
+
+           <div className="mb-8">
+             <h3 className="text-base font-bold mb-4 flex items-center gap-2 border-b pb-2" style={{ color: '#0f172a', borderColor: '#e2e8f0' }}>
+               Grafik Pertumbuhan (Antropometri)
+             </h3>
+             <div className="p-5 rounded-xl border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
+                <p className="text-xs mb-4" style={{ color: '#64748b' }}>Posisi indikator merupakan estimasi relatif terhadap standar pertumbuhan anak seusianya (kurva KMS/WHO).</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold mb-1">
+                      <span style={{ color: '#0f172a' }}>Berat Badan: {profile?.weightKg || '-'} kg</span>
+                      <span style={{ color: profile?.weightKg && profile.weightKg > 3 ? '#10b981' : '#f59e0b' }}>{profile?.weightKg && profile.weightKg > 3 ? 'Normal' : 'Perlu Pantauan'}</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
+                       <div className="h-full rounded-full" style={{ width: profile?.weightKg ? Math.min(Math.max((profile.weightKg / 10) * 100, 10), 100) + '%' : '0%', backgroundColor: profile?.weightKg && profile.weightKg > 3 ? '#10b981' : '#f59e0b' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold mb-1">
+                      <span style={{ color: '#0f172a' }}>Tinggi Badan: {profile?.heightCm || '-'} cm</span>
+                      <span style={{ color: profile?.heightCm && profile.heightCm > 50 ? '#10b981' : '#f59e0b' }}>{profile?.heightCm && profile.heightCm > 50 ? 'Normal' : 'Perlu Pantauan'}</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
+                       <div className="h-full rounded-full" style={{ width: profile?.heightCm ? Math.min(Math.max((profile.heightCm / 80) * 100, 10), 100) + '%' : '0%', backgroundColor: profile?.heightCm && profile.heightCm > 50 ? '#10b981' : '#f59e0b' }}></div>
+                    </div>
+                  </div>
+                  
+                  {profile?.headCircumferenceCm && (
+                    <div>
+                      <div className="flex justify-between text-xs font-semibold mb-1">
+                        <span style={{ color: '#0f172a' }}>Lingkar Kepala: {profile.headCircumferenceCm} cm</span>
+                        <span style={{ color: '#8b5cf6' }}>Terpantau</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
+                         <div className="h-full rounded-full" style={{ width: Math.min(Math.max((profile.headCircumferenceCm / 50) * 100, 10), 100) + '%', backgroundColor: '#8b5cf6' }}></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+             </div>
+           </div>
+
+           <div className="mb-8 p-6 rounded-xl border" style={{ backgroundColor: '#faf5ff', borderColor: '#f3e8ff' }}>
+             <h3 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: '#581c87' }}>
+               <Sparkles className="w-5 h-5" style={{ color: '#9333ea' }} />
+               Analisis AI & Rekomendasi Stimulasi
+             </h3>
+             <div className="max-w-none text-sm pdf-markdown leading-relaxed whitespace-pre-wrap" style={{ color: '#334155' }}>
+                <ReactMarkdown>{aiAnalysis || 'Analisis sedang disiapkan...'}</ReactMarkdown>
+             </div>
+           </div>
+           
+           <div className="mt-8 pt-6 border-t text-center" style={{ borderColor: '#e2e8f0' }}>
+             <p className="text-[10px] italic mb-3" style={{ color: '#64748b' }}>
+               <strong>Penafian Medis:</strong> Laporan ini adalah hasil skrining awal berdasarkan input pengguna dan bukan merupakan diagnosis medis. Jika terdapat hasil "Meragukan" atau "Ada Kemungkinan Penyimpangan", serta kondisi parameter pertumbuhan di luar rentang normal, mohon segera berkonsultasi dengan Dokter Spesialis Anak (Sp.A) atau Pusat Layanan Kesehatan terdekat.
+             </p>
+             <p className="text-[10px]" style={{ color: '#94a3b8' }}>
+               Dokumen ini dihasilkan secara otomatis oleh sistem Kuisioner Tumbuh Kembang Anak pada {new Date().toLocaleDateString('id-ID')}
+             </p>
+           </div>
+        </div>
       </div>
     </motion.div>
   );

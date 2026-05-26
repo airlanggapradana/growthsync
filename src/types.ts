@@ -29,6 +29,7 @@ export interface ChildProfile {
   ageInMonths: number;
   heightCm: number;
   weightKg: number;
+  headCircumferenceCm?: number;
   gender: 'Laki-laki' | 'Perempuan';
 }
 

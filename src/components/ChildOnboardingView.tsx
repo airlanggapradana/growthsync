@@ -12,6 +12,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
+  const [headCirc, setHeadCirc] = useState('');
   const [gender, setGender] = useState<'Laki-laki' | 'Perempuan' | ''>('');
   const [loading, setLoading] = useState(false);
 
@@ -30,6 +31,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
         ageInMonths: parseInt(age, 10),
         heightCm: parseFloat(height),
         weightKg: parseFloat(weight),
+        ...(headCirc ? { headCircumferenceCm: parseFloat(headCirc) } : {}),
         gender: gender as 'Laki-laki' | 'Perempuan',
       };
 
@@ -114,7 +116,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Usia (Bulan)</label>
             <input
@@ -125,6 +127,18 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
               onChange={(e) => setAge(e.target.value)}
               className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
               placeholder="0"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Lingkar Kepala (cm) - Opsional</label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={headCirc}
+              onChange={(e) => setHeadCirc(e.target.value)}
+              className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
+              placeholder="0.0"
             />
           </div>
           <div className="space-y-1.5">
