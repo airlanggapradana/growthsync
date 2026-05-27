@@ -171,63 +171,63 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#F4F5F7] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-[#263c32] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
       {/* Sidebar (Hidden on mobile) */}
       <aside className="w-[260px] hidden lg:flex flex-col pt-8 pb-6 px-5 shrink-0 overflow-y-auto">
         <div className="flex items-center px-3 mb-5">
-           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-16 w-auto object-contain" />
+           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Kuisioner Anak Logo" className="h-16 w-auto object-contain" />
         </div>
 
-        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Menu</div>
+        <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">Menu</div>
         <nav className="space-y-1.5 mb-8">
            <button 
              onClick={() => setView(userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
-             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
            >
-             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
              Dashboard
            </button>
            <button 
              disabled
-             className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 font-semibold rounded-xl text-sm cursor-not-allowed"
+             className="flex items-center gap-3 w-full px-4 py-3 text-white/40 font-semibold rounded-xl text-sm cursor-not-allowed"
            >
-             <CheckCircle2 className="w-5 h-5" />
-             Tugas <span className="ml-auto text-[9px] bg-slate-200 text-slate-500 dark:text-slate-400 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
+             <CheckCircle2 className="w-5 h-5 opacity-50" />
+             Tugas <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
            </button>
            {userProfile?.role !== 'nakes' && (
              <button 
                onClick={() => setView('ONBOARDING')}
-               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
              >
-               <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+               <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-70")} />
                Tambah Anak
              </button>
            )}
            {userProfile?.role === 'orang_tua' && (
              <button 
                onClick={() => setView('PARENT_CHAT_LIST')}
-               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm border border-slate-100 dark:border-slate-800" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 hover:text-slate-900 dark:text-slate-50")}
+               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
              >
-               <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1b4332] dark:text-emerald-400" : "text-slate-400")} />
+               <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
                Konsultasi Nakes
              </button>
            )}
         </nav>
 
         <div className="mt-auto">
-          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-4">Pengaturan</div>
+          <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">Pengaturan</div>
           <button 
              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-             className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 transition-colors text-sm font-semibold"
+             className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
           >
-             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+             {theme === 'dark' ? <Sun className="w-5 h-5 opacity-70" /> : <Moon className="w-5 h-5 opacity-70" />}
              {theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
           </button>
           <button 
              onClick={handleLogout}
-             className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-sm font-semibold"
+             className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors text-sm font-semibold"
           >
-             <LogOut className="w-5 h-5" />
+             <LogOut className="w-5 h-5 opacity-70" />
              Keluar
           </button>
         </div>

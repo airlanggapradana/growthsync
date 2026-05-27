@@ -5,6 +5,10 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   assignedNakesId?: string | null;
+  province?: string;
+  regency?: string;
+  district?: string;
+  village?: string;
 }
 
 export type AgeCategory = '3_bulan' | '6_bulan';

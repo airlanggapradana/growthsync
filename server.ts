@@ -36,7 +36,7 @@ ${qna.map((item: any) => `- Kategori ${item.kategori}: ${item.pertanyaan} -> Jaw
 Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran sesuai petunjuk di atas. Usahakan ringkas namun aplikatif.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: prompt,
       });
 
@@ -90,6 +90,54 @@ Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesma
     } catch (error) {
       console.error('Error finding puskesmas:', error);
       res.status(500).json({ error: 'Failed to find puskesmas' });
+    }
+  });
+
+  app.get("/api/wilayah/provinces", async (req, res) => {
+    try {
+      const response = await fetch("https://wilayah.id/api/provinces.json");
+      if (!response.ok) throw new Error("Failed to fetch provinces");
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch provinces" });
+    }
+  });
+
+  app.get("/api/wilayah/regencies/:provinceId", async (req, res) => {
+    try {
+      const response = await fetch(`https://wilayah.id/api/regencies/${req.params.provinceId}.json`);
+      if (!response.ok) throw new Error("Failed to fetch regencies");
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch regencies" });
+    }
+  });
+
+  app.get("/api/wilayah/districts/:regencyId", async (req, res) => {
+    try {
+      const response = await fetch(`https://wilayah.id/api/districts/${req.params.regencyId}.json`);
+      if (!response.ok) throw new Error("Failed to fetch districts");
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch districts" });
+    }
+  });
+
+  app.get("/api/wilayah/villages/:districtId", async (req, res) => {
+    try {
+      const response = await fetch(`https://wilayah.id/api/villages/${req.params.districtId}.json`);
+      if (!response.ok) throw new Error("Failed to fetch villages");
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch villages" });
     }
   });
 
