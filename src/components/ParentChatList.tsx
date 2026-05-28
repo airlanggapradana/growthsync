@@ -11,13 +11,17 @@ export default function ParentChatList({ userProfile, onOpenChat }: { userProfil
   useEffect(() => {
     const fetchNakes = async () => {
       try {
+        if (!userProfile.assignedNakesId) {
+           setNakesList([]);
+           setLoading(false);
+           return;
+        }
+
         let q = query(collection(db, 'users'), where('role', '==', 'nakes'));
         const snap = await getDocs(q);
         let data = snap.docs.map(doc => doc.data() as UserProfile);
         
-        if (userProfile.assignedNakesId) {
-          data = data.filter(n => n.uid === userProfile.assignedNakesId);
-        }
+        data = data.filter(n => n.uid === userProfile.assignedNakesId);
 
         setNakesList(data);
       } catch (err) {
@@ -33,12 +37,7 @@ export default function ParentChatList({ userProfile, onOpenChat }: { userProfil
     <div className="w-full h-full flex flex-col items-center">
       <div className="w-full max-w-4xl space-y-8">
         <header>
-          <div className="mb-4">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Konsultasi Nakes</h1>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
-              Pilih tenaga kesehatan yang tersedia untuk berkonsultasi mengenai perkembangan anak.
-            </p>
-          </div>
         </header>
 
         {loading ? (
@@ -76,7 +75,7 @@ export default function ParentChatList({ userProfile, onOpenChat }: { userProfil
              
              {nakesList.length === 0 && (
                 <div className="col-span-full py-20 text-center text-slate-500 dark:text-slate-400">
-                  Saat ini belum ada tenaga kesehatan yang terdaftar.
+                  Saat ini belum ada tenaga kesehatan yang melayani profil Anda. Harap tunggu hingga Nakes mengambil profil Anda untuk konsultasi.
                 </div>
              )}
           </div>

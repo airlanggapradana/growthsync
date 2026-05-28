@@ -53,6 +53,10 @@ export default function NakesDashboardView({ userProfile, onOpenChat }: { userPr
   }, []);
 
   const handleClaimParent = async (parentId: string) => {
+    if (!userProfile.isVerified) {
+      alert("Akun Anda belum terverifikasi oleh Admin sehingga tidak dapat mengambil pasien.");
+      return;
+    }
     setActionLoadingId(parentId);
     try {
       await updateDoc(doc(db, 'users', parentId), {
@@ -177,14 +181,28 @@ export default function NakesDashboardView({ userProfile, onOpenChat }: { userPr
                       </button>
                     ) : (
                       <button 
-                        onClick={() => handleClaimParent(parent.uid)}
-                        disabled={actionLoadingId === parent.uid}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] font-bold text-sm transition-all shadow-md shadow-[#8cc63f]/20"
+                        onClick={() => {
+                           if (!userProfile.isVerified) {
+                              alert("Akun Anda belum terverifikasi oleh Admin.");
+                              return;
+                           }
+                           handleClaimParent(parent.uid);
+                        }}
+                        disabled={actionLoadingId === parent.uid || !userProfile.isVerified}
+                        title={!userProfile.isVerified ? "Akun Anda belum terverifikasi" : ""}
+                        className={cn(
+                          "flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all shadow-md",
+                          userProfile.isVerified 
+                            ? "bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] shadow-[#8cc63f]/20" 
+                            : "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
+                        )}
                       >
                         {actionLoadingId === parent.uid ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
+                        ) : userProfile.isVerified ? (
                           <ShieldCheck className="w-4 h-4" />
+                        ) : (
+                          <ShieldCheck className="w-4 h-4 opacity-50" />
                         )}
                         Pilih & Layani
                       </button>
