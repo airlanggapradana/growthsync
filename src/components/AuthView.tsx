@@ -268,6 +268,19 @@ export default function AuthView() {
 
               {!isLogin && (
                 <div className="space-y-4 pt-2">
+                <div className="space-y-4">
+                    <label className="text-sm text-white/80 font-medium ml-2">Konfirmasi Password</label>
+                    <input 
+                      type="password" 
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
+                      placeholder="Ulangi password"
+                      required
+                      minLength={6}
+                    />
+                  </div>
                   <div className="space-y-4">
                     <label className="text-sm text-white/80 font-medium ml-2">Daftar Sebagai</label>
                     <div className="grid grid-cols-3 gap-2">
@@ -392,20 +405,6 @@ export default function AuthView() {
                       </select>
                     </div>
                   )}
-
-                  <div className="space-y-4">
-                    <label className="text-sm text-white/80 font-medium ml-2">Konfirmasi Password</label>
-                    <input 
-                      type="password" 
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      autoComplete="new-password"
-                      className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                      placeholder="Ulangi password"
-                      required
-                      minLength={6}
-                    />
-                  </div>
                 </div>
               )}
 
