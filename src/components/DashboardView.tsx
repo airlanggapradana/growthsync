@@ -146,7 +146,7 @@ export default function DashboardView({
       <div className="bg-[#263c32] rounded-[32px] p-8 md:p-10 mb-8 mt-2 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl shadow-[#263c32]/20">
          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
          <div className="relative z-10 w-full md:w-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">Hello, {profile?.name} <span className="inline-block animate-wave">👋</span></h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">Hello, {auth.currentUser?.email?.split('@')[0] || 'Orang Tua'}!! <span className="inline-block animate-wave">👋</span></h1>
             <p className="text-white/70 font-medium mt-2">Bagaimana perkembangan {profile?.name} hari ini?</p>
          </div>
          <div className="relative z-10 flex flex-wrap items-center gap-3 w-full md:w-auto">

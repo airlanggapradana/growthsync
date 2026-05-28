@@ -30,6 +30,7 @@ export interface ChildProfile {
   id?: string;
   userId?: string;
   name: string;
+  birthDate?: string;
   ageInMonths: number;
   heightCm: number;
   weightKg: number;

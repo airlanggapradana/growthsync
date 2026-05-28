@@ -6,10 +6,12 @@ import { ChildProfile } from '../types';
 import { Baby, Loader2, ArrowRight } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { cn } from '../lib/utils';
+import { differenceInMonths } from 'date-fns';
 
 export default function ChildOnboardingView({ user, onComplete }: { key?: string, user: User, onComplete: (profile: ChildProfile) => void }) {
   const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [computedAgeInMonths, setComputedAgeInMonths] = useState<number | null>(null);
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [headCirc, setHeadCirc] = useState('');
@@ -22,13 +24,18 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
       alert('Pilih jenis kelamin anak.');
       return;
     }
+    if (computedAgeInMonths === null) {
+      alert('Masukkan tanggal lahir anak.');
+      return;
+    }
 
     setLoading(true);
 
     try {
       const profileData: ChildProfile = {
         name,
-        ageInMonths: parseInt(age, 10),
+        birthDate,
+        ageInMonths: computedAgeInMonths,
         heightCm: parseFloat(height),
         weightKg: parseFloat(weight),
         ...(headCirc ? { headCircumferenceCm: parseFloat(headCirc) } : {}),
@@ -118,16 +125,28 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Usia (Bulan)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tanggal Lahir</label>
             <input
-              type="number"
+              type="date"
               required
-              min="0"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              value={birthDate}
+              onChange={(e) => {
+                setBirthDate(e.target.value);
+                if (e.target.value) {
+                  const months = differenceInMonths(new Date(), new Date(e.target.value));
+                  setComputedAgeInMonths(Math.max(0, months));
+                } else {
+                  setComputedAgeInMonths(null);
+                }
+              }}
               className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle text-sm font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
-              placeholder="0"
             />
+            {computedAgeInMonths !== null && (
+               <div className="text-sm font-semibold text-[#8cc63f] mt-1">
+                 Usia: {computedAgeInMonths} Bulan
+               </div>
+            )}
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Lingkar Kepala (cm) - Opsional</label>

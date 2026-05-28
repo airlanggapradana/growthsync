@@ -444,17 +444,18 @@ const QuestionnaireView: React.FC<{
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="max-w-3xl mx-auto space-y-8 pb-32" 
     >
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm sticky top-[80px] z-20">
-        <div className="flex justify-between items-end mb-3">
+      <div className="bg-[#263c32] p-8 rounded-[32px] shadow-xl shadow-[#263c32]/20 sticky top-[80px] z-20 overflow-hidden">
+        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
+        <div className="relative z-10 flex justify-between items-end mb-4">
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Progres Pengerjaan</span>
-            <span className="text-2xl font-bold text-slate-900 dark:text-slate-50 leading-none">{answeredCount}<span className="text-slate-400">/{questions.length}</span></span>
+            <span className="text-xs font-bold uppercase tracking-widest text-white/50 mb-1.5">Progres Pengerjaan</span>
+            <span className="text-3xl font-bold text-white leading-none">{answeredCount}<span className="text-white/40 text-xl font-medium ml-1">/ {questions.length}</span></span>
           </div>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">{Math.round(progress)}% Selesai</span>
+          <span className="text-sm text-white/70 font-semibold">{Math.round(progress)}% Selesai</span>
         </div>
-        <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-2 bg-black/20 rounded-full overflow-hidden relative z-10">
           <motion.div
-            className="h-full bg-[#1b4332] rounded-full"
+            className="h-full bg-[#8cc63f] rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ ease: "easeOut", duration: 0.3 }}
@@ -470,54 +471,54 @@ const QuestionnaireView: React.FC<{
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, x: -20, filter: 'blur(4px)' }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm flex flex-col justify-center"
+            className="bg-white p-8 md:p-12 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center"
           >
-            <span className="inline-flex px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider rounded-md mb-6 self-start">
+            <span className="inline-flex px-4 py-1.5 bg-[#8cc63f]/10 text-[#263c32] text-xs font-bold uppercase tracking-wider rounded-full mb-8 self-start">
               {currentQuestion.kategori}
             </span>
-            <h3 className="text-xl sm:text-2xl font-medium leading-relaxed text-slate-900 dark:text-slate-50 mb-10">
-              <span className="text-slate-300 font-normal mr-3">{currentIndex + 1}.</span>
+            <h3 className="text-2xl md:text-3xl font-bold leading-tight text-[#263c32] mb-12">
+              <span className="text-slate-300 font-medium mr-3">{currentIndex + 1}.</span>
               {currentQuestion.pertanyaan}
             </h3>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               <button
                 onClick={() => handleAnswerClick(1)}
                 className={cn(
-                  "p-6 rounded-xl border transition-all duration-200 flex flex-col items-center justify-center gap-2 cursor-pointer",
+                  "p-6 md:p-8 rounded-[24px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
                   currentAnswer === 1
-                    ? "border-[#1b4332] bg-[#1b4332] text-white shadow-md shadow-[#1b4332]/10"
-                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-800"
+                    ? "border-[#8cc63f] bg-[#8cc63f]/10"
+                    : "border-slate-100 bg-white hover:border-[#8cc63f]/50 hover:bg-slate-50"
                 )}
               >
-                <span className="text-lg font-bold">IYA</span>
-                <span className={cn("text-xs font-medium", currentAnswer === 1 ? "text-emerald-100" : "text-slate-500 dark:text-slate-400")}>Skor: 1</span>
+                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>IYA</span>
+                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 text-slate-400")}>Skor: 1</span>
               </button>
               <button
                 onClick={() => handleAnswerClick(0)}
                 className={cn(
-                  "p-6 rounded-xl border transition-all duration-200 flex flex-col items-center justify-center gap-2 cursor-pointer",
+                  "p-6 md:p-8 rounded-[24px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
                   currentAnswer === 0
-                    ? "border-[#1b4332] bg-[#1b4332] text-white shadow-md shadow-[#1b4332]/10"
-                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-800"
+                    ? "border-amber-500 bg-amber-500/10"
+                    : "border-slate-100 bg-white hover:border-amber-500/50 hover:bg-slate-50"
                 )}
               >
-                <span className="text-lg font-bold">TIDAK</span>
-                <span className={cn("text-xs font-medium", currentAnswer === 0 ? "text-emerald-100" : "text-slate-500 dark:text-slate-400")}>Skor: 0</span>
+                <span className={cn("text-2xl font-black", currentAnswer === 0 ? "text-amber-600" : "text-slate-400")}>TIDAK</span>
+                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 0 ? "bg-amber-500 text-white" : "bg-slate-100 text-slate-400")}>Skor: 0</span>
               </button>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-3xl glass-dark text-white p-2.5 rounded-2xl z-30 shadow-2xl flex items-center justify-between gap-4">
-        <div className="flex gap-2.5">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-64px)] max-w-3xl bg-[#263c32]/90 backdrop-blur-xl text-white p-3 rounded-full z-30 shadow-2xl shadow-[#263c32]/30 flex items-center justify-between gap-4 border border-white/10">
+        <div className="flex gap-2">
            <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
               className={cn(
-                 "p-3 rounded-xl transition-all flex items-center justify-center",
-                 currentIndex === 0 ? "text-slate-600 dark:text-slate-400 cursor-not-allowed" : "text-slate-300 hover:bg-white/10 dark:hover:bg-white/10 hover:text-white"
+                 "w-12 h-12 rounded-full transition-all flex items-center justify-center",
+                 currentIndex === 0 ? "text-white/20 cursor-not-allowed" : "text-white/70 hover:bg-white/10 hover:text-white"
               )}
            >
               <ArrowLeft className="w-5 h-5" />
@@ -526,8 +527,8 @@ const QuestionnaireView: React.FC<{
               onClick={handleNext}
               disabled={currentIndex === questions.length - 1}
               className={cn(
-                 "p-3 rounded-xl transition-all flex items-center justify-center",
-                 currentIndex === questions.length - 1 ? "text-slate-600 dark:text-slate-400 cursor-not-allowed" : "text-slate-300 hover:bg-white/10 dark:hover:bg-white/10 hover:text-white"
+                 "w-12 h-12 rounded-full transition-all flex items-center justify-center",
+                 currentIndex === questions.length - 1 ? "text-white/20 cursor-not-allowed" : "text-white/70 hover:bg-white/10 hover:text-white"
               )}
            >
              <ArrowRight className="w-5 h-5" />
@@ -537,10 +538,10 @@ const QuestionnaireView: React.FC<{
           disabled={!isComplete}
           onClick={onSubmit}
           className={cn(
-            "py-3 px-6 rounded-xl font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-white/20",
+            "py-3.5 px-8 rounded-full font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-white/20",
             isComplete 
-              ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 hover:bg-slate-100 dark:bg-slate-800 shadow-sm" 
-              : "bg-white/10 dark:bg-white/10 text-slate-400 cursor-not-allowed"
+              ? "bg-[#8cc63f] text-[#1e3025] hover:bg-[#7cb435] shadow-lg shadow-[#8cc63f]/20" 
+              : "bg-white/5 text-white/30 cursor-not-allowed"
           )}
         >
           {isComplete ? "Kirim Hasil" : "Jawab Semua (10)"}
