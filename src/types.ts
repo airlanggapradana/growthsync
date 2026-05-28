@@ -1,4 +1,4 @@
-export type UserRole = 'orang_tua' | 'nakes';
+export type UserRole = 'orang_tua' | 'nakes' | 'admin';
 
 export interface UserProfile {
   uid: string;
@@ -9,6 +9,7 @@ export interface UserProfile {
   regency?: string;
   district?: string;
   village?: string;
+  isVerified?: boolean; // For nakes
 }
 
 export type AgeCategory = '3_bulan' | '6_bulan';

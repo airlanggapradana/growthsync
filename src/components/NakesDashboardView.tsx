@@ -85,9 +85,20 @@ export default function NakesDashboardView({ userProfile, onOpenChat }: { userPr
                  Kelola data pertumbuhan anak dari setiap orang tua di area Anda.
                </p>
              </div>
-             <div className="bg-[#8cc63f]/20 text-[#263c32] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
-               <Activity className="w-4 h-4" />
-               Nakes Akses
+             <div className="flex flex-col items-end gap-2">
+               <div className="bg-[#8cc63f]/20 text-[#263c32] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+                 <Activity className="w-4 h-4" />
+                 Nakes Akses
+               </div>
+               {userProfile.isVerified ? (
+                 <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                   <ShieldCheck className="w-3.5 h-3.5" /> Terverifikasi
+                 </span>
+               ) : (
+                 <span className="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-semibold">
+                   Menunggu Verifikasi Admin
+                 </span>
+               )}
              </div>
           </div>
           

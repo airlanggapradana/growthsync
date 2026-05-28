@@ -11,13 +11,14 @@ import AuthView from './components/AuthView';
 import ChildOnboardingView from './components/ChildOnboardingView';
 import DashboardView from './components/DashboardView';
 import NakesDashboardView from './components/NakesDashboardView';
+import AdminDashboardView from './components/AdminDashboardView';
 import ChatView from './components/ChatView';
 import ParentChatList from './components/ParentChatList';
 import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
 
-type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT';
+type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -69,7 +70,9 @@ export default function App() {
             setUserProfile(fallbackProfile);
           }
 
-          if (currentRole === 'nakes') {
+          if (currentRole === 'admin') {
+             setView('ADMIN_DASHBOARD');
+          } else if (currentRole === 'nakes') {
              setView('NAKES_DASHBOARD');
           } else {
             const q = query(collection(db, 'childProfiles'), where('userId', '==', currentUser.uid));
@@ -181,10 +184,10 @@ export default function App() {
         <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">Menu</div>
         <nav className="space-y-1.5 mb-8">
            <button 
-             onClick={() => setView(userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
-             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+             onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
+             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
            >
-             <Activity className={cn("w-5 h-5", view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+             <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
              Dashboard
            </button>
            <button 
@@ -194,7 +197,7 @@ export default function App() {
              <CheckCircle2 className="w-5 h-5 opacity-50" />
              Tugas <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
            </button>
-           {userProfile?.role !== 'nakes' && (
+           {userProfile?.role === 'orang_tua' && (
              <button 
                onClick={() => setView('ONBOARDING')}
                className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
@@ -357,6 +360,9 @@ export default function App() {
               }}
               isHistoryMode={true}
             />
+          )}
+          {view === 'ADMIN_DASHBOARD' && userProfile && (
+             <AdminDashboardView key="admin_dashboard" userProfile={userProfile} />
           )}
           {view === 'NAKES_DASHBOARD' && userProfile && (
              <NakesDashboardView 

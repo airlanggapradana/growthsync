@@ -143,8 +143,10 @@ export default function DashboardView({
         </div>
       )}
 
-      <div className="bg-[#263c32] rounded-[32px] p-8 md:p-10 mb-8 mt-2 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl shadow-[#263c32]/20">
-         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
+      <div className="bg-[#263c32] rounded-[32px] p-8 md:p-10 mb-8 mt-2 relative flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl shadow-[#263c32]/20">
+         <div className="absolute inset-0 overflow-hidden rounded-[32px] pointer-events-none">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
+         </div>
          <div className="relative z-10 w-full md:w-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">Hello, {auth.currentUser?.email?.split('@')[0] || 'Orang Tua'}!! <span className="inline-block animate-wave">👋</span></h1>
             <p className="text-white/70 font-medium mt-2">Bagaimana perkembangan {profile?.name} hari ini?</p>
@@ -205,15 +207,15 @@ export default function DashboardView({
                              {p.name}
                           </button>
                         ))}
-                        <div className="p-2 border-t border-slate-100">
+                        <div className="p-3 border-t border-slate-100 bg-slate-50 mt-1">
                           <button 
                             onClick={() => {
                               onAddProfile();
                               setShowProfileMenu(false);
                             }}
-                            className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-slate-50 text-slate-600 hover:text-[#263c32] rounded-xl transition-colors text-sm font-semibold"
+                            className="w-full justify-center px-4 py-3 flex items-center gap-2 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-xl transition-all text-sm font-bold shadow-sm"
                           >
-                             <div className="w-6 flex justify-center"><Plus className="w-4 h-4" /></div>
+                             <Plus className="w-4 h-4" />
                              Tambah Anak Baru
                           </button>
                         </div>

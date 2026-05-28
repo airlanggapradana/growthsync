@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { auth, db } from '../lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { Loader2, Users, Briefcase } from 'lucide-react';
+import { Loader2, Users, Briefcase, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { UserRole } from '../types';
 
@@ -12,6 +12,8 @@ export default function AuthView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [sip, setSip] = useState('');
   const [role, setRole] = useState<UserRole>('orang_tua');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,6 +89,14 @@ export default function AuthView() {
     }
 
     if (!isLogin) {
+      if (!fullName) {
+        setError('Nama Lengkap harus diisi');
+        return;
+      }
+      if (role === 'nakes' && !sip) {
+        setError('Nomor SIP harus diisi untuk Tenaga Kesehatan');
+        return;
+      }
       if (password !== confirmPassword) {
         setError('Konfirmasi password tidak cocok');
         return;
@@ -108,8 +118,9 @@ export default function AuthView() {
         const selectedVillName = villages.find(v => v.code === selectedVillage)?.name || '';
 
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
+        const userData: any = {
           uid: userCredential.user.uid,
+          name: fullName,
           email: userCredential.user.email,
           role: role,
           province: selectedProvName,
@@ -117,7 +128,14 @@ export default function AuthView() {
           district: selectedDistName,
           village: selectedVillName,
           createdAt: new Date().toISOString()
-        });
+        };
+        
+        if (role === 'nakes') {
+          userData.sip = sip;
+          userData.isVerified = false; // Admin must verify
+        }
+
+        await setDoc(doc(db, 'users', userCredential.user.uid), userData);
       }
     } catch (err: any) {
       console.error(err);
@@ -199,6 +217,20 @@ export default function AuthView() {
                 </div>
               )}
               
+              {!isLogin && (
+                <div className="space-y-4 pb-2">
+                  <label className="text-sm text-white/80 font-medium ml-2">Nama Lengkap</label>
+                  <input 
+                    type="text" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+              )}
+              
               <div className="space-y-4">
                 <label className="text-sm text-white/80 font-medium ml-2">Email Address</label>
                 <input 
@@ -238,35 +270,62 @@ export default function AuthView() {
                 <div className="space-y-4 pt-2">
                   <div className="space-y-4">
                     <label className="text-sm text-white/80 font-medium ml-2">Daftar Sebagai</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-2">
                       <button
                         type="button"
                         onClick={() => setRole('orang_tua')}
                         className={cn(
-                          "flex items-center justify-center gap-2 py-3 px-4 rounded-full border transition-all text-sm font-semibold",
+                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
                           role === 'orang_tua' 
                             ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
                             : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
                         )}
                       >
-                        <Users className="w-4 h-4" />
+                        <Users className="w-3.5 h-3.5 hidden sm:block" />
                         Orang Tua
                       </button>
                       <button
                         type="button"
                         onClick={() => setRole('nakes')}
                         className={cn(
-                          "flex items-center justify-center gap-2 py-3 px-4 rounded-full border transition-all text-sm font-semibold",
+                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
                           role === 'nakes' 
                             ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
                             : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
                         )}
                       >
-                        <Briefcase className="w-4 h-4" />
+                        <Briefcase className="w-3.5 h-3.5 hidden sm:block" />
                         Nakes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole('admin')}
+                        className={cn(
+                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
+                          role === 'admin' 
+                            ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
+                            : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
+                        )}
+                      >
+                        <Lock className="w-3.5 h-3.5 hidden sm:block" />
+                        Admin
                       </button>
                     </div>
                   </div>
+
+                  {role === 'nakes' && (
+                    <div className="space-y-4">
+                      <label className="text-sm text-white/80 font-medium ml-2">Nomor SIP (Surat Izin Praktik)</label>
+                      <input 
+                        type="text" 
+                        value={sip}
+                        onChange={(e) => setSip(e.target.value)}
+                        className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
+                        placeholder="Masukkan Nomor SIP"
+                        required
+                      />
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     <label className="text-sm text-white/80 font-medium ml-2">Provinsi</label>
