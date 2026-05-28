@@ -12,7 +12,7 @@ export interface UserProfile {
   isVerified?: boolean; // For nakes
 }
 
-export type AgeCategory = '3_bulan' | '6_bulan';
+export type AgeCategory = '3_bulan' | '6_bulan' | '9_bulan' | '12_bulan' | '15_bulan' | '18_bulan' | '21_bulan' | '24_bulan' | '30_bulan' | '36_bulan' | '42_bulan';
 export type DevelopmentCategory = 'Gerak Kasar' | 'Gerak Halus' | 'Sosialisasi dan Kemandirian' | 'Bicara dan Bahasa';
 
 export interface Question {

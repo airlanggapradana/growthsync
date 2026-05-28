@@ -861,7 +861,7 @@ const ResultView: React.FC<{
                 </div>
              </div>
              <div className="p-5 rounded-xl border flex flex-col justify-center items-center text-center" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>Hasil Skrining (Usia {age === '3_bulan' ? '3' : '6'} Bulan)</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>Hasil Skrining (Usia {age.split('_')[0]} Bulan)</h3>
                 <div className="text-5xl font-extrabold mb-2" style={{ color: '#1e293b' }}>{totalScore}<span className="text-xl" style={{ color: '#94a3b8' }}>/10</span></div>
                 <div className="font-bold text-lg mb-1" style={{ color: '#059669' }}>{resultCategory}</div>
                 <p className="text-xs px-4" style={{ color: '#475569' }}>{resultDescription}</p>

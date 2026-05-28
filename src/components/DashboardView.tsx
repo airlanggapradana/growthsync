@@ -108,6 +108,20 @@ export default function DashboardView({
 
   const isTimeForScreening = history.length === 0 || (latestScreening && differenceInMonths(new Date(), new Date(latestScreening.createdAt)) >= 3);
 
+  const getRecommendedAgeCategory = (months: number): AgeCategory => {
+     if (months < 4.5) return '3_bulan';
+     if (months < 7.5) return '6_bulan';
+     if (months < 10.5) return '9_bulan';
+     if (months < 13.5) return '12_bulan';
+     if (months < 16.5) return '15_bulan';
+     if (months < 19.5) return '18_bulan';
+     if (months < 22.5) return '21_bulan';
+     if (months < 27) return '24_bulan';
+     if (months < 33) return '30_bulan';
+     if (months < 39) return '36_bulan';
+     return '42_bulan';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
@@ -132,8 +146,7 @@ export default function DashboardView({
             </p>
             <button 
                onClick={() => {
-                  if (profile.ageInMonths <= 4) onStartQuestionnaire('3_bulan');
-                  else onStartQuestionnaire('6_bulan');
+                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
                }}
                className="px-5 py-2.5 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-full text-sm font-bold transition-colors shadow-sm"
             >
@@ -160,8 +173,7 @@ export default function DashboardView({
              </button>
              <button 
                onClick={() => {
-                  if (profile.ageInMonths <= 4) onStartQuestionnaire('3_bulan');
-                  else onStartQuestionnaire('6_bulan');
+                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
                }}
                className="flex-1 md:flex-none justify-center px-5 py-3 bg-[#8cc63f] text-[#1e3025] rounded-full text-sm font-bold hover:bg-[#7cb435] transition-colors shadow-sm flex items-center gap-2 relative"
              >
@@ -364,7 +376,7 @@ export default function DashboardView({
                                {isGood ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
                             </div>
                             <div>
-                               <div className="font-bold text-white text-sm mb-0.5">Asesmen {result.ageCategory === '3_bulan' ? '3' : '6'} Bln</div>
+                               <div className="font-bold text-white text-sm mb-0.5">Asesmen {result.ageCategory.split('_')[0]} Bln</div>
                                <div className="text-xs text-white/50 font-medium">{formattedDate}</div>
                             </div>
                           </div>
@@ -379,8 +391,7 @@ export default function DashboardView({
             
             <div className="mt-6 pt-6 border-t border-white/10 relative z-10">
                <button onClick={() => {
-                  if (profile.ageInMonths <= 4) onStartQuestionnaire('3_bulan');
-                  else onStartQuestionnaire('6_bulan');
+                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
                }} className="w-full py-3.5 bg-[#8cc63f] text-[#1e3025] text-sm font-bold rounded-full flex justify-center items-center hover:bg-[#7cb435] transition-colors">
                   Buat Skrining Baru
                </button>

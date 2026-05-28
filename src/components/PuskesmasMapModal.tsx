@@ -203,7 +203,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                   <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
                     <Sparkles className="w-6 h-6 text-emerald-600 animate-pulse" />
                   </div>
-                  <span className="text-sm font-medium text-center">Gemini sedang mencari puskesmas terbaik di sekitar Anda...</span>
+                  <span className="text-sm font-medium text-center">Kami sedang mencari puskesmas terbaik di sekitar Anda...</span>
                   <Loader2 className="w-6 h-6 animate-spin text-emerald-600/50" />
                 </div>
               ) : aiError ? (

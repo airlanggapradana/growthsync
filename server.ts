@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { INTERVENSI_KNOWLEDGE } from "./src/data/knowledge.ts";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -18,22 +19,17 @@ async function startServer() {
       
       const prompt = `Anda adalah asisten AI ahli tumbuh kembang anak.
 Berdasarkan data kuesioner berikut, berikan analisis yang mendukung dan suportif kepada orang tua dengan format Markdown.
-Gunakan pengetahuan berikut secara mutlak:
-1. Jika kesimpulan hasil menunjukkan Perkembangan Anak Meragukan (skor < 9) maka sarankan intervensi stimulasi anak sebagai berikut:
-- Stimulasi Motorik Kasar: Merangkak menuju mainan, Berdiri dengan bantuan/tarikan tangan, Berjalan sambil berpegangan.
-- Stimulasi Motorik Halus: Memegang mainan dengan kedua tangan, Memegang alat tulis dan mencoret-coret, Memasukkan dan mengeluarkan benda dari wadah.
-- Stimulasi Bahasa: Mengajak bicara dan memanggil nama bayi, Membacakan buku cerita bergambar, Mengajarkan kata-kata sederhana dari suara bayi.
-- Stimulasi Sosial dan Emosional: Memberikan pelukan dan senyuman, Mengenalkan suasana hati bayi, Bermain sosial sederhana (misalnya tepuk tangan).
-- Stimulasi Kognitif: Mengajarkan konsep sebab-akibat, Melatih mencari dan menemukan mainan, Melatih membuat bunyi-bunyian dari benda/mainan.
-2. Jika kesimpulan hasil menunjukkan Perkembangan Anak Sesuai (skor >= 9) maka sarankan dan ingatkan orang tua melakukan pengecekan tumbuh kembang anak di bulan selanjutnya.
+Gunakan pengetahuan berikut secara mutlak sebagai pedoman atau rujukan intervensi berdasarkan usia anak:
 
-Data anak: Usia ${ageCategory === '3_bulan' ? '3 Bulan' : '6 Bulan'}
+${INTERVENSI_KNOWLEDGE}
+
+Data anak: Usia ${ageCategory.replace('_', ' ')}
 Total Skor: ${totalScore} (Sesuai jika >= 9, Meragukan jika 7-8, Penyimpangan jika < 7)
 
 Kuesioner yang dijawab:
 ${qna.map((item: any) => `- Kategori ${item.kategori}: ${item.pertanyaan} -> Jawaban: ${item.jawaban}`).join('\n')}
 
-Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran sesuai petunjuk di atas. Usahakan ringkas namun aplikatif.`;
+Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran intervensi sesuai dokumen rujukan di atas. Usahakan ringkas namun aplikatif.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-3.5-flash',
