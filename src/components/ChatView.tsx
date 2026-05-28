@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from 'firebase/firestore';
 import { UserProfile } from '../types';
 import { ArrowLeft, Send, User as UserIcon, Loader2, Sparkles, PlusCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -12,6 +12,7 @@ interface Message {
   senderId: string;
   text: string;
   createdAt: any;
+  read?: boolean;
 }
 
 export default function ChatView({ currentUser, targetUser, onBack }: { currentUser: UserProfile, targetUser: UserProfile | { email: string, uid: string }, onBack: () => void }) {
@@ -33,10 +34,18 @@ export default function ChatView({ currentUser, targetUser, onBack }: { currentU
       setTimeout(() => {
         endRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+
+      // Mark messages as read if sent by the other user
+      snapshot.docs.forEach(docSnap => {
+        const msgData = docSnap.data();
+        if (msgData.senderId !== currentUser.uid && msgData.read === false) {
+          updateDoc(doc(db, 'messages', docSnap.id), { read: true }).catch(console.error);
+        }
+      });
     });
 
     return () => unsubscribe();
-  }, [chatId]);
+  }, [chatId, currentUser.uid]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +57,10 @@ export default function ChatView({ currentUser, targetUser, onBack }: { currentU
       await addDoc(collection(db, 'messages'), {
         chatId,
         senderId: currentUser.uid,
+        receiverId: targetUser.uid,
         text,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        read: false
       });
       // the snapshot listener will update the UI
     } catch(err) {

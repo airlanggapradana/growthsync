@@ -11,7 +11,15 @@ interface ParentData extends UserProfile {
   children: ChildProfile[];
 }
 
-export default function NakesDashboardView({ userProfile, onOpenChat }: { userProfile: UserProfile, onOpenChat: (parentData: ParentData) => void }) {
+export default function NakesDashboardView({ 
+  userProfile, 
+  unreadCountsBySender = {}, 
+  onOpenChat 
+}: { 
+  userProfile: UserProfile, 
+  unreadCountsBySender?: Record<string, number>,
+  onOpenChat: (parentData: ParentData) => void 
+}) {
   const [parents, setParents] = useState<ParentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -174,10 +182,15 @@ export default function NakesDashboardView({ userProfile, onOpenChat }: { userPr
                     {activeTab === 'my_patients' ? (
                       <button 
                         onClick={() => onOpenChat(parent)}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] hover:bg-[#1e3025] text-white font-bold text-sm transition-all shadow-sm"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] hover:bg-[#1e3025] text-white font-bold text-sm transition-all shadow-sm relative"
                       >
                         <MessageSquare className="w-4 h-4" />
                         Chat Orang Tua
+                        {unreadCountsBySender[parent.uid] > 0 && (
+                          <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                            {unreadCountsBySender[parent.uid] > 99 ? '99+' : unreadCountsBySender[parent.uid]}
+                          </span>
+                        )}
                       </button>
                     ) : (
                       <button 

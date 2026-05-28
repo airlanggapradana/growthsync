@@ -4,7 +4,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { UserProfile } from '../types';
 import { Loader2, Search, Briefcase, ChevronRight, MessageSquare } from 'lucide-react';
 
-export default function ParentChatList({ userProfile, onOpenChat }: { userProfile: UserProfile, onOpenChat: (nakes: UserProfile) => void }) {
+export default function ParentChatList({ userProfile, unreadCount = 0, onOpenChat }: { userProfile: UserProfile, unreadCount?: number, onOpenChat: (nakes: UserProfile) => void }) {
   const [nakesList, setNakesList] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,9 +65,14 @@ export default function ParentChatList({ userProfile, onOpenChat }: { userProfil
 
                  <button 
                    onClick={() => onOpenChat(nakes)}
-                   className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 rounded-xl transition-all"
+                   className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 rounded-xl transition-all relative"
                  >
                    <MessageSquare className="w-5 h-5 ml-0.5" />
+                   {unreadCount > 0 && nakes.uid === userProfile.assignedNakesId && (
+                      <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                         {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                   )}
                  </button>
                  
                </div>

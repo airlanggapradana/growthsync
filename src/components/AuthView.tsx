@@ -199,7 +199,7 @@ export default function AuthView() {
 
           <div className="pt-10 relative z-10">
             <p className="text-xs text-slate-400 font-medium">© 2026 Aplikasi Tumbuh Kembang Anak</p>
-            <p className="text-[10px] text-slate-400">Powered by Healthcare Services</p>
+            <p className="text-[10px] text-slate-400">Created by Universitas Muhammadiyah Surakarta</p>
           </div>
         </div>
 

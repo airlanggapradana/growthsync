@@ -5,7 +5,7 @@ import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
 import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
 import AuthView from './components/AuthView';
 import ChildOnboardingView from './components/ChildOnboardingView';
@@ -50,6 +50,27 @@ export default function App() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [selectedHistory, setSelectedHistory] = useState<any>(null);
   const [currentResultId, setCurrentResultId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [unreadCountsBySender, setUnreadCountsBySender] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      setUnreadCountsBySender({});
+      return;
+    }
+    const qUnread = query(collection(db, 'messages'), where('receiverId', '==', user.uid), where('read', '==', false));
+    const unsubscribeUnread = onSnapshot(qUnread, (snap) => {
+      setUnreadCount(snap.docs.length);
+      const counts: Record<string, number> = {};
+      snap.docs.forEach(doc => {
+         const senderId = doc.data().senderId;
+         counts[senderId] = (counts[senderId] || 0) + 1;
+      });
+      setUnreadCountsBySender(counts);
+    });
+    return () => unsubscribeUnread();
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -185,10 +206,17 @@ export default function App() {
         <nav className="space-y-1.5 mb-8">
            <button 
              onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
-             className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+             className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
            >
-             <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-             Dashboard
+             <div className="flex items-center gap-3">
+               <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+               Dashboard
+             </div>
+             {unreadCount > 0 && userProfile?.role === 'nakes' && (
+               <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                 {unreadCount > 99 ? '99+' : unreadCount}
+               </span>
+             )}
            </button>
            <button 
              disabled
@@ -209,10 +237,17 @@ export default function App() {
            {userProfile?.role === 'orang_tua' && (
              <button 
                onClick={() => setView('PARENT_CHAT_LIST')}
-               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+               className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
              >
-               <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-               Konsultasi Nakes
+               <div className="flex items-center gap-3">
+                 <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+                 Konsultasi Nakes
+               </div>
+               {unreadCount > 0 && (
+                 <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                   {unreadCount > 99 ? '99+' : unreadCount}
+                 </span>
+               )}
              </button>
            )}
         </nav>
@@ -368,6 +403,7 @@ export default function App() {
              <NakesDashboardView 
                key="nakes_dashboard"
                userProfile={userProfile}
+               unreadCountsBySender={unreadCountsBySender}
                onOpenChat={(targetParent) => {
                  setTargetChatUser(targetParent);
                  setView('NAKES_CHAT');
@@ -386,6 +422,7 @@ export default function App() {
              <ParentChatList 
                key="parent_chat_list"
                userProfile={userProfile}
+               unreadCount={unreadCount}
                onOpenChat={(nakes) => {
                  setTargetChatUser(nakes);
                  setView('PARENT_CHAT');
