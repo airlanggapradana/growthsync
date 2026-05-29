@@ -3,12 +3,19 @@ import { motion } from 'motion/react';
 import { auth, db } from '../lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { Loader2, Users, Briefcase, Lock } from 'lucide-react';
+import { Loader2, Users, Briefcase, Lock, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { UserRole } from '../types';
 
-export default function AuthView() {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: () => void, initialMode?: 'login' | 'register' }) {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+
+  useEffect(() => {
+    setIsLogin(initialMode === 'login');
+  }, [initialMode]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -205,7 +212,17 @@ export default function AuthView() {
 
         {/* RIGHT COMPARTMENT - Dark Green Form */}
         <div className="flex-1 lg:w-[55%] flex flex-col px-6 py-10 lg:p-16 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-          <div className="max-w-md w-full mx-auto my-auto">
+          <div className="max-w-md w-full mx-auto my-auto relative">
+            {onBack && (
+              <button 
+                type="button"
+                onClick={onBack}
+                className="absolute -top-12 lg:-top-16 -left-2 lg:left-0 text-white/50 hover:text-white flex items-center gap-2 text-sm font-semibold transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Kembali
+              </button>
+            )}
             <h2 className="text-4xl font-bold text-white mb-8 tracking-tight">
               {isLogin ? 'Login' : 'Register'}
             </h2>
@@ -428,10 +445,14 @@ export default function AuthView() {
               <br/>
               <button 
                 onClick={() => {
-                  setIsLogin(!isLogin);
                   setError('');
                   setPassword('');
                   setConfirmPassword('');
+                  if (isLogin) {
+                    navigate('/auth/register');
+                  } else {
+                    navigate('/auth/login');
+                  }
                 }}
                 className="text-[#6b9d8d] hover:text-[#8bc7b5] font-semibold hover:underline transition-all mt-1"
               >

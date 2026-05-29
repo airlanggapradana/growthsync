@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
@@ -7,6 +8,7 @@ import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
+import LandingView from './components/LandingView';
 import AuthView from './components/AuthView';
 import ChildOnboardingView from './components/ChildOnboardingView';
 import DashboardView from './components/DashboardView';
@@ -21,6 +23,7 @@ import ReactMarkdown from 'react-markdown';
 type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
 
 export default function App() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [targetChatUser, setTargetChatUser] = useState<any>(null);
@@ -52,6 +55,7 @@ export default function App() {
   const [currentResultId, setCurrentResultId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [unreadCountsBySender, setUnreadCountsBySender] = useState<Record<string, number>>({});
+  const [showLanding, setShowLanding] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -76,6 +80,9 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        if (window.location.pathname.startsWith('/auth')) {
+          navigate('/');
+        }
         setLoadingProfile(true);
         try {
           // Fetch user profile to get role
@@ -171,6 +178,7 @@ export default function App() {
       setAge(null);
       setAnswers({});
       setView('HOME');
+      navigate('/');
     } catch (err) {
       console.error("Error signing out", err);
     }
@@ -191,9 +199,17 @@ export default function App() {
   }
 
   if (!user) {
-    return <AuthView />;
+    return (
+      <Routes>
+        <Route path="/" element={<LandingView />} />
+        <Route path="/auth/login" element={<AuthView initialMode="login" onBack={() => navigate('/')} />} />
+        <Route path="/auth/register" element={<AuthView initialMode="register" onBack={() => navigate('/')} />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    );
   }
 
+  // Wrapped content component goes here...
   return (
     <div className="flex h-screen bg-[#263c32] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
       {/* Sidebar (Hidden on mobile) */}
