@@ -1,11 +1,14 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { Shield, Sparkles, Activity, ArrowRight, HeartPulse, LineChart, Stethoscope, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import ThreeBackground from './ThreeBackground';
 
 export default function LandingView() {
   const navigate = useNavigate();
+  const { scrollY } = useScroll();
+  const backgroundY = useTransform(scrollY, [0, 4000], ['0%', '-20%']);
 
   const [activeSection, setActiveSection] = React.useState('beranda');
 
@@ -43,6 +46,20 @@ export default function LandingView() {
 
   return (
     <div className="min-h-screen bg-[#050A07] font-sans text-slate-50 relative overflow-hidden selection:bg-[#d9f99d] selection:text-[#050A07]">
+      {/* Background Image Layer */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[#050A07]/40 z-10 mix-blend-multiply" />
+        <motion.img 
+          src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp" 
+          alt="Mossy Background" 
+          className="w-full h-[130vh] object-cover absolute top-0 left-0"
+          style={{ y: backgroundY }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/60 to-[#050A07] z-10" />
+      </div>
+
+      <ThreeBackground />
+
       {/* Ambient Background Glows */}
       <motion.div 
         animate={{ 
