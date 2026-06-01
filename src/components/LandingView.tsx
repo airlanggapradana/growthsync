@@ -55,7 +55,7 @@ export default function LandingView() {
           className="w-full h-[130vh] object-cover absolute top-0 left-0"
           style={{ y: backgroundY }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/60 to-[#050A07] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/30 to-[#050A07] z-10" />
       </div>
 
       <ThreeBackground />
