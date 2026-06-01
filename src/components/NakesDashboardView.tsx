@@ -3,12 +3,18 @@ import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, orderBy, updateDoc, doc } from 'firebase/firestore';
 import { UserProfile, ChildProfile, QuestionnaireResult } from '../types';
-import { Loader2, Users, Search, ChevronRight, Activity, Smile, MapPin, MessageSquare, User as UserIcon, ShieldCheck } from 'lucide-react';
+import { Loader2, Users, Search, ChevronRight, Activity, Smile, MapPin, MessageSquare, User as UserIcon, ShieldCheck, FileText, CalendarClock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import dayjs from 'dayjs';
+import 'dayjs/locale/id';
+dayjs.locale('id');
+
+interface ChildWithHistory extends ChildProfile {
+  history: QuestionnaireResult[];
+}
 
 interface ParentData extends UserProfile {
-  children: ChildProfile[];
+  children: ChildWithHistory[];
 }
 
 export default function NakesDashboardView({ 
@@ -39,7 +45,25 @@ export default function NakesDashboardView({
         // Fetch children for this parent
         const childrenQ = query(collection(db, 'childProfiles'), where('userId', '==', uid));
         const childrenSnap = await getDocs(childrenQ);
-        const childrenData = childrenSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChildProfile));
+        
+        const childrenWithHistoryPromises = childrenSnap.docs.map(async (docSnap) => {
+          const childData = { id: docSnap.id, ...docSnap.data() } as ChildProfile;
+          
+          const historyQ = query(collection(db, 'questionnaireResults'), where('childId', '==', docSnap.id));
+          const historySnap = await getDocs(historyQ);
+          const historyData = historySnap.docs.map(hDoc => ({ id: hDoc.id, ...hDoc.data() } as QuestionnaireResult));
+          
+          // Sort descending based on createdAt string / date
+          historyData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+          return {
+            ...childData,
+            history: historyData
+          };
+        });
+
+        const childrenData = await Promise.all(childrenWithHistoryPromises);
+
         return {
           ...userData,
           uid,
@@ -164,19 +188,71 @@ export default function NakesDashboardView({
                         {parent.email}
                       </p>
                       
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {parent.children.length === 0 && (
-                           <span className="text-xs text-slate-400 italic">Belum ada profil anak.</span>
-                        )}
-                        {parent.children.map(child => (
-                           <div key={child.id} className="bg-[#8cc63f]/10 text-[#263c32] border border-[#8cc63f]/20 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
-                             <Smile className="w-3.5 h-3.5 text-[#8cc63f]" />
-                             {child.name} • {child.ageInMonths} bln
-                           </div>
-                        ))}
-                      </div>
-                    </div>
-                 </div>
+                      <div className="mt-4">
+                         {parent.children.length === 0 && (
+                            <span className="text-xs text-slate-400 italic">Belum ada profil anak.</span>
+                         )}
+                         <div className={cn(activeTab === 'my_patients' ? "flex flex-col gap-4 w-full" : "flex flex-wrap gap-2")}>
+                           {parent.children.map(child => {
+                             if (activeTab === 'my_patients') {
+                                const latestHistory = child.history?.[0];
+                                const nextSchedule = latestHistory ? dayjs(latestHistory.createdAt).add(3, 'month') : null;
+                                
+                                return (
+                                  <details key={child.id} className="bg-slate-50 border border-slate-100 rounded-2xl group">
+                                    <summary className="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+                                       <div className="flex items-center gap-2 font-bold text-[#263c32]">
+                                          <Smile className="w-4 h-4 text-[#8cc63f]" />
+                                          {child.name} <span className="text-slate-400 font-medium ml-1">({child.ageInMonths} Bulan)</span>
+                                       </div>
+                                       <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" />
+                                    </summary>
+                                    <div className="px-4 pb-4 flex flex-col gap-3">
+                                      <div className="flex items-center gap-6 text-xs font-medium">
+                                        <div className="flex flex-col">
+                                          <span className="text-slate-400">Berat Badan</span>
+                                          <span className="font-bold text-slate-700">{child.weightKg || '-'} kg</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                          <span className="text-slate-400">Tinggi Badan</span>
+                                          <span className="font-bold text-slate-700">{child.heightCm || '-'} cm</span>
+                                        </div>
+                                      </div>
+                                      <div className="mt-1 pt-3 border-t border-slate-200/60 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                         <div className="flex items-start gap-2">
+                                           <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+                                           <div className="flex flex-col">
+                                             <span className="text-slate-400 font-medium">Riwayat Skrining</span>
+                                             <span className="font-bold text-slate-700">{child.history?.length || 0} Kali</span>
+                                             {latestHistory && <span className="text-slate-500 mt-0.5">Terakhir: {dayjs(latestHistory.createdAt).format('DD MMM YYYY')}</span>}
+                                           </div>
+                                         </div>
+                                         <div className="flex items-start gap-2">
+                                           <CalendarClock className="w-4 h-4 text-amber-500 shrink-0" />
+                                           <div className="flex flex-col">
+                                             <span className="text-slate-400 font-medium">Jadwal Selanjutnya</span>
+                                             <span className="font-bold text-amber-600">
+                                                {nextSchedule ? nextSchedule.format('DD MMMM YYYY') : 'Sekarang'}
+                                             </span>
+                                           </div>
+                                         </div>
+                                      </div>
+                                    </div>
+                                  </details>
+                                );
+                             }
+
+                             return (
+                               <div key={child.id} className="bg-[#8cc63f]/10 text-[#263c32] border border-[#8cc63f]/20 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
+                                 <Smile className="w-3.5 h-3.5 text-[#8cc63f]" />
+                                 {child.name} • {child.ageInMonths} bln
+                               </div>
+                             );
+                           })}
+                         </div>
+                       </div>
+                     </div>
+                  </div>
 
                  <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
                     {activeTab === 'my_patients' ? (
