@@ -48,7 +48,7 @@ export default function LandingView() {
     <div className="min-h-screen bg-[#050A07] font-sans text-slate-50 relative overflow-hidden selection:bg-[#d9f99d] selection:text-[#050A07]">
       {/* Background Image Layer */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[#050A07]/40 z-10 mix-blend-multiply" />
+        // <div className="absolute inset-0 bg-[#050A07]/5 z-10 mix-blend-multiply" />
         <motion.img 
           src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp" 
           alt="Mossy Background" 

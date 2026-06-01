@@ -97,7 +97,7 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
 
     if (!isLogin) {
       if (!fullName) {
-        setError('Nama Lengkap harus diisi');
+        setError(role === 'orang_tua' ? 'Nama Orang Tua harus diisi' : 'Nama Lengkap harus diisi');
         return;
       }
       if (role === 'nakes' && !sip) {
@@ -236,13 +236,15 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
               
               {!isLogin && (
                 <div className="space-y-4 pb-2">
-                  <label className="text-sm text-white/80 font-medium ml-2">Nama Lengkap</label>
+                  <label className="text-sm text-white/80 font-medium ml-2">
+                    {role === 'orang_tua' ? 'Nama Orang Tua' : 'Nama Lengkap'}
+                  </label>
                   <input 
                     type="text" 
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                    placeholder="Enter your full name"
+                    placeholder={role === 'orang_tua' ? "Masukkan nama orang tua" : "Masukkan nama lengkap"}
                     required
                   />
                 </div>

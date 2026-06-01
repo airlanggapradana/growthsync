@@ -535,10 +535,20 @@ const QuestionnaireView: React.FC<{
             <span className="inline-flex px-4 py-1.5 bg-[#8cc63f]/10 text-[#263c32] text-xs font-bold uppercase tracking-wider rounded-full mb-8 self-start">
               {currentQuestion.kategori}
             </span>
-            <h3 className="text-2xl md:text-3xl font-bold leading-tight text-[#263c32] mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold leading-tight text-[#263c32] mb-6">
               <span className="text-slate-300 font-medium mr-3">{currentIndex + 1}.</span>
               {currentQuestion.pertanyaan}
             </h3>
+
+            <div className="mb-10 bg-slate-50 border border-slate-100 rounded-2xl p-5 text-sm text-slate-600">
+               <div className="flex items-start gap-3">
+                 <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
+                 <div className="space-y-1.5 mt-0.5">
+                   <p>&bull; Pilih jawaban <strong>"Ya"</strong> jika anak dapat melakukan perintah sesuai kuisioner</p>
+                   <p>&bull; Pilih jawaban <strong>"Tidak"</strong> jika yang dilakukan anak tidak sesuai dengan perintah dalam kuisioner</p>
+                 </div>
+               </div>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               <button
@@ -550,7 +560,7 @@ const QuestionnaireView: React.FC<{
                     : "border-slate-100 bg-white hover:border-[#8cc63f]/50 hover:bg-slate-50"
                 )}
               >
-                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>IYA</span>
+                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>YA</span>
                 <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 text-slate-400")}>Skor: 1</span>
               </button>
               <button

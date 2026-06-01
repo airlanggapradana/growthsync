@@ -32,7 +32,7 @@ ${qna.map((item: any) => `- Kategori ${item.kategori}: ${item.pertanyaan} -> Jaw
 Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran intervensi sesuai dokumen rujukan di atas. Usahakan ringkas namun aplikatif.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-2.5-flash',
         contents: prompt,
       });
 
@@ -83,9 +83,12 @@ Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesma
       }
 
       res.json({ result: parsedResult });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error finding puskesmas:', error);
-      res.status(500).json({ error: 'Failed to find puskesmas' });
+      res.status(500).json({ 
+        error: 'Gagal menghubungi Gemini AI untuk mencari puskesmas. Pastikan API key valid atau coba lagi nanti.',
+        details: error?.message || 'Unknown error'
+      });
     }
   });
 

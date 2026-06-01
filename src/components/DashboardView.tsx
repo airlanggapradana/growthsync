@@ -30,6 +30,8 @@ export default function DashboardView({
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [showAgeSelectModal, setShowAgeSelectModal] = useState(false);
+  const [ageOptions, setAgeOptions] = useState<number[]>([]);
 
   const profile = profiles.find(p => p.id === activeProfileId);
 
@@ -108,6 +110,29 @@ export default function DashboardView({
 
   const isTimeForScreening = history.length === 0 || (latestScreening && differenceInMonths(new Date(), new Date(latestScreening.createdAt)) >= 3);
 
+  const AVAILABLE_AGES = [3, 6, 9, 12, 15, 18, 21, 24, 30, 36, 42];
+  
+  const handleStartClicked = () => {
+    if (!profile) return;
+    const months = profile.ageInMonths;
+    if (months < 3) {
+      onStartQuestionnaire('3_bulan');
+      return;
+    }
+    if (AVAILABLE_AGES.includes(months)) {
+      onStartQuestionnaire(`${months}_bulan` as AgeCategory);
+    } else {
+      let options = [...AVAILABLE_AGES];
+      options.sort((a, b) => Math.abs(a - months) - Math.abs(b - months));
+      // Get the closest 2 options
+      let closest = options.slice(0, 2);
+      // Sort them ascending
+      closest.sort((a, b) => a - b);
+      setAgeOptions(closest);
+      setShowAgeSelectModal(true);
+    }
+  };
+
   const getRecommendedAgeCategory = (months: number): AgeCategory => {
      if (months < 4.5) return '3_bulan';
      if (months < 7.5) return '6_bulan';
@@ -145,9 +170,7 @@ export default function DashboardView({
                 : "Sudah lebih dari 3 bulan sejak skrining terakhir. Ayo perbarui data untuk memastikan anak Anda tetap berada di jalur perkembangan yang tepat!"}
             </p>
             <button 
-               onClick={() => {
-                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
-               }}
+               onClick={handleStartClicked}
                className="px-5 py-2.5 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-full text-sm font-bold transition-colors shadow-sm"
             >
               Mulai Skrining Sekarang
@@ -172,9 +195,7 @@ export default function DashboardView({
                <MapIcon className="w-4 h-4" /> Cari Puskesmas
              </button>
              <button 
-               onClick={() => {
-                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
-               }}
+               onClick={handleStartClicked}
                className="flex-1 md:flex-none justify-center px-5 py-3 bg-[#8cc63f] text-[#1e3025] rounded-full text-sm font-bold hover:bg-[#7cb435] transition-colors shadow-sm flex items-center gap-2 relative"
              >
                {isTimeForScreening && !loadingHistory && (
@@ -390,15 +411,59 @@ export default function DashboardView({
             </div>
             
             <div className="mt-6 pt-6 border-t border-white/10 relative z-10">
-               <button onClick={() => {
-                  onStartQuestionnaire(getRecommendedAgeCategory(profile.ageInMonths));
-               }} className="w-full py-3.5 bg-[#8cc63f] text-[#1e3025] text-sm font-bold rounded-full flex justify-center items-center hover:bg-[#7cb435] transition-colors">
+               <button onClick={handleStartClicked} className="w-full py-3.5 bg-[#8cc63f] text-[#1e3025] text-sm font-bold rounded-full flex justify-center items-center hover:bg-[#7cb435] transition-colors">
                   Buat Skrining Baru
                </button>
             </div>
          </div>
       </div>
       <PuskesmasMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
+
+      <AnimatePresence>
+        {showAgeSelectModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative"
+            >
+              <h2 className="text-2xl font-bold text-[#263c32] mb-2">Pilih Usia Skrining</h2>
+              <p className="text-slate-500 mb-6 font-medium text-sm">
+                 Usia {profile?.name} saat ini adalah <strong className="text-[#263c32]">{profile?.ageInMonths} bulan</strong>. Pilih kuisioner terdekat yang ingin dikerjakan.
+              </p>
+              
+              <div className="grid grid-cols-1 gap-3 mb-6">
+                {ageOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => {
+                      setShowAgeSelectModal(false);
+                      onStartQuestionnaire(`${opt}_bulan` as AgeCategory);
+                    }}
+                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 hover:border-[#8cc63f] hover:bg-[#8cc63f]/5 transition-all group"
+                  >
+                     <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 text-[#263c32] group-hover:bg-[#8cc63f] group-hover:text-[#1e3025] flex items-center justify-center font-bold transition-colors">
+                           {opt}
+                        </div>
+                        <span className="font-bold text-[#263c32]">Kuisioner {opt} Bulan</span>
+                     </div>
+                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#8cc63f]" />
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setShowAgeSelectModal(false)}
+                className="w-full py-3 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-bold transition-colors"
+               >
+                Batal
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

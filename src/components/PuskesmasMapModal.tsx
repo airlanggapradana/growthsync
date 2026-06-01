@@ -115,15 +115,22 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lat: loc.lat, lng: loc.lng }),
       });
+      
       const data = await res.json();
+      
+      if (!res.ok) {
+        setAiError(data.error || "Terjadi kesalahan pada layanan Gemini AI. Silakan coba beberapa saat lagi.");
+        return;
+      }
+
       if (data.result && data.result.puskesmas) {
         setAiResult(data.result.puskesmas);
       } else {
-        setAiError("Gagal mendapatkan rekomendasi puskesmas. Silakan coba lagi.");
+        setAiError("Gagal memproses rekomendasi puskesmas dari Gemini AI. Silakan coba lagi.");
       }
     } catch (err) {
       console.error(err);
-      setAiError("Terjadi kesalahan sistem saat mencari puskesmas.");
+      setAiError("Terjadi kesalahan koneksi saat mencari puskesmas menggunakan Gemini AI.");
     } finally {
       setLoadingAi(false);
     }
