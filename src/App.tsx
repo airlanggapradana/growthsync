@@ -52,7 +52,6 @@ export default function App() {
   const [age, setAge] = useState<AgeCategory | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [selectedHistory, setSelectedHistory] = useState<any>(null);
-  const [currentResultId, setCurrentResultId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [unreadCountsBySender, setUnreadCountsBySender] = useState<Record<string, number>>({});
   const [showLanding, setShowLanding] = useState(true);
@@ -144,26 +143,8 @@ export default function App() {
     setAnswers((prev) => ({ ...prev, [questionId]: score }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setView('RESULT');
-    // save to firestore
-    if (user && activeProfileId && age) {
-      const totalScore = Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
-      const resultId = user.uid + '_' + Date.now().toString();
-      setCurrentResultId(resultId);
-      try {
-        await setDoc(doc(db, 'questionnaireResults', resultId), {
-          userId: user.uid,
-          profileId: activeProfileId,
-          ageCategory: age,
-          answers: answers,
-          totalScore: totalScore,
-          createdAt: serverTimestamp()
-        });
-      } catch(err) {
-        console.error("Failed to save result", err);
-      }
-    }
   };
 
   const handleResetToDashboard = () => {
@@ -384,15 +365,24 @@ export default function App() {
               profile={activeProfile}
               onClose={handleResetToDashboard}
               isHistoryMode={false}
-              onAnalysisGenerated={async (analysis) => {
-                if (currentResultId) {
+              onSaveResult={async (analysis) => {
+                if (user && activeProfileId && age) {
+                  const totalScore = Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
+                  const resultId = user.uid + '_' + Date.now().toString();
                   try {
-                    const { updateDoc } = await import('firebase/firestore');
-                    await updateDoc(doc(db, 'questionnaireResults', currentResultId), {
-                      aiAnalysis: analysis
+                    await setDoc(doc(db, 'questionnaireResults', resultId), {
+                      userId: user.uid,
+                      profileId: activeProfileId,
+                      ageCategory: age,
+                      answers: answers,
+                      totalScore: totalScore,
+                      aiAnalysis: analysis,
+                      createdAt: serverTimestamp()
                     });
+                    handleResetToDashboard();
                   } catch (e) {
                     console.error('Failed to save AI analysis', e);
+                    alert("Gagal menyimpan hasil. Silakan coba lagi.");
                   }
                 }
               }}
@@ -503,7 +493,7 @@ const QuestionnaireView: React.FC<{
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="max-w-3xl mx-auto space-y-8 pb-32" 
     >
-      <div className="bg-[#263c32] p-8 rounded-[32px] shadow-xl shadow-[#263c32]/20 sticky top-[80px] z-20 overflow-hidden">
+      <div className="bg-[#263c32] p-8 rounded-[32px] shadow-xl shadow-[#263c32]/20 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
         <div className="relative z-10 flex justify-between items-end mb-4">
           <div className="flex flex-col">
@@ -627,8 +617,8 @@ const ResultView: React.FC<{
   isHistoryMode: boolean;
   profile?: ChildProfile;
   existingAnalysis?: string;
-  onAnalysisGenerated?: (analysis: string) => void;
-}> = ({ age, answers, onClose, isHistoryMode, profile, existingAnalysis, onAnalysisGenerated }) => {
+  onSaveResult?: (analysis: string) => void;
+}> = ({ age, answers, onClose, isHistoryMode, profile, existingAnalysis, onSaveResult }) => {
   const questions = QUESTIONS_DATA[age];
   const totalScore = useMemo(() => {
     return Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
@@ -693,39 +683,35 @@ const ResultView: React.FC<{
     }
   };
 
+  const fetchAiAnalysis = async () => {
+    setLoadingAi(true);
+    try {
+      const qna = questions.map(q => ({
+        kategori: q.kategori,
+        pertanyaan: q.pertanyaan,
+        jawaban: answers[q.id] === 1 ? 'Iya' : 'Tidak'
+      }));
+      
+      const res = await fetch('/api/analyze-questionnaire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ageCategory: age, totalScore, qna })
+      });
+      const data = await res.json();
+      setAiAnalysis(data.analysis);
+    } catch (err) {
+      console.error("AI Analysis failed", err);
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
     if (existingAnalysis) {
       return;
     }
-    const fetchAiAnalysis = async () => {
-      setLoadingAi(true);
-      try {
-        const qna = questions.map(q => ({
-          kategori: q.kategori,
-          pertanyaan: q.pertanyaan,
-          jawaban: answers[q.id] === 1 ? 'Iya' : 'Tidak'
-        }));
-        
-        const res = await fetch('/api/analyze-questionnaire', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ageCategory: age, totalScore, qna })
-        });
-        const data = await res.json();
-        if (isMounted) {
-          setAiAnalysis(data.analysis);
-          if (onAnalysisGenerated) onAnalysisGenerated(data.analysis);
-        }
-      } catch (err) {
-        console.error("AI Analysis failed", err);
-      } finally {
-        if (isMounted) setLoadingAi(false);
-      }
-    };
     fetchAiAnalysis();
-    return () => { isMounted = false; };
-  }, [age, totalScore, answers, questions, existingAnalysis, onAnalysisGenerated]);
+  }, [age, totalScore, answers, questions, existingAnalysis]);
 
   if (totalScore >= 9) {
     resultCategory = "Perkembangan Anak Sesuai";
@@ -815,7 +801,14 @@ const ResultView: React.FC<{
                 <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
               </div>
             ) : (
-               <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">Gagal memuat analisis.</div>
+               <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm font-medium gap-4">
+                 <span className="text-rose-500 font-bold">Gagal memuat analisis AI.</span>
+                 <p className="text-center text-slate-500 max-w-sm mb-2">Mohon generasikan ulang analisis AI untuk dapat menyimpan hasil kuisioner.</p>
+                 <button onClick={fetchAiAnalysis} className="px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 rounded-xl flex items-center gap-2 font-bold transition-colors">
+                   <RefreshCcw className="w-4 h-4 shrink-0 inline mr-2" />
+                   Generate Ulang Analisis
+                 </button>
+               </div>
             )}
           </div>
         </motion.div>
@@ -876,22 +869,36 @@ const ResultView: React.FC<{
           {exportingPdf ? 'Menyiapkan PDF...' : 'Export PDF'}
         </button>
 
-        <button
-          onClick={onClose}
-          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-slate-900 dark:bg-white border rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all shadow-md text-sm"
-        >
-          {isHistoryMode ? (
-            <>
-              <ArrowLeft className="w-5 h-5" />
-              Kembali ke Dashboard
-            </>
-          ) : (
-            <>
+        {isHistoryMode ? (
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-slate-900 dark:bg-white border rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all shadow-md text-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Kembali ke Dashboard
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center min-w-[150px] gap-2.5 px-6 py-3.5 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold transition-all shadow-sm text-sm"
+            >
+              Batal
+            </button>
+            <button
+              onClick={() => {
+                if (aiAnalysis && onSaveResult) {
+                  onSaveResult(aiAnalysis);
+                }
+              }}
+              disabled={loadingAi || !aiAnalysis}
+              className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-emerald-600 border border-emerald-600 rounded-xl hover:bg-emerald-700 text-white font-semibold transition-all shadow-md text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:border-slate-400"
+            >
               <Check className="w-5 h-5" />
-              Selesai & Kembali
-            </>
-          )}
-        </button>
+              Simpan Hasil
+            </button>
+          </>
+        )}
       </div>
 
       {/* Hidden PDF Template */}
