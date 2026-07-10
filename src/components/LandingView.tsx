@@ -48,14 +48,13 @@ export default function LandingView() {
     <div className="min-h-screen bg-[#050A07] font-sans text-slate-50 relative overflow-hidden selection:bg-[#d9f99d] selection:text-[#050A07]">
       {/* Background Image Layer */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        // <div className="absolute inset-0 bg-[#050A07]/5 z-10 mix-blend-multiply" />
         <motion.img 
           src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp" 
           alt="Mossy Background" 
           className="w-full h-[130vh] object-cover absolute top-0 left-0"
           style={{ y: backgroundY }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/30 to-[#050A07] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/10 to-[#050A07] z-10" />
       </div>
 
       <ThreeBackground />
@@ -96,7 +95,7 @@ export default function LandingView() {
         <nav className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
           <div className="flex items-center gap-3 pl-2">
              <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain brightness-0 invert" />
-             <span className="font-bold tracking-widest text-sm text-white/90 hidden sm:block">GROWTHSYNC</span>
+             <span className="font-bold tracking-widest text-sm text-white/90 hidden sm:block">KINDO</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -385,7 +384,7 @@ export default function LandingView() {
         <div className="w-full max-w-5xl border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 px-6 text-xs text-white/40">
            <div className="flex items-center gap-2">
               <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo" className="w-6 h-6 brightness-0 invert opacity-50" />
-              <span>© 2026 Growthsync. All rights reserved.</span>
+              <span>© {new Date().getFullYear()} Kindo. All rights reserved.</span>
            </div>
            <div className="flex gap-6">
              <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>

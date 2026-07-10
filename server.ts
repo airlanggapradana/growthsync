@@ -29,17 +29,45 @@ Total Skor: ${totalScore} (Sesuai jika >= 9, Meragukan jika 7-8, Penyimpangan ji
 Kuesioner yang dijawab:
 ${qna.map((item: any) => `- Kategori ${item.kategori}: ${item.pertanyaan} -> Jawaban: ${item.jawaban}`).join('\n')}
 
-Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran intervensi sesuai dokumen rujukan di atas. Usahakan ringkas namun aplikatif.`;
+Berikan simpulan singkat yang menenangkan orang tua, dilanjutkan dengan poin-poin saran intervensi sesuai dokumen rujukan di atas. Usahakan ringkas namun aplikatif.
+
+Berikan respons akhir Anda dalam format JSON (bukan markdown block) dengan properti "id" (terjemahan bahasa Indonesia) dan "en" (terjemahan bahasa Inggris dari respons "id"). Struktur:
+{ "id": "Markdown text Indonesia", "en": "Markdown text English" }`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json"
+        }
+      });
+
+      const parsedResponse = JSON.parse(response.text || '{}');
+      res.json({ analysisId: parsedResponse.id, analysisEn: parsedResponse.en });
+    } catch (error) {
+      console.error('Error generating analysis:', error);
+      res.status(500).json({ error: 'Failed to generate analysis' });
+    }
+  });
+
+  app.post("/api/translate-analysis", async (req, res) => {
+    try {
+      const { text, targetLang } = req.body;
+      
+      const prompt = `Translate the following markdown text into ${targetLang === 'en' ? 'English' : 'Indonesian'}. Preserve all markdown formatting, emojis, and styling. Output ONLY the translated text without any wrapping code blocks.
+      
+Text to translate:
+${text}`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
       });
 
-      res.json({ analysis: response.text });
+      res.json({ translatedText: response.text });
     } catch (error) {
-      console.error('Error generating analysis:', error);
-      res.status(500).json({ error: 'Failed to generate analysis' });
+      console.error('Error translating text:', error);
+      res.status(500).json({ error: 'Failed to translate' });
     }
   });
 

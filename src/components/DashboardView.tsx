@@ -6,9 +6,10 @@ import { db, auth } from '../lib/firebase';
 import { ChildProfile, AgeCategory, QuestionnaireResult } from '../types';
 import { Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, Bell, AlertTriangle, Map as MapIcon } from 'lucide-react';
 import { format, differenceInMonths } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { id as idLocale, enUS } from 'date-fns/locale';
 import { cn } from '../lib/utils';
 import PuskesmasMapModal from './PuskesmasMapModal';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function DashboardView({ 
   profiles, 
@@ -32,6 +33,7 @@ export default function DashboardView({
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [showAgeSelectModal, setShowAgeSelectModal] = useState(false);
   const [ageOptions, setAgeOptions] = useState<number[]>([]);
+  const { language, t } = useLanguage();
 
   const profile = profiles.find(p => p.id === activeProfileId);
 
@@ -162,18 +164,18 @@ export default function DashboardView({
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-[#263c32] mb-1">
-              Waktunya Skrining Perkembangan!
+              {t('dashboard.screening_time')}
             </h3>
             <p className="text-sm font-medium text-[#263c32]/80 mb-3 leading-relaxed">
               {history.length === 0 
-                ? "Ayo lakukan skrining pertama untuk memantau perkembangan optimal anak Anda. Kenali potensi dan kebutuhan mereka seawal mungkin!"
-                : "Sudah lebih dari 3 bulan sejak skrining terakhir. Ayo perbarui data untuk memastikan anak Anda tetap berada di jalur perkembangan yang tepat!"}
+                ? t('dashboard.screening_desc_1')
+                : t('dashboard.screening_desc_2')}
             </p>
             <button 
                onClick={handleStartClicked}
                className="px-5 py-2.5 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-full text-sm font-bold transition-colors shadow-sm"
             >
-              Mulai Skrining Sekarang
+              {t('dashboard.start_screening')}
             </button>
           </div>
         </div>
@@ -184,15 +186,15 @@ export default function DashboardView({
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
          </div>
          <div className="relative z-10 w-full md:w-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">Hello, {auth.currentUser?.email?.split('@')[0] || 'Orang Tua'}!! <span className="inline-block animate-wave">👋</span></h1>
-            <p className="text-white/70 font-medium mt-2">Bagaimana perkembangan {profile?.name} hari ini?</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">{t('dashboard.hello')}, {auth.currentUser?.email?.split('@')[0] || t('dashboard.parent')}!! <span className="inline-block animate-wave">👋</span></h1>
+            <p className="text-white/70 font-medium mt-2">{t('dashboard.greeting', { name: profile?.name || '' })}</p>
          </div>
          <div className="relative z-10 flex flex-wrap items-center gap-3 w-full md:w-auto">
              <button 
                onClick={() => setIsMapOpen(true)}
                className="flex-1 md:flex-none justify-center px-5 py-3 bg-white/10 text-white backdrop-blur-md rounded-full text-sm font-semibold hover:bg-white/20 transition-colors flex items-center gap-2"
              >
-               <MapIcon className="w-4 h-4" /> Cari Puskesmas
+               <MapIcon className="w-4 h-4" /> {t('dashboard.search_clinic')}
              </button>
              <button 
                onClick={handleStartClicked}
@@ -204,7 +206,7 @@ export default function DashboardView({
                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-white border-2 border-[#8cc63f]"></span>
                  </span>
                )}
-               <Plus className="w-4 h-4" /> Skrining
+               <Plus className="w-4 h-4" /> {t('dashboard.screening')}
              </button>
              <div className="relative w-full md:w-auto mt-2 md:mt-0">
                  <button 
@@ -212,7 +214,7 @@ export default function DashboardView({
                    className="w-full md:w-auto justify-center px-5 py-3 bg-white text-[#263c32] rounded-full text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
                  >
                    <span className="text-lg leading-none mr-0.5">{profile.gender === 'Perempuan' ? '👧' : '👦'}</span>
-                   Profil <ChevronDown className="w-4 h-4 ml-1 opacity-50" />
+                   {t('dashboard.profile')} <ChevronDown className="w-4 h-4 ml-1 opacity-50" />
                  </button>
                  
                  <AnimatePresence>
@@ -249,7 +251,7 @@ export default function DashboardView({
                             className="w-full justify-center px-4 py-3 flex items-center gap-2 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-xl transition-all text-sm font-bold shadow-sm"
                           >
                              <Plus className="w-4 h-4" />
-                             Tambah Anak Baru
+                             {t('dashboard.add_new_child')}
                           </button>
                         </div>
                       </motion.div>
@@ -261,13 +263,13 @@ export default function DashboardView({
 
       {/* Row 1: Stat Cards */}
       <div className="flex items-center justify-between mb-2 px-2">
-         <h2 className="text-lg font-bold text-slate-800">Overview</h2>
+         <h2 className="text-lg font-bold text-slate-800">{t('dashboard.overview')}</h2>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Card 1 */}
         <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">Usia Anak</div>
+             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.child_age')}</div>
              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-slate-100 transition-colors">
                <span className="text-lg flex leading-none pt-0.5">{profile.gender === 'Perempuan' ? '👧' : '👦'}</span>
              </div>
@@ -275,7 +277,7 @@ export default function DashboardView({
            <div>
              <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.ageInMonths}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">Bulan</span> Aktual
+                <span className="bg-slate-100 px-2 py-0.5 rounded-full">{t('dashboard.month')}</span> {t('dashboard.actual')}
              </div>
            </div>
         </div>
@@ -283,7 +285,7 @@ export default function DashboardView({
         {/* Card 2 */}
         <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">Tinggi Badan</div>
+             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.height')}</div>
              <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
@@ -291,7 +293,7 @@ export default function DashboardView({
            <div>
              <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.heightCm}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">cm</span> Saat ini
+                <span className="bg-slate-100 px-2 py-0.5 rounded-full">cm</span> {t('dashboard.current')}
              </div>
            </div>
         </div>
@@ -299,7 +301,7 @@ export default function DashboardView({
         {/* Card 3 */}
         <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">Berat Badan</div>
+             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.weight')}</div>
              <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
@@ -307,7 +309,7 @@ export default function DashboardView({
            <div>
              <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.weightKg}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">kg</span> Saat ini
+                <span className="bg-slate-100 px-2 py-0.5 rounded-full">kg</span> {t('dashboard.current')}
              </div>
            </div>
         </div>
@@ -315,7 +317,7 @@ export default function DashboardView({
         {/* Card 4 */}
         <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">Skor Terakhir</div>
+             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.last_score')}</div>
              <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
@@ -325,11 +327,11 @@ export default function DashboardView({
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                 {latestScreening ? (
                    latestScreening.totalScore >= 9 ? (
-                     <span className="bg-[#8cc63f]/20 text-[#263c32] px-2 py-0.5 rounded-full">Sesuai Usia</span>
+                     <span className="bg-[#8cc63f]/20 text-[#263c32] px-2 py-0.5 rounded-full">{t('dashboard.age_appropriate')}</span>
                    ) : (
-                     <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Cek Lanjut</span>
+                     <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{t('dashboard.needs_review')}</span>
                    )
-                ) : 'Belum ada'}
+                ) : t('dashboard.none')}
              </div>
            </div>
         </div>
@@ -340,10 +342,10 @@ export default function DashboardView({
          {/* Chart */}
          <div className="lg:col-span-2 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-8">
-               <h3 className="font-bold text-[#263c32] text-xl">Pertumbuhan Berkala</h3>
+               <h3 className="font-bold text-[#263c32] text-xl">{t('dashboard.periodic_growth')}</h3>
                <div className="flex items-center gap-2">
                  <button className="w-8 h-8 rounded-full bg-slate-50 flex justify-center items-center hover:bg-slate-100 transition-colors"><ChevronDown className="w-4 h-4 text-slate-400" /></button>
-                 <button className="px-4 py-1.5 bg-[#8cc63f] text-[#1e3025] rounded-full text-xs font-bold shadow-sm">Export</button>
+                 <button className="px-4 py-1.5 bg-[#8cc63f] text-[#1e3025] rounded-full text-xs font-bold shadow-sm">{t('dashboard.export')}</button>
                </div>
             </div>
             <div className="flex-1 min-h-[220px] w-full">
@@ -374,7 +376,7 @@ export default function DashboardView({
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none"></div>
             
             <div className="flex items-center justify-between mb-8 relative z-10">
-               <h3 className="font-bold text-white text-xl">Riwayat Skrining</h3>
+               <h3 className="font-bold text-white text-xl">{t('dashboard.history')}</h3>
                <button className="w-8 h-8 flex justify-center items-center bg-[#8cc63f]/20 rounded-full hover:bg-[#8cc63f]/30 transition-colors">
                   <Plus className="w-4 h-4 text-[#8cc63f]" />
                </button>
@@ -382,12 +384,12 @@ export default function DashboardView({
             
             <div className="space-y-3 flex-1 overflow-y-auto pr-2 relative z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                {loadingHistory ? (
-                  <div className="text-center py-6 text-white/50 text-sm font-medium">Memuat...</div>
+                  <div className="text-center py-6 text-white/50 text-sm font-medium">{t('dashboard.loading')}</div>
                ) : history.length === 0 ? (
-                  <div className="text-center py-8 text-white/50 text-sm font-medium bg-[#1e3025] rounded-[20px] border border-dashed border-white/10">Belum ada riwayat</div>
+                  <div className="text-center py-8 text-white/50 text-sm font-medium bg-[#1e3025] rounded-[20px] border border-dashed border-white/10">{t('dashboard.no_history')}</div>
                ) : (
                   history.map((result) => {
-                     const formattedDate = format(new Date(result.createdAt), "dd MMM", { locale: id });
+                     const formattedDate = format(new Date(result.createdAt), "dd MMM", { locale: language === 'id' ? idLocale : enUS });
                      const isGood = result.totalScore >= 9;
 
                      return (
@@ -397,7 +399,7 @@ export default function DashboardView({
                                {isGood ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
                             </div>
                             <div>
-                               <div className="font-bold text-white text-sm mb-0.5">Asesmen {result.ageCategory.split('_')[0]} Bln</div>
+                               <div className="font-bold text-white text-sm mb-0.5">{t('dashboard.assessment', { age: result.ageCategory.split('_')[0] })}</div>
                                <div className="text-xs text-white/50 font-medium">{formattedDate}</div>
                             </div>
                           </div>
@@ -412,7 +414,7 @@ export default function DashboardView({
             
             <div className="mt-6 pt-6 border-t border-white/10 relative z-10">
                <button onClick={handleStartClicked} className="w-full py-3.5 bg-[#8cc63f] text-[#1e3025] text-sm font-bold rounded-full flex justify-center items-center hover:bg-[#7cb435] transition-colors">
-                  Buat Skrining Baru
+                  {t('dashboard.create_new_screening')}
                </button>
             </div>
          </div>
@@ -428,9 +430,9 @@ export default function DashboardView({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative"
             >
-              <h2 className="text-2xl font-bold text-[#263c32] mb-2">Pilih Usia Skrining</h2>
+              <h2 className="text-2xl font-bold text-[#263c32] mb-2">{t('dashboard.select_screening_age')}</h2>
               <p className="text-slate-500 mb-6 font-medium text-sm">
-                 Usia {profile?.name} saat ini adalah <strong className="text-[#263c32]">{profile?.ageInMonths} bulan</strong>. Pilih kuisioner terdekat yang ingin dikerjakan.
+                 <span dangerouslySetInnerHTML={{__html: t('dashboard.age_desc', { name: profile?.name || '', age: profile?.ageInMonths?.toString() || '' })}} />
               </p>
               
               <div className="grid grid-cols-1 gap-3 mb-6">
@@ -447,7 +449,7 @@ export default function DashboardView({
                         <div className="w-10 h-10 rounded-full bg-slate-100 text-[#263c32] group-hover:bg-[#8cc63f] group-hover:text-[#1e3025] flex items-center justify-center font-bold transition-colors">
                            {opt}
                         </div>
-                        <span className="font-bold text-[#263c32]">Kuisioner {opt} Bulan</span>
+                        <span className="font-bold text-[#263c32]">{t('dashboard.questionnaire', { age: opt.toString() })}</span>
                      </div>
                      <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#8cc63f]" />
                   </button>
@@ -458,7 +460,7 @@ export default function DashboardView({
                 onClick={() => setShowAgeSelectModal(false)}
                 className="w-full py-3 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-bold transition-colors"
                >
-                Batal
+                {t('dashboard.cancel')}
               </button>
             </motion.div>
           </div>

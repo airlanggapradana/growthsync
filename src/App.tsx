@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
@@ -19,11 +19,20 @@ import ParentChatList from './components/ParentChatList';
 import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
+import { useLanguage } from './contexts/LanguageContext';
+
+const categoryI18nKeyMap: Record<string, string> = {
+  "Gerak Kasar": "questionnaire.category.gross_motor",
+  "Gerak Halus": "questionnaire.category.fine_motor",
+  "Bicara dan Bahasa": "questionnaire.category.speech",
+  "Sosialisasi dan Kemandirian": "questionnaire.category.social"
+};
 
 type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
 
 export default function App() {
   const navigate = useNavigate();
+  const { language, setLanguage, t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [targetChatUser, setTargetChatUser] = useState<any>(null);
@@ -199,7 +208,7 @@ export default function App() {
            <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Kuisioner Anak Logo" className="h-16 w-auto object-contain" />
         </div>
 
-        <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">Menu</div>
+        <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">{t('sidebar.menu')}</div>
         <nav className="space-y-1.5 mb-8">
            <button 
              onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
@@ -207,7 +216,7 @@ export default function App() {
            >
              <div className="flex items-center gap-3">
                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-               Dashboard
+               {t('Dashboard')}
              </div>
              {unreadCount > 0 && userProfile?.role === 'nakes' && (
                <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
@@ -220,7 +229,7 @@ export default function App() {
              className="flex items-center gap-3 w-full px-4 py-3 text-white/40 font-semibold rounded-xl text-sm cursor-not-allowed"
            >
              <CheckCircle2 className="w-5 h-5 opacity-50" />
-             Tugas <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">Cooming Soon</span>
+             {t('sidebar.tasks')} <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">{t('sidebar.coming_soon')}</span>
            </button>
            {userProfile?.role === 'orang_tua' && (
              <button 
@@ -228,7 +237,7 @@ export default function App() {
                className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
              >
                <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-70")} />
-               Tambah Anak
+               {t('Tambah Anak')}
              </button>
            )}
            {userProfile?.role === 'orang_tua' && (
@@ -238,7 +247,7 @@ export default function App() {
              >
                <div className="flex items-center gap-3">
                  <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-                 Konsultasi Nakes
+                 {t('sidebar.chat')}
                </div>
                {unreadCount > 0 && (
                  <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
@@ -250,20 +259,30 @@ export default function App() {
         </nav>
 
         <div className="mt-auto">
-          <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">Pengaturan</div>
+          <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">{t('Pengaturan')}</div>
+          <button 
+             onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+             className="flex items-center justify-between w-full px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
+          >
+             <div className="flex items-center gap-3">
+               <Languages className="w-5 h-5 opacity-70" />
+               {t('Bahasa')}
+             </div>
+             <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full uppercase tracking-widest">{language}</span>
+          </button>
           <button 
              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
              className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
           >
              {theme === 'dark' ? <Sun className="w-5 h-5 opacity-70" /> : <Moon className="w-5 h-5 opacity-70" />}
-             {theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
+             {theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}
           </button>
           <button 
              onClick={handleLogout}
              className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors text-sm font-semibold"
           >
              <LogOut className="w-5 h-5 opacity-70" />
-             Keluar
+             {t('sidebar.logout')}
           </button>
         </div>
       </aside>
@@ -299,7 +318,7 @@ export default function App() {
                   onClick={handleResetToDashboard}
                   className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 transition-colors"
                 >
-                  Batalkan Skrining
+                  {t('app.cancel_screening')}
                 </button>
               )}
               {view === 'ONBOARDING' && activeProfile && (
@@ -307,7 +326,7 @@ export default function App() {
                   onClick={() => setView('DASHBOARD')}
                   className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 transition-colors"
                 >
-                  Kembali ke Dashboard
+                  {t('app.back_to_dashboard')}
                 </button>
               )}
               
@@ -365,7 +384,7 @@ export default function App() {
               profile={activeProfile}
               onClose={handleResetToDashboard}
               isHistoryMode={false}
-              onSaveResult={async (analysis) => {
+              onSaveResult={async (analysis, analysisEn) => {
                 if (user && activeProfileId && age) {
                   const totalScore = Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
                   const resultId = user.uid + '_' + Date.now().toString();
@@ -377,12 +396,13 @@ export default function App() {
                       answers: answers,
                       totalScore: totalScore,
                       aiAnalysis: analysis,
+                      aiAnalysisEn: analysisEn || '',
                       createdAt: serverTimestamp()
                     });
                     handleResetToDashboard();
                   } catch (e) {
                     console.error('Failed to save AI analysis', e);
-                    alert("Gagal menyimpan hasil. Silakan coba lagi.");
+                    alert(t('app.save_error'));
                   }
                 }
               }}
@@ -395,6 +415,7 @@ export default function App() {
               answers={selectedHistory.answers}
               profile={childProfiles.find(p => p.id === selectedHistory.profileId) || activeProfile}
               existingAnalysis={selectedHistory.aiAnalysis}
+              existingAnalysisEn={selectedHistory.aiAnalysisEn}
               onClose={() => {
                 setSelectedHistory(null);
                 setView('DASHBOARD');
@@ -457,6 +478,7 @@ const QuestionnaireView: React.FC<{
   onAnswer: (id: string, score: number) => void;
   onSubmit: () => void;
 }> = ({ age, answers, onAnswer, onSubmit }) => {
+  const { t, language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const questions = QUESTIONS_DATA[age];
   const answeredCount = Object.keys(answers).length;
@@ -497,10 +519,10 @@ const QuestionnaireView: React.FC<{
         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
         <div className="relative z-10 flex justify-between items-end mb-4">
           <div className="flex flex-col">
-            <span className="text-xs font-bold uppercase tracking-widest text-white/50 mb-1.5">Progres Pengerjaan</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-white/50 mb-1.5">{t('app.progress')}</span>
             <span className="text-3xl font-bold text-white leading-none">{answeredCount}<span className="text-white/40 text-xl font-medium ml-1">/ {questions.length}</span></span>
           </div>
-          <span className="text-sm text-white/70 font-semibold">{Math.round(progress)}% Selesai</span>
+          <span className="text-sm text-white/70 font-semibold">{Math.round(progress)}% {t('app.finished')}</span>
         </div>
         <div className="h-2 bg-black/20 rounded-full overflow-hidden relative z-10">
           <motion.div
@@ -523,19 +545,19 @@ const QuestionnaireView: React.FC<{
             className="bg-white p-8 md:p-12 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center"
           >
             <span className="inline-flex px-4 py-1.5 bg-[#8cc63f]/10 text-[#263c32] text-xs font-bold uppercase tracking-wider rounded-full mb-8 self-start">
-              {currentQuestion.kategori}
+              {t(categoryI18nKeyMap[currentQuestion.kategori] || currentQuestion.kategori)}
             </span>
             <h3 className="text-2xl md:text-3xl font-bold leading-tight text-[#263c32] mb-6">
               <span className="text-slate-300 font-medium mr-3">{currentIndex + 1}.</span>
-              {currentQuestion.pertanyaan}
+              {t(`question.${currentQuestion.id}`)}
             </h3>
 
             <div className="mb-10 bg-slate-50 border border-slate-100 rounded-2xl p-5 text-sm text-slate-600">
                <div className="flex items-start gap-3">
                  <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
                  <div className="space-y-1.5 mt-0.5">
-                   <p>&bull; Pilih jawaban <strong>"Ya"</strong> jika anak dapat melakukan perintah sesuai kuisioner</p>
-                   <p>&bull; Pilih jawaban <strong>"Tidak"</strong> jika yang dilakukan anak tidak sesuai dengan perintah dalam kuisioner</p>
+                   <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_yes') }} /></p>
+                   <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_no') }} /></p>
                  </div>
                </div>
             </div>
@@ -550,8 +572,8 @@ const QuestionnaireView: React.FC<{
                     : "border-slate-100 bg-white hover:border-[#8cc63f]/50 hover:bg-slate-50"
                 )}
               >
-                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>YA</span>
-                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 text-slate-400")}>Skor: 1</span>
+                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>{t('app.yes')}</span>
+                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 text-slate-400")}>{t('app.score', { score: '1' })}</span>
               </button>
               <button
                 onClick={() => handleAnswerClick(0)}
@@ -562,8 +584,8 @@ const QuestionnaireView: React.FC<{
                     : "border-slate-100 bg-white hover:border-amber-500/50 hover:bg-slate-50"
                 )}
               >
-                <span className={cn("text-2xl font-black", currentAnswer === 0 ? "text-amber-600" : "text-slate-400")}>TIDAK</span>
-                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 0 ? "bg-amber-500 text-white" : "bg-slate-100 text-slate-400")}>Skor: 0</span>
+                <span className={cn("text-2xl font-black", currentAnswer === 0 ? "text-amber-600" : "text-slate-400")}>{t('app.no')}</span>
+                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 0 ? "bg-amber-500 text-white" : "bg-slate-100 text-slate-400")}>{t('app.score', { score: '0' })}</span>
               </button>
             </div>
           </motion.div>
@@ -603,7 +625,7 @@ const QuestionnaireView: React.FC<{
               : "bg-white/5 text-white/30 cursor-not-allowed"
           )}
         >
-          {isComplete ? "Kirim Hasil" : "Jawab Semua (10)"}
+          {isComplete ? t('app.submit_result') : t('app.answer_all', { count: questions.length.toString() })}
         </button>
       </div>
     </motion.div>
@@ -617,8 +639,10 @@ const ResultView: React.FC<{
   isHistoryMode: boolean;
   profile?: ChildProfile;
   existingAnalysis?: string;
-  onSaveResult?: (analysis: string) => void;
-}> = ({ age, answers, onClose, isHistoryMode, profile, existingAnalysis, onSaveResult }) => {
+  existingAnalysisEn?: string;
+  onSaveResult?: (analysis: string, analysisEn?: string) => void;
+}> = ({ age, answers, onClose, isHistoryMode, profile, existingAnalysis, existingAnalysisEn, onSaveResult }) => {
+  const { language, t } = useLanguage();
   const questions = QUESTIONS_DATA[age];
   const totalScore = useMemo(() => {
     return Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
@@ -640,6 +664,7 @@ const ResultView: React.FC<{
   let resultDescription = "";
 
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(existingAnalysis || null);
+  const [aiAnalysisEn, setAiAnalysisEn] = useState<string | null>(existingAnalysisEn || null);
   const [loadingAi, setLoadingAi] = useState(!existingAnalysis);
   
   const [exportingPdf, setExportingPdf] = useState(false);
@@ -698,7 +723,8 @@ const ResultView: React.FC<{
         body: JSON.stringify({ ageCategory: age, totalScore, qna })
       });
       const data = await res.json();
-      setAiAnalysis(data.analysis);
+      setAiAnalysis(data.analysisId);
+      setAiAnalysisEn(data.analysisEn);
     } catch (err) {
       console.error("AI Analysis failed", err);
     } finally {
@@ -713,21 +739,43 @@ const ResultView: React.FC<{
     fetchAiAnalysis();
   }, [age, totalScore, answers, questions, existingAnalysis]);
 
+  useEffect(() => {
+    if (language === 'en' && !aiAnalysisEn && aiAnalysis) {
+       const translateMissing = async () => {
+         setLoadingAi(true);
+         try {
+           const res = await fetch('/api/translate-analysis', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ text: aiAnalysis, targetLang: 'en' })
+           });
+           const data = await res.json();
+           setAiAnalysisEn(data.translatedText);
+         } catch(e) {
+           console.error("Translation failed", e);
+         } finally {
+           setLoadingAi(false);
+         }
+       };
+       translateMissing();
+    }
+  }, [language, aiAnalysisEn, aiAnalysis]);
+
   if (totalScore >= 9) {
-    resultCategory = "Perkembangan Anak Sesuai";
+    resultCategory = t('app.result_cat_appropriate');
     resultColor = "text-emerald-600 bg-emerald-50 border-emerald-200";
     resultIcon = <CheckCircle2 className="w-12 h-12 text-emerald-500" />;
-    resultDescription = "Perkembangan anak Anda saat ini sesuai dengan tahapan usianya. Teruskan stimulasi yang selama ini dilakukan!";
+    resultDescription = t('app.result_desc_appropriate');
   } else if (totalScore >= 7) {
-    resultCategory = "Perkembangan Anak Meragukan";
+    resultCategory = t('app.result_cat_doubtful');
     resultColor = "text-amber-600 bg-amber-50 border-amber-200";
     resultIcon = <AlertCircle className="w-12 h-12 text-amber-500" />;
-    resultDescription = "Ada beberapa hal yang perlu distimulasi lebih lanjut. Jadwalkan evaluasi ulang 2 minggu lagi atau konsultasikan dengan tenaga kesehatan.";
+    resultDescription = t('app.result_desc_doubtful');
   } else {
-    resultCategory = "Ada Kemungkinan Penyimpangan";
+    resultCategory = t('app.result_cat_deviation');
     resultColor = "text-rose-600 bg-rose-50 border-rose-200";
     resultIcon = <Activity className="w-12 h-12 text-rose-500" />;
-    resultDescription = "Disarankan untuk segera berkonsultasi dengan dokter spesialis anak atau tenaga kesehatan terdekat untuk evaluasi lebih komprehensif.";
+    resultDescription = t('app.result_desc_deviation');
   }
 
   return (
@@ -765,7 +813,7 @@ const ResultView: React.FC<{
             </div>
           </div>
           <div className="relative z-10">
-            <div className="text-sm font-semibold uppercase tracking-wider opacity-70 mb-3">Skor Anda</div>
+            <div className="text-sm font-semibold uppercase tracking-wider opacity-70 mb-3">{t('app.your_score')}</div>
             <div className="text-7xl font-extrabold tracking-tight mb-2 text-slate-800 dark:text-slate-100">
               {totalScore}<span className="text-3xl font-medium text-slate-400 opacity-60">/10</span>
             </div>
@@ -787,26 +835,26 @@ const ResultView: React.FC<{
               <Sparkles className="w-5 h-5" />
             </div>
             <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
-              Analisis & Saran Ahli
+              {t('app.ai_analysis_title')}
             </h3>
           </div>
           <div className="p-6 sm:p-8 flex-1 overflow-y-auto min-h-[300px]">
             {loadingAi ? (
               <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-                <span className="text-sm font-medium">Menyusun analisis khusus untuk anak Anda...</span>
+                <span className="text-sm font-medium">{t('app.ai_loading')}</span>
               </div>
             ) : aiAnalysis ? (
               <div className="markdown-body prose prose-slate prose-sm sm:prose-base dark:prose-invert prose-p:leading-relaxed prose-a:text-purple-600 dark:prose-a:text-purple-400 max-w-none">
-                <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+                <ReactMarkdown>{(language === 'en' && aiAnalysisEn) ? aiAnalysisEn : aiAnalysis}</ReactMarkdown>
               </div>
             ) : (
                <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm font-medium gap-4">
-                 <span className="text-rose-500 font-bold">Gagal memuat analisis AI.</span>
-                 <p className="text-center text-slate-500 max-w-sm mb-2">Mohon generasikan ulang analisis AI untuk dapat menyimpan hasil kuisioner.</p>
+                 <span className="text-rose-500 font-bold">{t('app.ai_error')}</span>
+                 <p className="text-center text-slate-500 max-w-sm mb-2">{t('app.ai_retry')}</p>
                  <button onClick={fetchAiAnalysis} className="px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 rounded-xl flex items-center gap-2 font-bold transition-colors">
                    <RefreshCcw className="w-4 h-4 shrink-0 inline mr-2" />
-                   Generate Ulang Analisis
+                   {t('app.ai_regenerate')}
                  </button>
                </div>
             )}
@@ -823,7 +871,7 @@ const ResultView: React.FC<{
         >
           <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700/60 flex items-center gap-3">
             <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
-              Rekapitulasi Jawaban
+              {t('app.recap_title')}
             </h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:gap-px bg-slate-100 dark:bg-slate-800">
@@ -834,8 +882,8 @@ const ResultView: React.FC<{
                   <div className="flex items-start gap-4 mb-4 flex-1">
                     <span className="font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-lg w-8 h-8 flex items-center justify-center shrink-0 shadow-sm text-sm">{i + 1}</span>
                     <div>
-                      <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{q.kategori}</span>
-                      <p className="text-slate-700 dark:text-slate-200 text-sm font-medium leading-relaxed">{q.pertanyaan}</p>
+                      <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{t(categoryI18nKeyMap[q.kategori] || q.kategori)}</span>
+                      <p className="text-slate-700 dark:text-slate-200 text-sm font-medium leading-relaxed">{t(`question.${q.id}`)}</p>
                     </div>
                   </div>
                   <div className="mt-auto pl-12">
@@ -845,7 +893,7 @@ const ResultView: React.FC<{
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
                         : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                     )}>
-                      {score === 1 ? 'Iya (Skor: 1)' : 'Tidak (Skor: 0)'}
+                      {score === 1 ? t('app.yes_score') : t('app.no_score')}
                     </span>
                   </div>
                 </div>
@@ -866,7 +914,7 @@ const ResultView: React.FC<{
           ) : (
             <Download className="w-5 h-5" />
           )}
-          {exportingPdf ? 'Menyiapkan PDF...' : 'Export PDF'}
+          {exportingPdf ? t('app.preparing_pdf') : t('app.export_pdf')}
         </button>
 
         {isHistoryMode ? (
@@ -875,7 +923,7 @@ const ResultView: React.FC<{
             className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-slate-900 dark:bg-white border rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold transition-all shadow-md text-sm"
           >
             <ArrowLeft className="w-5 h-5" />
-            Kembali ke Dashboard
+            {t('app.back_to_dashboard')}
           </button>
         ) : (
           <>
@@ -883,19 +931,19 @@ const ResultView: React.FC<{
               onClick={onClose}
               className="flex items-center justify-center min-w-[150px] gap-2.5 px-6 py-3.5 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold transition-all shadow-sm text-sm"
             >
-              Batal
+              {t('app.cancel')}
             </button>
             <button
               onClick={() => {
                 if (aiAnalysis && onSaveResult) {
-                  onSaveResult(aiAnalysis);
+                  onSaveResult(aiAnalysis, aiAnalysisEn || undefined);
                 }
               }}
               disabled={loadingAi || !aiAnalysis}
               className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-emerald-600 border border-emerald-600 rounded-xl hover:bg-emerald-700 text-white font-semibold transition-all shadow-md text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:border-slate-400"
             >
               <Check className="w-5 h-5" />
-              Simpan Hasil
+              {t('app.save_result')}
             </button>
           </>
         )}
@@ -909,29 +957,29 @@ const ResultView: React.FC<{
                <Activity className="w-8 h-8" style={{ color: '#059669' }} />
              </div>
              <div>
-               <h1 className="text-2xl font-bold" style={{ color: '#0f172a' }}>Laporan Hasil Skrining Perkembangan</h1>
-               <p style={{ color: '#64748b' }}>Aplikasi Kuisioner Tumbuh Kembang Anak</p>
+               <h1 className="text-2xl font-bold" style={{ color: '#0f172a' }}>{t('app.report_title')}</h1>
+               <p style={{ color: '#64748b' }}>{t('app.report_subtitle')}</p>
              </div>
            </div>
 
            <div className="grid grid-cols-2 gap-6 mb-8">
              <div className="p-5 rounded-xl border" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#64748b' }}>Data Anak</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#64748b' }}>{t('app.child_data')}</h3>
                 <div className="space-y-3">
-                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Nama Lengkap</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.name || '-'}</span></div>
-                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Usia</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.ageInMonths || '-'} Bulan</span></div>
-                  <div><span className="block text-xs" style={{ color: '#64748b' }}>Jenis Kelamin</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.gender || '-'}</span></div>
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('onboarding.name')}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.name || '-'}</span></div>
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('dashboard.child_age')}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.ageInMonths || '-'} {t('dashboard.month')}</span></div>
+                  <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('onboarding.gender')}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.gender === 'Laki-laki' ? t('onboarding.boy') : profile?.gender === 'Perempuan' ? t('onboarding.girl') : '-'}</span></div>
                   <div className="flex gap-4">
-                     <div><span className="block text-xs" style={{ color: '#64748b' }}>Tinggi Badan</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.heightCm || '-'} cm</span></div>
-                     <div><span className="block text-xs" style={{ color: '#64748b' }}>Berat Badan</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.weightKg || '-'} kg</span></div>
+                     <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('dashboard.height')}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.heightCm || '-'} cm</span></div>
+                     <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('dashboard.weight')}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile?.weightKg || '-'} kg</span></div>
                      {profile?.headCircumferenceCm && (
-                       <div><span className="block text-xs" style={{ color: '#64748b' }}>Lingkar Kepala</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile.headCircumferenceCm} cm</span></div>
+                       <div><span className="block text-xs" style={{ color: '#64748b' }}>{t('onboarding.head_circ').split(' ')[0]}</span><span className="font-semibold" style={{ color: '#0f172a' }}>{profile.headCircumferenceCm} cm</span></div>
                      )}
                   </div>
                 </div>
              </div>
              <div className="p-5 rounded-xl border flex flex-col justify-center items-center text-center" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>Hasil Skrining (Usia {age.split('_')[0]} Bulan)</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>{t('dashboard.assessment', { age: age.split('_')[0] })}</h3>
                 <div className="text-5xl font-extrabold mb-2" style={{ color: '#1e293b' }}>{totalScore}<span className="text-xl" style={{ color: '#94a3b8' }}>/10</span></div>
                 <div className="font-bold text-lg mb-1" style={{ color: '#059669' }}>{resultCategory}</div>
                 <p className="text-xs px-4" style={{ color: '#475569' }}>{resultDescription}</p>
@@ -940,7 +988,7 @@ const ResultView: React.FC<{
 
            <div className="mb-8">
              <h3 className="text-base font-bold mb-4 flex items-center gap-2 border-b pb-2" style={{ color: '#0f172a', borderColor: '#e2e8f0' }}>
-               Rincian Parameter Skrining
+               {t('app.parameter_details')}
              </h3>
              <div className="grid grid-cols-2 gap-4">
                {Object.entries(categoryScores).map(([cat, score]) => (
@@ -954,16 +1002,16 @@ const ResultView: React.FC<{
 
            <div className="mb-8">
              <h3 className="text-base font-bold mb-4 flex items-center gap-2 border-b pb-2" style={{ color: '#0f172a', borderColor: '#e2e8f0' }}>
-               Grafik Pertumbuhan (Antropometri)
+               {t('app.anthro_title')}
              </h3>
              <div className="p-5 rounded-xl border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                <p className="text-xs mb-4" style={{ color: '#64748b' }}>Posisi indikator merupakan estimasi relatif terhadap standar pertumbuhan anak seusianya (kurva KMS/WHO).</p>
+                <p className="text-xs mb-4" style={{ color: '#64748b' }}>{t('app.anthro_desc')}</p>
                 
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span style={{ color: '#0f172a' }}>Berat Badan: {profile?.weightKg || '-'} kg</span>
-                      <span style={{ color: profile?.weightKg && profile.weightKg > 3 ? '#10b981' : '#f59e0b' }}>{profile?.weightKg && profile.weightKg > 3 ? 'Normal' : 'Perlu Pantauan'}</span>
+                      <span style={{ color: '#0f172a' }}>{t('dashboard.weight')}: {profile?.weightKg || '-'} kg</span>
+                      <span style={{ color: profile?.weightKg && profile.weightKg > 3 ? '#10b981' : '#f59e0b' }}>{profile?.weightKg && profile.weightKg > 3 ? t('app.anthro_normal') : t('app.anthro_needs_review')}</span>
                     </div>
                     <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
                        <div className="h-full rounded-full" style={{ width: profile?.weightKg ? Math.min(Math.max((profile.weightKg / 10) * 100, 10), 100) + '%' : '0%', backgroundColor: profile?.weightKg && profile.weightKg > 3 ? '#10b981' : '#f59e0b' }}></div>
@@ -972,8 +1020,8 @@ const ResultView: React.FC<{
                   
                   <div>
                     <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span style={{ color: '#0f172a' }}>Tinggi Badan: {profile?.heightCm || '-'} cm</span>
-                      <span style={{ color: profile?.heightCm && profile.heightCm > 50 ? '#10b981' : '#f59e0b' }}>{profile?.heightCm && profile.heightCm > 50 ? 'Normal' : 'Perlu Pantauan'}</span>
+                      <span style={{ color: '#0f172a' }}>{t('dashboard.height')}: {profile?.heightCm || '-'} cm</span>
+                      <span style={{ color: profile?.heightCm && profile.heightCm > 50 ? '#10b981' : '#f59e0b' }}>{profile?.heightCm && profile.heightCm > 50 ? t('app.anthro_normal') : t('app.anthro_needs_review')}</span>
                     </div>
                     <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
                        <div className="h-full rounded-full" style={{ width: profile?.heightCm ? Math.min(Math.max((profile.heightCm / 80) * 100, 10), 100) + '%' : '0%', backgroundColor: profile?.heightCm && profile.heightCm > 50 ? '#10b981' : '#f59e0b' }}></div>
@@ -983,8 +1031,8 @@ const ResultView: React.FC<{
                   {profile?.headCircumferenceCm && (
                     <div>
                       <div className="flex justify-between text-xs font-semibold mb-1">
-                        <span style={{ color: '#0f172a' }}>Lingkar Kepala: {profile.headCircumferenceCm} cm</span>
-                        <span style={{ color: '#8b5cf6' }}>Terpantau</span>
+                        <span style={{ color: '#0f172a' }}>{t('onboarding.head_circ').split(' ')[0]} {t('onboarding.head_circ').split(' ')[1]}: {profile.headCircumferenceCm} cm</span>
+                        <span style={{ color: '#8b5cf6' }}>{t('app.anthro_monitored')}</span>
                       </div>
                       <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#e2e8f0' }}>
                          <div className="h-full rounded-full" style={{ width: Math.min(Math.max((profile.headCircumferenceCm / 50) * 100, 10), 100) + '%', backgroundColor: '#8b5cf6' }}></div>
@@ -998,19 +1046,19 @@ const ResultView: React.FC<{
            <div className="mb-8 p-6 rounded-xl border" style={{ backgroundColor: '#faf5ff', borderColor: '#f3e8ff' }}>
              <h3 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: '#581c87' }}>
                <Sparkles className="w-5 h-5" style={{ color: '#9333ea' }} />
-               Analisis AI & Rekomendasi Stimulasi
+               {t('app.ai_analysis_title')}
              </h3>
              <div className="max-w-none text-sm pdf-markdown leading-relaxed whitespace-pre-wrap" style={{ color: '#334155' }}>
-                <ReactMarkdown>{aiAnalysis || 'Analisis sedang disiapkan...'}</ReactMarkdown>
+                <ReactMarkdown>{(language === 'en' && aiAnalysisEn) ? aiAnalysisEn : (aiAnalysis || t('app.ai_loading'))}</ReactMarkdown>
              </div>
            </div>
            
            <div className="mt-8 pt-6 border-t text-center" style={{ borderColor: '#e2e8f0' }}>
              <p className="text-[10px] italic mb-3" style={{ color: '#64748b' }}>
-               <strong>Penafian Medis:</strong> Laporan ini adalah hasil skrining awal berdasarkan input pengguna dan bukan merupakan diagnosis medis. Jika terdapat hasil "Meragukan" atau "Ada Kemungkinan Penyimpangan", serta kondisi parameter pertumbuhan di luar rentang normal, mohon segera berkonsultasi dengan Dokter Spesialis Anak (Sp.A) atau Pusat Layanan Kesehatan terdekat.
+               <strong>{t('app.medical_disclaimer_title')}:</strong> {t('app.medical_disclaimer_text')}
              </p>
              <p className="text-[10px]" style={{ color: '#94a3b8' }}>
-               Dokumen ini dihasilkan secara otomatis oleh sistem Kuisioner Tumbuh Kembang Anak pada {new Date().toLocaleDateString('id-ID')}
+               {t('app.auto_generated_doc', { date: new Date().toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID') })}
              </p>
            </div>
         </div>

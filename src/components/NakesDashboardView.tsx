@@ -5,6 +5,7 @@ import { collection, query, where, getDocs, orderBy, updateDoc, doc } from 'fire
 import { UserProfile, ChildProfile, QuestionnaireResult } from '../types';
 import { Loader2, Users, Search, ChevronRight, Activity, Smile, MapPin, MessageSquare, User as UserIcon, ShieldCheck, FileText, CalendarClock } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useLanguage } from '../contexts/LanguageContext';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 dayjs.locale('id');
@@ -31,6 +32,8 @@ export default function NakesDashboardView({
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'my_patients' | 'unassigned'>('my_patients');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     try {
@@ -86,7 +89,7 @@ export default function NakesDashboardView({
 
   const handleClaimParent = async (parentId: string) => {
     if (!userProfile.isVerified) {
-      alert("Akun Anda belum terverifikasi oleh Admin sehingga tidak dapat mengambil pasien.");
+      alert(t('nakes.unverified_alert'));
       return;
     }
     setActionLoadingId(parentId);
@@ -116,23 +119,23 @@ export default function NakesDashboardView({
         <header>
           <div className="flex items-center justify-between mb-4">
              <div>
-               <h1 className="text-3xl font-bold tracking-tight text-[#263c32]">Pasien & Layanan</h1>
+               <h1 className="text-3xl font-bold tracking-tight text-[#263c32]">{t('nakes.title')}</h1>
                <p className="text-sm font-medium text-slate-500 mt-1">
-                 Kelola data pertumbuhan anak dari setiap orang tua di area Anda.
+                 {t('nakes.subtitle')}
                </p>
              </div>
              <div className="flex flex-col items-end gap-2">
                <div className="bg-[#8cc63f]/20 text-[#263c32] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
                  <Activity className="w-4 h-4" />
-                 Nakes Akses
+                 {t('nakes.role_access')}
                </div>
                {userProfile.isVerified ? (
                  <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-                   <ShieldCheck className="w-3.5 h-3.5" /> Terverifikasi
+                   <ShieldCheck className="w-3.5 h-3.5" /> {t('nakes.verified')}
                  </span>
                ) : (
                  <span className="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-semibold">
-                   Menunggu Verifikasi Admin
+                   {t('nakes.waiting_verification')}
                  </span>
                )}
              </div>
@@ -144,14 +147,14 @@ export default function NakesDashboardView({
                className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'my_patients' ? "bg-white text-[#263c32] shadow-sm flex items-center gap-2" : "text-slate-500 hover:text-slate-900 line-clamp-1")}
              >
                {activeTab === 'my_patients' && <ShieldCheck className="w-4 h-4" />}
-               Pasien Saya ({myPatients.length})
+               {t('nakes.my_patients')} ({myPatients.length})
              </button>
              <button
                onClick={() => setActiveTab('unassigned')}
                className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'unassigned' ? "bg-white text-[#263c32] shadow-sm flex items-center gap-2" : "text-slate-500 hover:text-slate-900")}
              >
                {activeTab === 'unassigned' && <Users className="w-4 h-4" />}
-               Daftar Orang Tua ({unassignedParents.length})
+               {t('nakes.parent_list')} ({unassignedParents.length})
              </button>
           </div>
 
@@ -159,7 +162,7 @@ export default function NakesDashboardView({
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input 
               type="text" 
-              placeholder="Cari email orang tua atau nama anak..." 
+              placeholder={t('nakes.search')} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-full outline-none focus:border-[#8cc63f] focus:ring-4 focus:ring-[#8cc63f]/10 transition-all font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
@@ -190,7 +193,7 @@ export default function NakesDashboardView({
                       
                       <div className="mt-4">
                          {parent.children.length === 0 && (
-                            <span className="text-xs text-slate-400 italic">Belum ada profil anak.</span>
+                            <span className="text-xs text-slate-400 italic">{t('nakes.no_child_profile')}</span>
                          )}
                          <div className={cn(activeTab === 'my_patients' ? "flex flex-col gap-4 w-full" : "flex flex-wrap gap-2")}>
                            {parent.children.map(child => {
@@ -203,18 +206,18 @@ export default function NakesDashboardView({
                                     <summary className="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
                                        <div className="flex items-center gap-2 font-bold text-[#263c32]">
                                           <Smile className="w-4 h-4 text-[#8cc63f]" />
-                                          {child.name} <span className="text-slate-400 font-medium ml-1">({child.ageInMonths} Bulan)</span>
+                                          {child.name} <span className="text-slate-400 font-medium ml-1">({child.ageInMonths} {t('dashboard.month')})</span>
                                        </div>
                                        <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" />
                                     </summary>
                                     <div className="px-4 pb-4 flex flex-col gap-3">
                                       <div className="flex items-center gap-6 text-xs font-medium">
                                         <div className="flex flex-col">
-                                          <span className="text-slate-400">Berat Badan</span>
+                                          <span className="text-slate-400">{t('nakes.weight')}</span>
                                           <span className="font-bold text-slate-700">{child.weightKg || '-'} kg</span>
                                         </div>
                                         <div className="flex flex-col">
-                                          <span className="text-slate-400">Tinggi Badan</span>
+                                          <span className="text-slate-400">{t('nakes.height')}</span>
                                           <span className="font-bold text-slate-700">{child.heightCm || '-'} cm</span>
                                         </div>
                                       </div>
@@ -222,17 +225,17 @@ export default function NakesDashboardView({
                                          <div className="flex items-start gap-2">
                                            <FileText className="w-4 h-4 text-slate-400 shrink-0" />
                                            <div className="flex flex-col">
-                                             <span className="text-slate-400 font-medium">Riwayat Skrining</span>
-                                             <span className="font-bold text-slate-700">{child.history?.length || 0} Kali</span>
-                                             {latestHistory && <span className="text-slate-500 mt-0.5">Terakhir: {dayjs(latestHistory.createdAt).format('DD MMM YYYY')}</span>}
+                                             <span className="text-slate-400 font-medium">{t('nakes.screening_history')}</span>
+                                             <span className="font-bold text-slate-700">{child.history?.length || 0} {t('nakes.times')}</span>
+                                             {latestHistory && <span className="text-slate-500 mt-0.5">{t('nakes.latest')} {dayjs(latestHistory.createdAt).format('DD MMM YYYY')}</span>}
                                            </div>
                                          </div>
                                          <div className="flex items-start gap-2">
                                            <CalendarClock className="w-4 h-4 text-amber-500 shrink-0" />
                                            <div className="flex flex-col">
-                                             <span className="text-slate-400 font-medium">Jadwal Selanjutnya</span>
+                                             <span className="text-slate-400 font-medium">{t('nakes.next_schedule')}</span>
                                              <span className="font-bold text-amber-600">
-                                                {nextSchedule ? nextSchedule.format('DD MMMM YYYY') : 'Sekarang'}
+                                                {nextSchedule ? nextSchedule.format('DD MMMM YYYY') : t('nakes.now')}
                                              </span>
                                            </div>
                                          </div>
@@ -245,7 +248,7 @@ export default function NakesDashboardView({
                              return (
                                <div key={child.id} className="bg-[#8cc63f]/10 text-[#263c32] border border-[#8cc63f]/20 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
                                  <Smile className="w-3.5 h-3.5 text-[#8cc63f]" />
-                                 {child.name} • {child.ageInMonths} bln
+                                 {child.name} • {child.ageInMonths} {t('dashboard.month')}
                                </div>
                              );
                            })}
@@ -261,7 +264,7 @@ export default function NakesDashboardView({
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] hover:bg-[#1e3025] text-white font-bold text-sm transition-all shadow-sm relative"
                       >
                         <MessageSquare className="w-4 h-4" />
-                        Chat Orang Tua
+                        {t('nakes.chat_parent')}
                         {unreadCountsBySender[parent.uid] > 0 && (
                           <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                             {unreadCountsBySender[parent.uid] > 99 ? '99+' : unreadCountsBySender[parent.uid]}
@@ -272,13 +275,13 @@ export default function NakesDashboardView({
                       <button 
                         onClick={() => {
                            if (!userProfile.isVerified) {
-                              alert("Akun Anda belum terverifikasi oleh Admin.");
+                              alert(t('nakes.unverified_alert'));
                               return;
                            }
                            handleClaimParent(parent.uid);
                         }}
                         disabled={actionLoadingId === parent.uid || !userProfile.isVerified}
-                        title={!userProfile.isVerified ? "Akun Anda belum terverifikasi" : ""}
+                        title={!userProfile.isVerified ? t('nakes.unverified_alert') : ""}
                         className={cn(
                           "flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all shadow-md",
                           userProfile.isVerified 
@@ -293,7 +296,7 @@ export default function NakesDashboardView({
                         ) : (
                           <ShieldCheck className="w-4 h-4 opacity-50" />
                         )}
-                        Pilih & Layani
+                        {t('nakes.select_serve')}
                       </button>
                     )}
                  </div>
@@ -308,8 +311,8 @@ export default function NakesDashboardView({
                   </div>
                   <div className="text-slate-500 font-medium">
                     {activeTab === 'my_patients' 
-                      ? 'Belum ada pasien yang Anda layani.' 
-                      : 'Tidak ada daftar orang tua baru saat ini.'}
+                      ? t('nakes.empty_patients') 
+                      : t('nakes.empty_unassigned')}
                   </div>
                 </div>
              )}

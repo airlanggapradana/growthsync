@@ -7,8 +7,10 @@ import { Baby, Loader2, ArrowRight } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { cn } from '../lib/utils';
 import { differenceInMonths } from 'date-fns';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function ChildOnboardingView({ user, onComplete }: { key?: string, user: User, onComplete: (profile: ChildProfile) => void }) {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [computedAgeInMonths, setComputedAgeInMonths] = useState<number | null>(null);
@@ -21,11 +23,11 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!gender) {
-      alert('Pilih jenis kelamin anak.');
+      alert(t('onboarding.alert_gender'));
       return;
     }
     if (computedAgeInMonths === null) {
-      alert('Masukkan tanggal lahir anak.');
+      alert(t('onboarding.alert_dob'));
       return;
     }
 
@@ -72,29 +74,29 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
           <Baby className="w-8 h-8" />
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
-          Profil Anak
+          {t('onboarding.title')}
         </h2>
         <p className="text-slate-500 dark:text-slate-400 font-medium">
-          Silakan isi data anak untuk menyesuaikan informasi perkembangan.
+          {t('onboarding.subtitle')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-6">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nama Lengkap Anak</label>
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('onboarding.name')}</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 rounded-xl outline-none transition-subtle font-medium text-slate-900 dark:text-slate-50 placeholder:text-slate-400"
-            placeholder="e.g. Arjuna Putra"
+            placeholder={t('onboarding.name_placeholder')}
             maxLength={100}
           />
         </div>
 
         <div className="space-y-3">
-           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Jenis Kelamin</label>
+           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('onboarding.gender')}</label>
            <div className="grid grid-cols-2 gap-4">
              <button
                 type="button"
@@ -106,7 +108,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                     : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
                 )}
              >
-                <span className="text-xl">👦</span> Laki-laki
+                <span className="text-xl">👦</span> {t('onboarding.boy')}
              </button>
              <button
                 type="button"
@@ -118,14 +120,14 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                     : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
                 )}
              >
-                <span className="text-xl">👧</span> Perempuan
+                <span className="text-xl">👧</span> {t('onboarding.girl')}
              </button>
            </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tanggal Lahir</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('onboarding.dob')}</label>
             <input
               type="date"
               required
@@ -144,12 +146,12 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
             />
             {computedAgeInMonths !== null && (
                <div className="text-sm font-semibold text-[#8cc63f] mt-1">
-                 Usia: {computedAgeInMonths} Bulan
+                 {t('onboarding.age_months', { age: computedAgeInMonths.toString() })}
                </div>
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Lingkar Kepala (cm) - Opsional</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('onboarding.head_circ')}</label>
             <input
               type="number"
               min="0"
@@ -161,7 +163,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tinggi Badan (cm)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('dashboard.height')} (cm)</label>
             <input
               type="number"
               required
@@ -174,7 +176,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Berat Badan (kg)</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('dashboard.weight')} (kg)</label>
             <input
               type="number"
               required
@@ -196,7 +198,7 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
               <>
-                Simpan Profil Anak
+                {t('onboarding.save')}
               </>
             )}
           </button>

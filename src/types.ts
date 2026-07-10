@@ -18,7 +18,9 @@ export type DevelopmentCategory = 'Gerak Kasar' | 'Gerak Halus' | 'Sosialisasi d
 export interface Question {
   id: string;
   kategori: DevelopmentCategory;
+  kategoriEn?: string;
   pertanyaan: string;
+  pertanyaanEn?: string;
 }
 
 export interface Answer {
@@ -47,5 +49,6 @@ export interface QuestionnaireResult {
   answers: Record<string, number>;
   totalScore: number;
   aiAnalysis?: string;
+  aiAnalysisEn?: string;
   createdAt: string;
 }
