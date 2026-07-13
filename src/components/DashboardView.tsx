@@ -10,7 +10,6 @@ import { id as idLocale, enUS } from 'date-fns/locale';
 import { cn } from '../lib/utils';
 import PuskesmasMapModal from './PuskesmasMapModal';
 import { useLanguage } from '../contexts/LanguageContext';
-import GoogleDriveReports from './GoogleDriveReports';
 
 export default function DashboardView({ 
   profiles, 
@@ -421,11 +420,6 @@ export default function DashboardView({
          </div>
       </div>
       <PuskesmasMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
-
-      {/* Google Drive Reports Backup List */}
-      <div className="mt-8">
-        <GoogleDriveReports />
-      </div>
 
       <AnimatePresence>
         {showAgeSelectModal && (
