@@ -42,6 +42,9 @@ export default function ChatView({ currentUser, targetUser, onBack }: { currentU
           updateDoc(doc(db, 'messages', docSnap.id), { read: true }).catch(console.error);
         }
       });
+    }, (error) => {
+      console.warn("Chat listener failed/offline:", error);
+      setLoading(false);
     });
 
     return () => unsubscribe();

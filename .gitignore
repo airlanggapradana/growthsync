@@ -1,10 +1,6 @@
 node_modules/
 build/
 dist/
-public/
-server.js
-api/index.js
-api/index.js.map
 coverage/
 .DS_Store
 *.log

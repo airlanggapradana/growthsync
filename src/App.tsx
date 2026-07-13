@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA } from './data/questions';
 import { cn } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages, Cloud } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
@@ -20,6 +20,12 @@ import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
 import { useLanguage } from './contexts/LanguageContext';
+import { 
+  getDriveAccessToken, 
+  connectGoogleDrive, 
+  getOrCreateFolder, 
+  uploadPdfToDrive 
+} from './lib/googleDrive';
 
 const categoryI18nKeyMap: Record<string, string> = {
   "Gerak Kasar": "questionnaire.category.gross_motor",
@@ -80,6 +86,8 @@ export default function App() {
          counts[senderId] = (counts[senderId] || 0) + 1;
       });
       setUnreadCountsBySender(counts);
+    }, (error) => {
+      console.warn("Unread listener failed/offline:", error);
     });
     return () => unsubscribeUnread();
   }, [user]);
@@ -96,14 +104,23 @@ export default function App() {
           // Fetch user profile to get role
           const userDocSnap = await getDoc(doc(db, 'users', currentUser.uid));
           let currentRole = 'orang_tua'; // default
+          let resolvedProfile: UserProfile;
+
           if (userDocSnap.exists()) {
             const data = userDocSnap.data();
             currentRole = data.role || 'orang_tua';
-            setUserProfile(data as UserProfile);
+            resolvedProfile = data as UserProfile;
           } else {
             // Provide a default user profile if none exists
-            const fallbackProfile: UserProfile = { uid: currentUser.uid, email: currentUser.email || '', role: 'orang_tua' };
-            setUserProfile(fallbackProfile);
+            resolvedProfile = { uid: currentUser.uid, email: currentUser.email || '', role: 'orang_tua' };
+          }
+          
+          setUserProfile(resolvedProfile);
+          // Save to localStorage cache
+          try {
+            localStorage.setItem(`userProfile_${currentUser.uid}`, JSON.stringify(resolvedProfile));
+          } catch (cacheErr) {
+            console.error("Failed to cache userProfile", cacheErr);
           }
 
           if (currentRole === 'admin') {
@@ -118,6 +135,14 @@ export default function App() {
               profiles.push({ id: docSnap.id, ...docSnap.data() } as ChildProfile);
             });
             setChildProfiles(profiles);
+            
+            // Save to localStorage cache
+            try {
+              localStorage.setItem(`childProfiles_${currentUser.uid}`, JSON.stringify(profiles));
+            } catch (cacheErr) {
+              console.error("Failed to cache childProfiles", cacheErr);
+            }
+
             if (profiles.length > 0) {
               setActiveProfileId(profiles[0].id || null);
               setView('DASHBOARD');
@@ -126,7 +151,41 @@ export default function App() {
             }
           }
         } catch (err) {
-          console.error("Error fetching user data", err);
+          console.error("Error fetching user data, using offline fallback:", err);
+          
+          // Try to recover from local cache
+          let cachedProfile: UserProfile | null = null;
+          let cachedChildProfiles: ChildProfile[] = [];
+          
+          try {
+            const profileStr = localStorage.getItem(`userProfile_${currentUser.uid}`);
+            if (profileStr) {
+              cachedProfile = JSON.parse(profileStr);
+            }
+            const childProfilesStr = localStorage.getItem(`childProfiles_${currentUser.uid}`);
+            if (childProfilesStr) {
+              cachedChildProfiles = JSON.parse(childProfilesStr);
+            }
+          } catch (cacheErr) {
+            console.error("Failed to retrieve cached offline data", cacheErr);
+          }
+          
+          const finalProfile = cachedProfile || { uid: currentUser.uid, email: currentUser.email || '', role: 'orang_tua' };
+          setUserProfile(finalProfile);
+          
+          if (finalProfile.role === 'admin') {
+            setView('ADMIN_DASHBOARD');
+          } else if (finalProfile.role === 'nakes') {
+            setView('NAKES_DASHBOARD');
+          } else {
+            setChildProfiles(cachedChildProfiles);
+            if (cachedChildProfiles.length > 0) {
+              setActiveProfileId(cachedChildProfiles[0].id || null);
+              setView('DASHBOARD');
+            } else {
+              setView('ONBOARDING');
+            }
+          }
         } finally {
           setLoadingProfile(false);
         }
@@ -670,6 +729,64 @@ const ResultView: React.FC<{
   const [exportingPdf, setExportingPdf] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
 
+  const [savingToDrive, setSavingToDrive] = useState(false);
+  const [driveSaveSuccess, setDriveSaveSuccess] = useState(false);
+
+  const handleSaveToDrive = async () => {
+    try {
+      setSavingToDrive(true);
+      setDriveSaveSuccess(false);
+
+      // Get or request token
+      let token = getDriveAccessToken();
+      if (!token) {
+        try {
+          token = await connectGoogleDrive();
+        } catch (err: any) {
+          console.error("Failed to connect to Google Drive", err);
+          alert(language === 'en' ? 'Failed to connect to Google Drive. Please authorize access.' : 'Gagal menghubungkan ke Google Drive. Harap berikan izin akses.');
+          setSavingToDrive(false);
+          return;
+        }
+      }
+
+      const element = pdfRef.current;
+      if (!element) {
+        setSavingToDrive(false);
+        return;
+      }
+
+      const dataUrl = await toJpeg(element, { quality: 0.98, backgroundColor: '#ffffff', pixelRatio: 2 });
+      
+      const pdfWidthIn = 8.27; // A4 width in inches
+      const pdfHeightIn = (element.offsetHeight * pdfWidthIn) / element.offsetWidth;
+      
+      const pdf = new jsPDF({
+        orientation: pdfHeightIn > pdfWidthIn ? 'portrait' : 'landscape',
+        unit: 'in',
+        format: [pdfWidthIn, pdfHeightIn]
+      });
+
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidthIn, pdfHeightIn);
+      const pdfBlob = pdf.output('blob');
+
+      // Create folder on Google Drive
+      const folderId = await getOrCreateFolder(token, 'Kindo - Laporan Tumbuh Kembang');
+
+      // Upload file
+      const fileName = `Laporan_Perkembangan_${profile?.name || 'Anak'}_${age.split('_')[0]}_bulan_${Date.now()}.pdf`;
+      await uploadPdfToDrive(token, pdfBlob, fileName, folderId);
+
+      setDriveSaveSuccess(true);
+      alert(language === 'en' ? 'Report successfully saved to Google Drive!' : 'Laporan berhasil disimpan ke Google Drive!');
+    } catch (err: any) {
+      console.error(err);
+      alert(language === 'en' ? `Failed to save to Google Drive: ${err.message}` : `Gagal menyimpan ke Google Drive: ${err.message}`);
+    } finally {
+      setSavingToDrive(false);
+    }
+  };
+
   const handleExportPdf = async () => {
     try {
       setExportingPdf(true);
@@ -903,11 +1020,11 @@ const ResultView: React.FC<{
         </motion.div>
       </motion.div>
 
-      <div className="flex justify-center gap-4 pt-10">
+      <div className="flex flex-wrap justify-center gap-4 pt-10">
         <button
           onClick={handleExportPdf}
           disabled={exportingPdf}
-          className="flex items-center justify-center min-w-[200px] gap-2.5 px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+          className="flex items-center justify-center min-w-[180px] gap-2.5 px-5 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm text-sm disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {exportingPdf ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -915,6 +1032,24 @@ const ResultView: React.FC<{
             <Download className="w-5 h-5" />
           )}
           {exportingPdf ? t('app.preparing_pdf') : t('app.export_pdf')}
+        </button>
+
+        <button
+          onClick={handleSaveToDrive}
+          disabled={savingToDrive}
+          className="flex items-center justify-center min-w-[180px] gap-2.5 px-5 py-3.5 bg-white dark:bg-slate-800 border border-[#8cc63f]/30 dark:border-[#8cc63f]/20 rounded-xl hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 text-[#263c32] dark:text-emerald-400 font-semibold transition-all shadow-sm text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {savingToDrive ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Cloud className="w-5 h-5 text-[#8cc63f]" />
+          )}
+          {savingToDrive 
+            ? (language === 'en' ? 'Saving...' : 'Menyimpan...') 
+            : driveSaveSuccess 
+              ? (language === 'en' ? 'Saved to Drive' : 'Tersimpan di Drive') 
+              : (language === 'en' ? 'Save to Google Drive' : 'Simpan ke Drive')
+          }
         </button>
 
         {isHistoryMode ? (
