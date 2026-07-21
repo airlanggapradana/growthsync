@@ -30,54 +30,64 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_3_6",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Ambil gulungan wool merah, lalu letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala atau sebaliknya. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepalanya dari kanan atau kiri ke tengah?"
+      "pertanyaan": "Ambil gulungan wool merah, lalu letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala atau sebaliknya. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepalanya dari kanan atau kiri ke tengah?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1znojDLZnTUQiNe-B9XY0OPRbXHZB_hKS"
     },
     {
       "id": "q_3_7",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Ambil gulungan wool merah, lalu letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala atau sebaliknya. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepalanya dari satu sisi hampir sampai pada sisi yang lain?"
+      "pertanyaan": "Ambil gulungan wool merah, lalu letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala atau sebaliknya. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepalanya dari satu sisi hampir sampai pada sisi yang lain?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/18wqpTasy-l_o2vQdqPT2wds9TOEv-VMl"
     },
     {
       "id": "q_3_8",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya seperti pada gambar?"
+      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya seperti pada gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1W102GfrmLSs6rkakYlYgNw7KMpikNaj4"
     },
     {
       "id": "q_3_9",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya sehingga membentuk sudut 45˚ seperti pada gambar?"
+      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya sehingga membentuk sudut 45˚ seperti pada gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1OKuuvZsRvXi6eMbw8HM-kq5Xt7GgQoi7"
     },
     {
       "id": "q_3_10",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya dengan tegak seperti pada gambar?"
+      "pertanyaan": "Pada saat bayi tengkurap di alas yang datar, apakah ia dapat mengangkat kepalanya dengan tegak seperti pada gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1Ze36ylaoucRZAkD_TSSawugDn4eKs50f"
     }
   ],
   "6_bulan": [
     {
       "id": "q_6_1",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi diposisikan terlentang. Ambil gulungan wool merah, letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepala sepenuhnya dari satu ke sisi yang lain?"
+      "pertanyaan": "Bayi diposisikan terlentang. Ambil gulungan wool merah, letakkan di atas wajah di depan mata bayi. Gerakkan wool dari samping kiri ke kanan kepala. Apakah ia dapat mengikuti gerakan Anda dengan menggerakkan kepala sepenuhnya dari satu ke sisi yang lain?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/12LgXs1gREQwOUpIkEHY4FrYyqEnAJeJ0"
     },
     {
       "id": "q_6_2",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Pada posisi bayi terlentang, pegang kedua tangannya lalu tarik perlahan ke posisi duduk. Dapatkah bayi mempertahankan lehernya secara kaku seperti pada gambar? Jawab ‘Tidak’ bila kepala bayi jatuh kembali seperti gambar."
+      "pertanyaan": "Pada posisi bayi terlentang, pegang kedua tangannya lalu tarik perlahan ke posisi duduk. Dapatkah bayi mempertahankan lehernya secara kaku seperti pada gambar? Jawab ‘Tidak’ bila kepala bayi jatuh kembali seperti gambar.",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1arU4hWiAaqn68YqtPlSy8Z7EoW4TLU8r"
     },
     {
       "id": "q_6_3",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Ketika bayi tengkurap di alas yang datar, apakah ia dapat mengangkat dada dengan kedua lengannya sebagai penyangga seperti pada gambar?"
+      "pertanyaan": "Ketika bayi tengkurap di alas yang datar, apakah ia dapat mengangkat dada dengan kedua lengannya sebagai penyangga seperti pada gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1NnmUMNRrdeEnfDbvhzEsu4ugVos6-l8U"
     },
     {
       "id": "q_6_4",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Dapatkah bayi mempertahankan posisi kepala dalam keadaan tegak dan stabil? Jawab ‘Tidak’ bila kepala bayi cenderung jatuh ke kanan, kiri, atau ke dadanya."
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Dapatkah bayi mempertahankan posisi kepala dalam keadaan tegak dan stabil? Jawab ‘Tidak’ bila kepala bayi cenderung jatuh ke kanan, kiri, atau ke dadanya.",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1UpPgTgJITxgtMgQHpW5c8yWBqp7sn6I9"
     },
     {
       "id": "q_6_5",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Sentuhkan pensil di punggung tangan atau ujung jari bayi (jangan meletakkan di atas telapak tangan bayi). Apakah bayi dapat menggenggam pensil itu selama beberapa detik?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Sentuhkan pensil di punggung tangan atau ujung jari bayi (jangan meletakkan di atas telapak tangan bayi). Apakah bayi dapat menggenggam pensil itu selama beberapa detik?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1mYmkHwSErTDuXdZOUYPb_2tBC08mwxVL"
     },
     {
       "id": "q_6_6",
@@ -109,12 +119,13 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_9_1",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh, Taruh kismis di atas meja. Dapatkah bayi memungut dengan tangannya benda−benda kecil seperti kismis, kacang-kacangan, potongan biskuit dengan gerakan miring atau menggerapai seperti gambar?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh, Taruh kismis di atas meja. Dapatkah bayi memungut dengan tangannya benda−benda kecil seperti kismis, kacang-kacangan, potongan biskuit dengan gerakan miring atau menggerapai seperti gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1q12Q2lcx42R1_lGh2UA8TFTyXLljKeg7"
     },
     {
       "id": "q_9_2",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Taruh 2 kubus di atas meja, buat agar bayi dapat memungut dan memegang kubus pada masing-masing tangannya. Dapatkah ia melakukannya?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Taruh 2 kubus di atas meja, buat agar bayi dapat memungut and memegang kubus pada masing-masing tangannya. Dapatkah ia melakukannya?"
     },
     {
       "id": "q_9_3",
@@ -149,7 +160,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_9_9",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Tanpa disangga oleh bantal, kursi atau dinding, dapatkah bayi duduk sendiri selama 60 detik?"
+      "pertanyaan": "Tanpa disangga oleh bantal, kursi atau dinding, dapatkah bayi duduk sendiri selama 60 detik?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1t7PAorkZXFYsfMVTaGYQsFqQ80GfIrWn"
     },
     {
       "id": "q_9_10",
@@ -166,7 +178,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_12_2",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Letakkan kismis di atas meja. Dapatkah anak memungut dengan tangannya benda−benda kecil seperti kismis, kacang−kacangan, potongan biskuit dengan gerakan miring atau menggerapai seperti gambar?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Letakkan kismis di atas meja. Dapatkah anak memungut dengan tangannya benda−benda kecil seperti kismis, kacang−kacangan, potongan biskuit dengan gerakan miring atau menggerapai seperti gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1TLp6aQmRuZx2QMDOdDZEB4phkFC51Agf"
     },
     {
       "id": "q_12_3",
@@ -181,7 +194,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_12_5",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Tanyakan kepada ibu atau pengasuh, apakah anak dapat mengangkat badannya ke posisi berdiri tanpa bantuan?"
+      "pertanyaan": "Tanyakan kepada ibu atau pengasuh, apakah anak dapat mengangkat badannya ke posisi berdiri tanpa bantuan?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1Y4RkUJeS3UofhTDppCzneqLNoxxzh1Bx"
     },
     {
       "id": "q_12_6",
@@ -213,7 +227,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_15_1",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Berikan 2 kubus kepada anak. Tanpa bantuan, apakah anak dapat mempertemukan 2 kubus kecil yang ia pegang?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Berikan 2 kubus kepada anak. Tanpa bantuan, apakah anak dapat mempertemukan 2 kubus kecil yang ia pegang?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1PBc1bacREjollIdbf6rmad6k6okt0p94"
     },
     {
       "id": "q_15_2",
@@ -253,7 +268,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_15_9",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Apakah anak dapat berjalan di sepanjang ruangan tanpa jatuh atau terhuyung-huyung?"
+      "pertanyaan": "Apakah anak dapat berjalan di sepanjang ruangan tanpa jatuh atau terhuyung-huyung?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1ElOxaBY4fqF-K8j-vnHs4rPDdawqvaGo"
     },
     {
       "id": "q_15_10",
@@ -295,7 +311,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_18_7",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Letakkan kubus di lantai, tanpa berpegangan atau menyentuh lantai, apakah anak dapat membungkuk untuk memungut kubus di lantai dan kemudian berdiri kembali?"
+      "pertanyaan": "Letakkan kubus di lantai, tanpa berpegangan atau menyentuh lantai, apakah anak dapat membungkuk untuk memungut kubus di lantai dan kemudian berdiri kembali?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1Wb_Q2Trh2sPTNXo-tGnNODFEKGSjlsUB"
     },
     {
       "id": "q_18_8",
@@ -327,7 +344,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_21_3",
       "kategori": "Bicara dan Bahasa",
-      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Tunjukkan gambar di bawah pada anak dan minta ia untuk menunjuk gambar sesuai dengan yang Anda sebutkan namanya. Apakah anak dapat menunjuk minimal 1 gambar?"
+      "pertanyaan": "Bayi dipangku orang tua atau pengasuh. Tunjukkan gambar di bawah pada anak dan minta ia untuk menunjuk gambar sesuai dengan yang Anda sebutkan namanya. Apakah anak dapat menunjuk minimal 1 gambar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1xKtdjKhDcBdmWWyiG3z6Iae8izp_leng"
     },
     {
       "id": "q_21_4",
@@ -357,7 +375,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_21_9",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Letakkan kubus di lantai, tanpa berpegangan atau menyentuh lantai, apakah anak dapat membungkuk untuk memungut kubus di lantai dan kemudian berdiri kembali?"
+      "pertanyaan": "Letakkan kubus di lantai, tanpa berpegangan atau menyentuh lantai, apakah anak dapat membungkuk untuk memungut kubus di lantai dan kemudian berdiri kembali?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1up9UKPUU20a2rYl1KM22M-wUVgjMQ4SI"
     },
     {
       "id": "q_21_10",
@@ -421,17 +440,20 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_30_1",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Beri kubus di depan anak. Dapatkah anak menyusun 4 buah kubus menyerupai kereta api dengan cerobong asap (dicontohkan)?"
+      "pertanyaan": "Beri kubus di depan anak. Dapatkah anak menyusun 4 buah kubus menyerupai kereta api dengan cerobong asap (dicontohkan)?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1CY0fonFTVPEGOTRJVKDouS7b10MNbvxs"
     },
     {
       "id": "q_30_2",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:"
+      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1-ydvjY4NZ-XHa4B0Jp21zku-lUJPvCq8"
     },
     {
       "id": "q_30_3",
       "kategori": "Bicara dan Bahasa",
-      "pertanyaan": "Tanpa bimbingan, petunjuk, atau bantuan Anda, dapatkah anak menyebut 2 gambar di antara gambar-gambar di bawah dengan benar? Menyebut dengan suara binatang tidak ikut dinilai."
+      "pertanyaan": "Tanpa bimbingan, petunjuk, atau bantuan Anda, dapatkah anak menyebut 2 gambar di antara gambar-gambar di bawah dengan benar? Menyebut dengan suara binatang tidak ikut dinilai.",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1q1hrp3oQjHRr9V4By69g2QY7qULoVRDJ"
     },
     {
       "id": "q_30_4",
@@ -478,12 +500,14 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_36_2",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:"
+      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1iyvPbjqKshjsiQ5-JsDrdwLMeS8H6wnR"
     },
     {
       "id": "q_36_3",
       "kategori": "Bicara dan Bahasa",
-      "pertanyaan": "Tanpa bimbingan, petunjuk, atau bantuan Anda, dapatkah anak menyebut 4 gambar di antara gambar-gambar di bawah dengan benar? Menyebut dengan suara binatang tidak ikut dinilai."
+      "pertanyaan": "Tanpa bimbingan, petunjuk, atau bantuan Anda, dapatkah anak menyebut 4 gambar di antara gambar-gambar di bawah dengan benar? Menyebut dengan suara binatang tidak ikut dinilai.",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1Z5xJBQtUJQo2GlofU4P38gS0SFbe-Dhu"
     },
     {
       "id": "q_36_4",
@@ -525,7 +549,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_42_1",
       "kategori": "Gerak Halus",
-      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:"
+      "pertanyaan": "Buat garis lurus ke bawah sepanjang sekurang-kurangnya 2,5 cm. Minta anak untuk menggambar garis lain di samping garis ini. Jawab ‘Ya’ bila ia menggambar garis seperti ini: Jawab ‘Tidak’ bila ia menggambar garis seperti ini:",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1bWoMqhy_kZ_rALyC9w-3DeOolbbOMC_3"
     },
     {
       "id": "q_42_2",
@@ -535,7 +560,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_42_3",
       "kategori": "Bicara dan Bahasa",
-      "pertanyaan": "Tunjukkan anak gambar di bawah ini dan tanyakan: “Mana yang dapat terbang?” “Mana yang dapat mengeong?” “Mana yang dapat bicara?” “Mana yang dapat menggonggong?” “Mana yang dapat meringkik?” Apakah anak dapat menunjuk 2 kegiatan yang sesuai?"
+      "pertanyaan": "Tunjukkan anak gambar di bawah ini dan tanyakan: “Mana yang dapat terbang?” “Mana yang dapat mengeong?” “Mana yang dapat bicara?” “Mana yang dapat menggonggong?” “Mana yang dapat meringkik?” Apakah anak dapat menunjuk 2 kegiatan yang sesuai?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1hDJbNLVyCWB7KKc0RJpkoEjlOod8hPMI"
     },
     {
       "id": "q_42_4",
@@ -545,7 +571,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_42_5",
       "kategori": "Bicara dan Bahasa",
-      "pertanyaan": "Minta anak untuk menyebut 1 warna. Dapatkah anak menyebut 1 warna dengan benar?"
+      "pertanyaan": "Minta anak untuk menyebut 1 warna. Dapatkah anak menyebut 1 warna dengan benar?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1n8ULOJPotNxvsqm51zVcvbYYps8Bh78N"
     },
     {
       "id": "q_42_6",
@@ -570,7 +597,8 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
     {
       "id": "q_42_10",
       "kategori": "Gerak Kasar",
-      "pertanyaan": "Minta anak untuk berdiri 1 kaki tanpa berpegangan. Jika perlu tunjukkan caranya dan beri anak kesempatan sebanyak 3 kali. Dapatkah ia mempertahankan keseimbangan dalam waktu 1 detik atau lebih?"
+      "pertanyaan": "Minta anak untuk berdiri 1 kaki tanpa berpegangan. Jika perlu tunjukkan caranya dan beri anak kesempatan sebanyak 3 kali. Dapatkah ia mempertahankan keseimbangan dalam waktu 1 detik atau lebih?",
+      "imageUrl": "https://lh3.googleusercontent.com/d/1K9U3dHtZX-b9wfd9bzhYvD77ywpGdbdf"
     }
   ]
 };

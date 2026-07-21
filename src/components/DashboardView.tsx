@@ -158,15 +158,15 @@ export default function DashboardView({
       className="w-full mx-auto space-y-6"
     >
       {isTimeForScreening && !loadingHistory && (
-        <div className="bg-[#8cc63f]/10 border border-[#8cc63f]/20 rounded-3xl p-5 flex items-start gap-4 shadow-sm mb-6">
+        <div className="bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 border border-[#8cc63f]/20 dark:border-[#8cc63f]/15 rounded-3xl p-5 flex items-start gap-4 shadow-sm mb-6 animate-in fade-in duration-300">
           <div className="w-10 h-10 rounded-full bg-[#8cc63f]/20 flex items-center justify-center shrink-0">
-            <Bell className="w-5 h-5 text-[#263c32]" />
+            <Bell className="w-5 h-5 text-[#263c32] dark:text-[#bef264]" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-[#263c32] mb-1">
+            <h3 className="font-semibold text-[#263c32] dark:text-[#bef264] mb-1">
               {t('dashboard.screening_time')}
             </h3>
-            <p className="text-sm font-medium text-[#263c32]/80 mb-3 leading-relaxed">
+            <p className="text-sm font-medium text-[#263c32]/80 dark:text-[#bef264]/80 mb-3 leading-relaxed">
               {history.length === 0 
                 ? t('dashboard.screening_desc_1')
                 : t('dashboard.screening_desc_2')}
@@ -211,7 +211,7 @@ export default function DashboardView({
              <div className="relative w-full md:w-auto mt-2 md:mt-0">
                  <button 
                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                   className="w-full md:w-auto justify-center px-5 py-3 bg-white text-[#263c32] rounded-full text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
+                   className="w-full md:w-auto justify-center px-5 py-3 bg-white dark:bg-slate-900 text-[#263c32] dark:text-white rounded-full text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center gap-2"
                  >
                    <span className="text-lg leading-none mr-0.5">{profile.gender === 'Perempuan' ? '👧' : '👦'}</span>
                    {t('dashboard.profile')} <ChevronDown className="w-4 h-4 ml-1 opacity-50" />
@@ -224,7 +224,7 @@ export default function DashboardView({
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 4 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-100 shadow-xl rounded-2xl overflow-hidden z-50 text-slate-800"
+                        className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl rounded-2xl overflow-hidden z-50 text-slate-800 dark:text-slate-100"
                       >
                         {profiles.map(p => (
                           <button 
@@ -235,14 +235,14 @@ export default function DashboardView({
                             }}
                             className={cn(
                               "w-full text-left px-4 py-3 flex items-center gap-3 transition-colors text-sm font-semibold",
-                              p.id === activeProfileId ? "bg-slate-50 text-[#8cc63f]" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              p.id === activeProfileId ? "bg-slate-50 dark:bg-slate-800 text-[#8cc63f]" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                             )}
                           >
                              <span className="text-lg leading-none">{p.gender === 'Perempuan' ? '👧' : '👦'}</span>
                              {p.name}
                           </button>
                         ))}
-                        <div className="p-3 border-t border-slate-100 bg-slate-50 mt-1">
+                        <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 mt-1">
                           <button 
                             onClick={() => {
                               onAddProfile();
@@ -263,73 +263,73 @@ export default function DashboardView({
 
       {/* Row 1: Stat Cards */}
       <div className="flex items-center justify-between mb-2 px-2">
-         <h2 className="text-lg font-bold text-slate-800">{t('dashboard.overview')}</h2>
+         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('dashboard.overview')}</h2>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Card 1 */}
-        <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
+        <div className="bg-white dark:bg-slate-900 p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.child_age')}</div>
-             <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-slate-100 transition-colors">
+             <div className="font-semibold text-slate-500 dark:text-slate-400 text-sm">{t('dashboard.child_age')}</div>
+             <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                <span className="text-lg flex leading-none pt-0.5">{profile.gender === 'Perempuan' ? '👧' : '👦'}</span>
              </div>
            </div>
            <div>
-             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.ageInMonths}</div>
+             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32] dark:text-slate-100">{profile.ageInMonths}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">{t('dashboard.month')}</span> {t('dashboard.actual')}
+                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">{t('dashboard.month')}</span> {t('dashboard.actual')}
              </div>
            </div>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
+        <div className="bg-white dark:bg-slate-900 p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.height')}</div>
-             <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
+             <div className="font-semibold text-slate-500 dark:text-slate-400 text-sm">{t('dashboard.height')}</div>
+             <div className="w-8 h-8 bg-[#8cc63f]/10 dark:bg-[#8cc63f]/20 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 dark:hover:bg-[#8cc63f]/30 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
            </div>
            <div>
-             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.heightCm}</div>
+             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32] dark:text-slate-100">{profile.heightCm}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">cm</span> {t('dashboard.current')}
+                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">cm</span> {t('dashboard.current')}
              </div>
            </div>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
+        <div className="bg-white dark:bg-slate-900 p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.weight')}</div>
-             <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
+             <div className="font-semibold text-slate-500 dark:text-slate-400 text-sm">{t('dashboard.weight')}</div>
+             <div className="w-8 h-8 bg-[#8cc63f]/10 dark:bg-[#8cc63f]/20 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 dark:hover:bg-[#8cc63f]/30 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
            </div>
            <div>
-             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{profile.weightKg}</div>
+             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32] dark:text-slate-100">{profile.weightKg}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full">kg</span> {t('dashboard.current')}
+                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">kg</span> {t('dashboard.current')}
              </div>
            </div>
         </div>
 
         {/* Card 4 */}
-        <div className="bg-white p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between h-[160px]">
+        <div className="bg-white dark:bg-slate-900 p-5 lg:p-6 rounded-[28px] relative overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between h-[160px]">
            <div className="flex justify-between items-start">
-             <div className="font-semibold text-slate-500 text-sm">{t('dashboard.last_score')}</div>
-             <div className="w-8 h-8 bg-[#8cc63f]/10 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 transition-colors">
+             <div className="font-semibold text-slate-500 dark:text-slate-400 text-sm">{t('dashboard.last_score')}</div>
+             <div className="w-8 h-8 bg-[#8cc63f]/10 dark:bg-[#8cc63f]/20 rounded-full flex items-center justify-center text-[#8cc63f] cursor-pointer hover:bg-[#8cc63f]/20 dark:hover:bg-[#8cc63f]/30 transition-colors">
                <ArrowUpRight className="w-4 h-4" />
              </div>
            </div>
            <div>
-             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32]">{latestScreening ? latestScreening.totalScore : '-'}</div>
+             <div className="text-[40px] font-bold tracking-tight leading-none mb-2 text-[#263c32] dark:text-slate-100">{latestScreening ? latestScreening.totalScore : '-'}</div>
              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                 {latestScreening ? (
                    latestScreening.totalScore >= 9 ? (
-                     <span className="bg-[#8cc63f]/20 text-[#263c32] px-2 py-0.5 rounded-full">{t('dashboard.age_appropriate')}</span>
+                     <span className="bg-[#8cc63f]/20 text-[#263c32] dark:text-[#8cc63f] px-2 py-0.5 rounded-full">{t('dashboard.age_appropriate')}</span>
                    ) : (
-                     <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{t('dashboard.needs_review')}</span>
+                     <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">{t('dashboard.needs_review')}</span>
                    )
                 ) : t('dashboard.none')}
              </div>
@@ -340,11 +340,11 @@ export default function DashboardView({
       {/* Row 2: Analytics & Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
          {/* Chart */}
-         <div className="lg:col-span-2 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm flex flex-col">
+         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-8">
-               <h3 className="font-bold text-[#263c32] text-xl">{t('dashboard.periodic_growth')}</h3>
+               <h3 className="font-bold text-[#263c32] dark:text-slate-100 text-xl">{t('dashboard.periodic_growth')}</h3>
                <div className="flex items-center gap-2">
-                 <button className="w-8 h-8 rounded-full bg-slate-50 flex justify-center items-center hover:bg-slate-100 transition-colors"><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                 <button className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex justify-center items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                  <button className="px-4 py-1.5 bg-[#8cc63f] text-[#1e3025] rounded-full text-xs font-bold shadow-sm">{t('dashboard.export')}</button>
                </div>
             </div>
@@ -359,7 +359,7 @@ export default function DashboardView({
                    </defs>
                    <XAxis dataKey="month" stroke="#cbd5e1" fontSize={11} tickLine={false} axisLine={false} />
                    <YAxis stroke="#cbd5e1" hide fontSize={11} tickLine={false} axisLine={false} />
-                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
+                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#cbd5e1" strokeOpacity={0.15} />
                    <Tooltip 
                       contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 8px 30px -4px rgba(0,0,0,0.1)', backgroundColor: '#ffffff', padding: '12px 16px' }}
                       labelStyle={{ fontWeight: '700', color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}
@@ -428,10 +428,10 @@ export default function DashboardView({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative"
             >
-              <h2 className="text-2xl font-bold text-[#263c32] mb-2">{t('dashboard.select_screening_age')}</h2>
-              <p className="text-slate-500 mb-6 font-medium text-sm">
+              <h2 className="text-2xl font-bold text-[#263c32] dark:text-slate-100 mb-2">{t('dashboard.select_screening_age')}</h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-6 font-medium text-sm">
                  <span dangerouslySetInnerHTML={{__html: t('dashboard.age_desc', { name: profile?.name || '', age: profile?.ageInMonths?.toString() || '' })}} />
               </p>
               
@@ -443,13 +443,13 @@ export default function DashboardView({
                       setShowAgeSelectModal(false);
                       onStartQuestionnaire(`${opt}_bulan` as AgeCategory);
                     }}
-                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 hover:border-[#8cc63f] hover:bg-[#8cc63f]/5 transition-all group"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-[#8cc63f] dark:hover:border-[#8cc63f] hover:bg-[#8cc63f]/5 dark:hover:bg-[#8cc63f]/5 transition-all group"
                   >
                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 text-[#263c32] group-hover:bg-[#8cc63f] group-hover:text-[#1e3025] flex items-center justify-center font-bold transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-[#263c32] dark:text-slate-200 group-hover:bg-[#8cc63f] group-hover:text-[#1e3025] flex items-center justify-center font-bold transition-colors">
                            {opt}
                         </div>
-                        <span className="font-bold text-[#263c32]">{t('dashboard.questionnaire', { age: opt.toString() })}</span>
+                        <span className="font-bold text-[#263c32] dark:text-slate-200">{t('dashboard.questionnaire', { age: opt.toString() })}</span>
                      </div>
                      <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#8cc63f]" />
                   </button>
@@ -458,7 +458,7 @@ export default function DashboardView({
 
               <button
                 onClick={() => setShowAgeSelectModal(false)}
-                className="w-full py-3 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-bold transition-colors"
+                className="w-full py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-bold transition-colors"
                >
                 {t('dashboard.cancel')}
               </button>

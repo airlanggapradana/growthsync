@@ -552,6 +552,17 @@ const QuestionnaireView: React.FC<{
               {t(`question.${currentQuestion.id}`)}
             </h3>
 
+            {currentQuestion.imageUrl && (
+              <div className="mb-6 rounded-[24px] overflow-hidden border border-slate-100 flex justify-center bg-slate-50/50 p-4 max-w-full">
+                <img 
+                  src={currentQuestion.imageUrl} 
+                  alt={t(`question.${currentQuestion.id}`)}
+                  className="max-h-64 md:max-h-80 object-contain rounded-xl hover:scale-[1.02] transition-transform duration-300 shadow-sm"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            )}
+
             <div className="mb-10 bg-slate-50 border border-slate-100 rounded-2xl p-5 text-sm text-slate-600">
                <div className="flex items-start gap-3">
                  <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
@@ -666,6 +677,7 @@ const ResultView: React.FC<{
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(existingAnalysis || null);
   const [aiAnalysisEn, setAiAnalysisEn] = useState<string | null>(existingAnalysisEn || null);
   const [loadingAi, setLoadingAi] = useState(!existingAnalysis);
+  const [isFallback, setIsFallback] = useState<boolean>(false);
   
   const [exportingPdf, setExportingPdf] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -725,6 +737,9 @@ const ResultView: React.FC<{
       const data = await res.json();
       setAiAnalysis(data.analysisId);
       setAiAnalysisEn(data.analysisEn);
+      if (data.isFallback !== undefined) {
+        setIsFallback(data.isFallback);
+      }
     } catch (err) {
       console.error("AI Analysis failed", err);
     } finally {
@@ -751,8 +766,12 @@ const ResultView: React.FC<{
            });
            const data = await res.json();
            setAiAnalysisEn(data.translatedText);
+           if (data.isFallback) {
+             setIsFallback(true);
+           }
          } catch(e) {
            console.error("Translation failed", e);
+           setIsFallback(true);
          } finally {
            setLoadingAi(false);
          }
@@ -830,15 +849,33 @@ const ResultView: React.FC<{
           }}
           className="col-span-1 md:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden relative"
         >
-          <div className="p-6 bg-purple-50/50 dark:bg-purple-900/10 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 shrink-0">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl border border-purple-200/50 dark:border-purple-800/50 text-purple-600 dark:text-purple-400">
-              <Sparkles className="w-5 h-5" />
+          <div className="p-6 bg-purple-50/50 dark:bg-purple-900/10 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl border border-purple-200/50 dark:border-purple-800/50 text-purple-600 dark:text-purple-400">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
+                {t('app.ai_analysis_title')}
+              </h3>
             </div>
-            <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-50 tracking-tight">
-              {t('app.ai_analysis_title')}
-            </h3>
+            {isFallback && (
+              <span className="text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm animate-pulse">
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping"></span>
+                {language === 'en' ? 'Local Engine' : 'Mesin Lokal'}
+              </span>
+            )}
           </div>
           <div className="p-6 sm:p-8 flex-1 overflow-y-auto min-h-[300px]">
+            {isFallback && (
+              <div className="mb-6 bg-amber-50/40 dark:bg-amber-950/10 border border-amber-200/30 dark:border-amber-800/30 rounded-xl p-3 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2.5">
+                <span className="text-base select-none">⚡</span>
+                <p className="leading-relaxed">
+                  {language === 'en' 
+                    ? "Your Gemini API Key is depleted or unconfigured. App has seamlessly switched to high-quality local analysis calculations to guarantee 100% reliability."
+                    : "Kunci API Gemini habis kuota atau belum dikonfigurasi. Aplikasi secara otomatis beralih ke analisis kalkulasi lokal berkualitas tinggi untuk keandalan 100%."}
+                </p>
+              </div>
+            )}
             {loadingAi ? (
               <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />

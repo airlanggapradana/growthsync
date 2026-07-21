@@ -104,8 +104,8 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                 className={cn(
                   "py-4 rounded-xl border-2 font-semibold text-sm transition-subtle flex items-center justify-center gap-2",
                   gender === 'Laki-laki' 
-                    ? "border-blue-500 bg-blue-50 text-blue-700" 
-                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300" 
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300"
                 )}
              >
                 <span className="text-xl">👦</span> {t('onboarding.boy')}
@@ -116,8 +116,8 @@ export default function ChildOnboardingView({ user, onComplete }: { key?: string
                 className={cn(
                   "py-4 rounded-xl border-2 font-semibold text-sm transition-subtle flex items-center justify-center gap-2",
                   gender === 'Perempuan' 
-                    ? "border-pink-500 bg-pink-50 text-pink-700" 
-                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300"
+                    ? "border-pink-500 bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300" 
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300"
                 )}
              >
                 <span className="text-xl">👧</span> {t('onboarding.girl')}

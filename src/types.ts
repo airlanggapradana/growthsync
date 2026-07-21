@@ -21,6 +21,7 @@ export interface Question {
   kategoriEn?: string;
   pertanyaan: string;
   pertanyaanEn?: string;
+  imageUrl?: string;
 }
 
 export interface Answer {

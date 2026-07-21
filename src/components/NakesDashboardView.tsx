@@ -119,39 +119,39 @@ export default function NakesDashboardView({
         <header>
           <div className="flex items-center justify-between mb-4">
              <div>
-               <h1 className="text-3xl font-bold tracking-tight text-[#263c32]">{t('nakes.title')}</h1>
+               <h1 className="text-3xl font-bold tracking-tight text-[#263c32] dark:text-slate-100">{t('nakes.title')}</h1>
                <p className="text-sm font-medium text-slate-500 mt-1">
                  {t('nakes.subtitle')}
                </p>
              </div>
              <div className="flex flex-col items-end gap-2">
-               <div className="bg-[#8cc63f]/20 text-[#263c32] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+               <div className="bg-[#8cc63f]/20 text-[#263c32] dark:text-[#bef264] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
                  <Activity className="w-4 h-4" />
                  {t('nakes.role_access')}
                </div>
                {userProfile.isVerified ? (
-                 <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                 <span className="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
                    <ShieldCheck className="w-3.5 h-3.5" /> {t('nakes.verified')}
                  </span>
                ) : (
-                 <span className="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-semibold">
+                 <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-xs px-2.5 py-1 rounded-full font-semibold">
                    {t('nakes.waiting_verification')}
                  </span>
                )}
              </div>
           </div>
           
-          <div className="flex items-center gap-4 mt-8 bg-slate-100 p-1 rounded-full w-max">
+          <div className="flex items-center gap-4 mt-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-full w-max">
              <button
                onClick={() => setActiveTab('my_patients')}
-               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'my_patients' ? "bg-white text-[#263c32] shadow-sm flex items-center gap-2" : "text-slate-500 hover:text-slate-900 line-clamp-1")}
+               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'my_patients' ? "bg-white dark:bg-slate-900 text-[#263c32] dark:text-[#bef264] shadow-sm flex items-center gap-2" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white line-clamp-1")}
              >
                {activeTab === 'my_patients' && <ShieldCheck className="w-4 h-4" />}
                {t('nakes.my_patients')} ({myPatients.length})
              </button>
              <button
                onClick={() => setActiveTab('unassigned')}
-               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'unassigned' ? "bg-white text-[#263c32] shadow-sm flex items-center gap-2" : "text-slate-500 hover:text-slate-900")}
+               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'unassigned' ? "bg-white dark:bg-slate-900 text-[#263c32] dark:text-[#bef264] shadow-sm flex items-center gap-2" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")}
              >
                {activeTab === 'unassigned' && <Users className="w-4 h-4" />}
                {t('nakes.parent_list')} ({unassignedParents.length})
@@ -165,7 +165,7 @@ export default function NakesDashboardView({
               placeholder={t('nakes.search')} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-full outline-none focus:border-[#8cc63f] focus:ring-4 focus:ring-[#8cc63f]/10 transition-all font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
+              className="w-full pl-14 pr-6 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full outline-none focus:border-[#8cc63f] focus:ring-4 focus:ring-[#8cc63f]/10 transition-all font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
             />
           </div>
         </header>
@@ -177,14 +177,14 @@ export default function NakesDashboardView({
         ) : (
           <div className="grid grid-cols-1 gap-4 pb-20">
              {displayList.map((parent) => (
-               <div key={parent.uid} className="bg-white border border-slate-100 rounded-[24px] p-6 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+               <div key={parent.uid} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-6 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                  
                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-700">
                       <UserIcon className="w-6 h-6 text-[#8cc63f]" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-[#263c32] text-lg flex items-center gap-2">
+                      <h3 className="font-bold text-[#263c32] dark:text-slate-100 text-lg flex items-center gap-2">
                         {parent.email.split('@')[0]}
                       </h3>
                       <p className="text-sm text-slate-500 font-medium">
@@ -202,9 +202,9 @@ export default function NakesDashboardView({
                                 const nextSchedule = latestHistory ? dayjs(latestHistory.createdAt).add(3, 'month') : null;
                                 
                                 return (
-                                  <details key={child.id} className="bg-slate-50 border border-slate-100 rounded-2xl group">
+                                  <details key={child.id} className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/60 rounded-2xl group">
                                     <summary className="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-                                       <div className="flex items-center gap-2 font-bold text-[#263c32]">
+                                       <div className="flex items-center gap-2 font-bold text-[#263c32] dark:text-slate-200">
                                           <Smile className="w-4 h-4 text-[#8cc63f]" />
                                           {child.name} <span className="text-slate-400 font-medium ml-1">({child.ageInMonths} {t('dashboard.month')})</span>
                                        </div>
@@ -214,19 +214,19 @@ export default function NakesDashboardView({
                                       <div className="flex items-center gap-6 text-xs font-medium">
                                         <div className="flex flex-col">
                                           <span className="text-slate-400">{t('nakes.weight')}</span>
-                                          <span className="font-bold text-slate-700">{child.weightKg || '-'} kg</span>
+                                          <span className="font-bold text-slate-700 dark:text-slate-300">{child.weightKg || '-'} kg</span>
                                         </div>
                                         <div className="flex flex-col">
                                           <span className="text-slate-400">{t('nakes.height')}</span>
-                                          <span className="font-bold text-slate-700">{child.heightCm || '-'} cm</span>
+                                          <span className="font-bold text-slate-700 dark:text-slate-300">{child.heightCm || '-'} cm</span>
                                         </div>
                                       </div>
-                                      <div className="mt-1 pt-3 border-t border-slate-200/60 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                      <div className="mt-1 pt-3 border-t border-slate-200/60 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                                          <div className="flex items-start gap-2">
                                            <FileText className="w-4 h-4 text-slate-400 shrink-0" />
                                            <div className="flex flex-col">
                                              <span className="text-slate-400 font-medium">{t('nakes.screening_history')}</span>
-                                             <span className="font-bold text-slate-700">{child.history?.length || 0} {t('nakes.times')}</span>
+                                             <span className="font-bold text-slate-700 dark:text-slate-300">{child.history?.length || 0} {t('nakes.times')}</span>
                                              {latestHistory && <span className="text-slate-500 mt-0.5">{t('nakes.latest')} {dayjs(latestHistory.createdAt).format('DD MMM YYYY')}</span>}
                                            </div>
                                          </div>
@@ -246,7 +246,7 @@ export default function NakesDashboardView({
                              }
 
                              return (
-                               <div key={child.id} className="bg-[#8cc63f]/10 text-[#263c32] border border-[#8cc63f]/20 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
+                                  <div key={child.id} className="bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 text-[#263c32] dark:text-[#bef264] border border-[#8cc63f]/20 dark:border-[#8cc63f]/15 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
                                  <Smile className="w-3.5 h-3.5 text-[#8cc63f]" />
                                  {child.name} • {child.ageInMonths} {t('dashboard.month')}
                                </div>
@@ -261,7 +261,7 @@ export default function NakesDashboardView({
                     {activeTab === 'my_patients' ? (
                       <button 
                         onClick={() => onOpenChat(parent)}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] hover:bg-[#1e3025] text-white font-bold text-sm transition-all shadow-sm relative"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] dark:bg-emerald-600 hover:bg-[#1e3025] dark:hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-sm relative"
                       >
                         <MessageSquare className="w-4 h-4" />
                         {t('nakes.chat_parent')}
