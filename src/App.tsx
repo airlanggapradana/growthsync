@@ -461,7 +461,7 @@ export default function App() {
                key="parent_chat"
                currentUser={userProfile}
                targetUser={targetChatUser}
-               onBack={() => setView('PARENT_CHAT_LIST')}
+               onBack={() => setView('DASHBOARD')}
              />
           )}
         </AnimatePresence>

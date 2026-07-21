@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { UserProfile } from '../types';
-import { Loader2, Search, Briefcase, ChevronRight, MessageSquare } from 'lucide-react';
+import { Loader2, Briefcase } from 'lucide-react';
 
-export default function ParentChatList({ userProfile, unreadCount = 0, onOpenChat }: { userProfile: UserProfile, unreadCount?: number, onOpenChat: (nakes: UserProfile) => void }) {
+export default function ParentChatList({ userProfile, unreadCount, onOpenChat }: { userProfile: UserProfile, unreadCount?: number, onOpenChat: (nakes: UserProfile) => void }) {
   const [nakesList, setNakesList] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,14 +16,15 @@ export default function ParentChatList({ userProfile, unreadCount = 0, onOpenCha
            setLoading(false);
            return;
         }
-
         let q = query(collection(db, 'users'), where('role', '==', 'nakes'));
         const snap = await getDocs(q);
         let data = snap.docs.map(doc => doc.data() as UserProfile);
         
         data = data.filter(n => n.uid === userProfile.assignedNakesId);
-
         setNakesList(data);
+        if (data.length > 0) {
+          onOpenChat(data[0]);
+        }
       } catch (err) {
         console.error("Error fetching nakes", err);
       } finally {
@@ -45,42 +46,16 @@ export default function ParentChatList({ userProfile, unreadCount = 0, onOpenCha
                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
              </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-             {nakesList.map((nakes) => (
-               <div key={nakes.uid} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-4">
-                 
-                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400">
-                      <Briefcase className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 dark:text-slate-50 text-base">
-                        {nakes.email.split('@')[0]}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                        Tenaga Kesehatan Terdaftar
-                      </p>
-                    </div>
-                 </div>
-
-                 <button 
-                   onClick={() => onOpenChat(nakes)}
-                   className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 rounded-xl transition-all relative"
-                 >
-                   <MessageSquare className="w-5 h-5 ml-0.5" />
-                   {unreadCount > 0 && nakes.uid === userProfile.assignedNakesId && (
-                      <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                         {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                   )}
-                 </button>
-                 
-               </div>
-             ))}
-             
+          <div className="w-full pb-20">
              {nakesList.length === 0 && (
-                <div className="col-span-full py-20 text-center text-slate-500 dark:text-slate-400">
-                  Saat ini belum ada tenaga kesehatan yang melayani profil Anda. Harap tunggu hingga Nakes mengambil profil Anda untuk konsultasi.
+                <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm max-w-xl mx-auto flex flex-col items-center">
+                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+                     <Briefcase className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Belum Ada Nakes</h3>
+                  <p className="text-slate-500 dark:text-slate-400 max-w-md">
+                    Saat ini belum ada tenaga kesehatan yang menangani profil Anda. Harap tunggu hingga Nakes mengambil profil Anda untuk memulai konsultasi.
+                  </p>
                 </div>
              )}
           </div>

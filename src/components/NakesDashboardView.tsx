@@ -52,9 +52,16 @@ export default function NakesDashboardView({
         const childrenWithHistoryPromises = childrenSnap.docs.map(async (docSnap) => {
           const childData = { id: docSnap.id, ...docSnap.data() } as ChildProfile;
           
-          const historyQ = query(collection(db, 'questionnaireResults'), where('childId', '==', docSnap.id));
+          const historyQ = query(collection(db, 'questionnaireResults'), where('profileId', '==', docSnap.id));
           const historySnap = await getDocs(historyQ);
-          const historyData = historySnap.docs.map(hDoc => ({ id: hDoc.id, ...hDoc.data() } as QuestionnaireResult));
+          const historyData = historySnap.docs.map(hDoc => {
+            const data = hDoc.data();
+            return {
+              id: hDoc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (typeof data.createdAt === 'string' ? data.createdAt : new Date().toISOString())
+            } as QuestionnaireResult;
+          });
           
           // Sort descending based on createdAt string / date
           historyData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

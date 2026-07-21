@@ -1,0 +1,12 @@
+--- src/components/ParentChatList.tsx
++++ src/components/ParentChatList.tsx
+@@ -20,6 +20,9 @@
+         
+         data = data.filter(n => n.uid === userProfile.assignedNakesId);
+         setNakesList(data);
++        if (data.length > 0) {
++          onOpenChat(data[0]);
++        }
+       } catch (err) {
+         console.error("Error fetching nakes", err);
+       } finally {
