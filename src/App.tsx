@@ -16,6 +16,7 @@ import NakesDashboardView from './components/NakesDashboardView';
 import AdminDashboardView from './components/AdminDashboardView';
 import ChatView from './components/ChatView';
 import ParentChatList from './components/ParentChatList';
+import KonsultasiNakesView from './components/KonsultasiNakesView';
 import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
@@ -352,7 +353,12 @@ export default function App() {
            </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-6 py-8 lg:px-10 lg:py-10 bg-white dark:bg-slate-900">
+        <div className={cn(
+          "flex-1 overflow-y-auto",
+          (view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' || view === 'NAKES_CHAT')
+            ? "p-3 sm:p-5 lg:p-6 bg-slate-50 dark:bg-slate-950 flex flex-col h-full"
+            : "px-6 py-8 lg:px-10 lg:py-10 bg-white dark:bg-slate-900"
+        )}>
           <AnimatePresence mode="wait">
             {view === 'ONBOARDING' && (
             <ChildOnboardingView key="onboarding" user={user} onComplete={handleProfileComplete} />
@@ -443,30 +449,30 @@ export default function App() {
              />
           )}
           {view === 'NAKES_CHAT' && userProfile && targetChatUser && (
-             <ChatView 
+             <KonsultasiNakesView 
                key="nakes_chat"
                currentUser={userProfile}
-               targetUser={targetChatUser}
-               onBack={() => setView('NAKES_DASHBOARD')}
+               initialTargetUser={targetChatUser}
+               unreadCount={unreadCount}
+               onBackToDashboard={() => setView('NAKES_DASHBOARD')}
              />
           )}
           {view === 'PARENT_CHAT_LIST' && userProfile && (
-             <ParentChatList 
+             <KonsultasiNakesView 
                key="parent_chat_list"
-               userProfile={userProfile}
+               currentUser={userProfile}
+               initialTargetUser={targetChatUser}
                unreadCount={unreadCount}
-               onOpenChat={(nakes) => {
-                 setTargetChatUser(nakes);
-                 setView('PARENT_CHAT');
-               }}
+               onBackToDashboard={() => setView('DASHBOARD')}
              />
           )}
-          {view === 'PARENT_CHAT' && userProfile && targetChatUser && (
-             <ChatView 
+          {view === 'PARENT_CHAT' && userProfile && (
+             <KonsultasiNakesView 
                key="parent_chat"
                currentUser={userProfile}
-               targetUser={targetChatUser}
-               onBack={() => setView('DASHBOARD')}
+               initialTargetUser={targetChatUser}
+               unreadCount={unreadCount}
+               onBackToDashboard={() => setView('DASHBOARD')}
              />
           )}
         </AnimatePresence>
