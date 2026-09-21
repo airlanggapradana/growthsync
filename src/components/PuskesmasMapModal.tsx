@@ -225,10 +225,6 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                 </div>
               ) : aiResult ? (
                 <div className="p-4 sm:p-6 flex flex-col h-full">
-                  <div className="flex items-center gap-2 mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-100 dark:border-emerald-800/50 shrink-0">
-                    <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Rekomendasi AI (Gemini)</span>
-                  </div>
                   <div className="space-y-3 overflow-y-auto flex-1 pr-2 pb-4">
                     {aiResult.map((p, idx) => (
                       <button

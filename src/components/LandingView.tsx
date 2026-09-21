@@ -342,30 +342,41 @@ export default function LandingView() {
               hidden: { opacity: 0 },
               visible: {
                 opacity: 1,
-                transition: { staggerChildren: 0.15 }
+                transition: { staggerChildren: 0.12 }
               }
             }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+            className="flex flex-wrap justify-center gap-4 sm:gap-6 max-w-6xl mx-auto"
           >
-            {[1, 2, 3, 4].map((member) => (
+            {[
+              { name: 'ASROFI NOOR MASITHOH', role: 'Developer', photo: '/team/asrofi.webp' },
+              { name: 'PUTRI AZZAHRA NAMORA', role: 'Developer', photo: '/team/putri.webp' },
+              { name: 'REJA ARRAFI', role: 'Developer', photo: '/team/reja.webp' },
+              { name: 'AIRLANGGA PRADANA PRAKUSA', role: 'Developer', photo: '/team/rangga.webp' },
+              { name: 'SHAFWAN AULIA RAHMAN', role: 'Developer', photo: '/team/shafwan.webp' },
+            ].map((member) => (
               <motion.div 
-                key={member} 
+                key={member.name} 
                 variants={{
-                  hidden: { opacity: 0, scale: 0.9, y: 20 },
+                  hidden: { opacity: 0, scale: 0.92, y: 20 },
                   visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5 } }
                 }}
-                className="group cursor-pointer"
+                className="w-[calc(50%-8px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(20%-20px)] max-w-[210px] flex-shrink-0 group cursor-pointer"
               >
-                <div className="aspect-[3/4] rounded-[32px] overflow-hidden mb-4 bg-white/5 border border-white/10 group-hover:border-[#d9f99d]/50 transition-colors relative">
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                <div className="aspect-[3/4] w-full rounded-[24px] sm:rounded-[28px] overflow-hidden mb-3 bg-white/5 border border-white/10 group-hover:border-[#d9f99d]/50 transition-all duration-300 relative shadow-lg shadow-black/40">
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10 pointer-events-none" />
                    <img 
-                      src={`https://res.cloudinary.com/airlanggapradana/image/upload/v1779689150/Gemini_Generated_Image_wf93s2wf93s2wf93_zx0ejo.webp`} 
-                      alt="Team Member" 
-                      className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                      src={member.photo} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover object-top grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                      loading="lazy"
                     />
-                    <div className="absolute bottom-6 left-6 z-20 text-left">
-                      <h3 className="text-lg font-medium text-white tracking-tight mb-1">Anggota {member}</h3>
-                      <p className="text-xs text-[#d9f99d]">Developer</p>
+                    <div className="absolute bottom-4 inset-x-4 z-20 text-left">
+                      <h3 className="text-xs sm:text-sm font-semibold text-white tracking-tight leading-snug mb-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-[11px] font-medium text-[#d9f99d] tracking-wide">
+                        {member.role}
+                      </p>
                     </div>
                 </div>
               </motion.div>

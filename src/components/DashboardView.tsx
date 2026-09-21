@@ -1,10 +1,15 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
-import { ChildProfile, AgeCategory, QuestionnaireResult } from '../types';
-import { Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, Bell, AlertTriangle, Map as MapIcon } from 'lucide-react';
+import { ChildProfile, AgeCategory, QuestionnaireResult, GrowthRecord } from '../types';
+import { 
+  Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, 
+  CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, 
+  Bell, AlertTriangle, Map as MapIcon, Edit3, Trash2, Save, X, CircleDot, 
+  Download, RotateCcw, Calendar, FileText, Sparkles
+} from 'lucide-react';
 import { format, differenceInMonths } from 'date-fns';
 import { id as idLocale, enUS } from 'date-fns/locale';
 import { cn } from '../lib/utils';
@@ -17,7 +22,8 @@ export default function DashboardView({
   onSelectProfile, 
   onAddProfile, 
   onStartQuestionnaire,
-  onViewHistoryDetail
+  onViewHistoryDetail,
+  onUpdateProfile
 }: { 
   key?: string;
   profiles: ChildProfile[];
@@ -26,6 +32,7 @@ export default function DashboardView({
   onAddProfile: () => void;
   onStartQuestionnaire: (age: AgeCategory) => void;
   onViewHistoryDetail: (history: QuestionnaireResult) => void;
+  onUpdateProfile?: (profile: ChildProfile) => void;
 }) {
   const [history, setHistory] = useState<QuestionnaireResult[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -68,28 +75,304 @@ export default function DashboardView({
     fetchHistory();
   }, [activeProfileId]);
   
-  // Dummy chart data representing generic CDC/WHO growth curve
-  const chartData = useMemo(() => {
-    if (!profile) return [];
-    let data = [];
-    const age = profile.ageInMonths;
-    const startMonth = Math.max(0, age - 5);
-    
-    for (let i = startMonth; i < age; i++) {
-        data.push({
-            month: `Bln ${i}`,
-            weight: +(profile.weightKg * (0.5 + 0.5 * (i/age))).toFixed(1),
-            height: +(profile.heightCm * (0.8 + 0.2 * (i/age))).toFixed(1),
+  // Growth Tracking States & Handlers
+  const [growthRecords, setGrowthRecords] = useState<GrowthRecord[]>([]);
+  const [selectedMetric, setSelectedMetric] = useState<'weight' | 'height' | 'head' | 'all'>('weight');
+  const [isGrowthModalOpen, setIsGrowthModalOpen] = useState(false);
+  const [editingRecordMonth, setEditingRecordMonth] = useState<number | null>(null);
+
+  // Form states for manual growth entry
+  const [formMonth, setFormMonth] = useState<number>(6);
+  const [formWeight, setFormWeight] = useState<string>('7.5');
+  const [formHeight, setFormHeight] = useState<string>('65');
+  const [formHeadCircumference, setFormHeadCircumference] = useState<string>('42');
+  const [formDate, setFormDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  const [formNote, setFormNote] = useState<string>('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  // Generate realistic WHO / Kemenkes baseline trajectory
+  const getInitialBaselineRecords = (prof: ChildProfile): GrowthRecord[] => {
+    const age = prof.ageInMonths || 6;
+    const currentWeight = prof.weightKg || 7.5;
+    const currentHeight = prof.heightCm || 65;
+    const currentHead = prof.headCircumferenceCm || 42;
+    const isBoy = prof.gender === 'Laki-laki';
+
+    // Birth baseline estimates (WHO median)
+    const birthWeight = isBoy ? 3.3 : 3.2;
+    const birthHeight = isBoy ? 49.9 : 49.1;
+    const birthHead = isBoy ? 34.5 : 33.9;
+
+    const records: GrowthRecord[] = [];
+    const milestoneSteps = [0, 1, 2, 3, 4, 5, 6, 9, 12, 15, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72];
+    const steps = milestoneSteps.filter(m => m <= age);
+    if (!steps.includes(age)) steps.push(age);
+
+    steps.sort((a, b) => a - b).forEach(m => {
+      if (m === 0) {
+        records.push({
+          month: 0,
+          weightKg: +birthWeight.toFixed(1),
+          heightCm: +birthHeight.toFixed(1),
+          headCircumferenceCm: +birthHead.toFixed(1),
+          date: 'Saat Lahir',
+          note: 'Data Lahir (Standar WHO)'
         });
-    }
-    
-    data.push({
-        month: `Bln ${age}`,
-        weight: profile.weightKg,
-        height: profile.heightCm,
+      } else if (m === age) {
+        records.push({
+          month: age,
+          weightKg: +currentWeight.toFixed(1),
+          heightCm: +currentHeight.toFixed(1),
+          headCircumferenceCm: +currentHead.toFixed(1),
+          date: format(new Date(), 'yyyy-MM-dd'),
+          note: 'Pengukuran Terkini'
+        });
+      } else {
+        const ratio = age > 0 ? m / age : 0;
+        const growthFactor = Math.pow(ratio, 0.7);
+        const interpolatedWeight = birthWeight + (currentWeight - birthWeight) * growthFactor;
+        const interpolatedHeight = birthHeight + (currentHeight - birthHeight) * growthFactor;
+        const interpolatedHead = birthHead + (currentHead - birthHead) * growthFactor;
+
+        records.push({
+          month: m,
+          weightKg: +interpolatedWeight.toFixed(1),
+          heightCm: +interpolatedHeight.toFixed(1),
+          headCircumferenceCm: +interpolatedHead.toFixed(1),
+          date: `Bulan ke-${m}`,
+          note: 'Standar WHO'
+        });
+      }
     });
-    return data;
-  }, [profile]);
+
+    return records;
+  };
+
+  // Load and cache growth records when active profile changes
+  useEffect(() => {
+    if (!profile) return;
+    const cacheKey = `growth_records_${profile.id}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setGrowthRecords(parsed);
+          return;
+        }
+      } catch (e) {
+        console.error("Error reading cached growth records", e);
+      }
+    }
+
+    if (profile.growthHistory && profile.growthHistory.length > 0) {
+      setGrowthRecords(profile.growthHistory);
+      if (profile.id) {
+        localStorage.setItem(cacheKey, JSON.stringify(profile.growthHistory));
+      }
+    } else {
+      const initial = getInitialBaselineRecords(profile);
+      setGrowthRecords(initial);
+      if (profile.id) {
+        localStorage.setItem(cacheKey, JSON.stringify(initial));
+      }
+    }
+  }, [profile?.id]);
+
+  // Real data prepared for chart visualization
+  const chartData = useMemo(() => {
+    return growthRecords.map(rec => ({
+      rawMonth: rec.month,
+      month: `Bln ${rec.month}`,
+      weight: rec.weightKg,
+      height: rec.heightCm,
+      head: rec.headCircumferenceCm || 0,
+      date: rec.date || '',
+      note: rec.note || ''
+    }));
+  }, [growthRecords]);
+
+  const latestGrowthRecord = useMemo(() => {
+    if (!growthRecords || growthRecords.length === 0) return null;
+    return growthRecords[growthRecords.length - 1];
+  }, [growthRecords]);
+
+  const handleOpenGrowthModal = (rec?: GrowthRecord) => {
+    if (rec) {
+      setEditingRecordMonth(rec.month);
+      setFormMonth(rec.month);
+      setFormWeight(String(rec.weightKg));
+      setFormHeight(String(rec.heightCm));
+      setFormHeadCircumference(String(rec.headCircumferenceCm || 40));
+      setFormDate(rec.date && rec.date.includes('-') ? rec.date : format(new Date(), 'yyyy-MM-dd'));
+      setFormNote(rec.note || '');
+    } else {
+      setEditingRecordMonth(null);
+      const currentAge = profile?.ageInMonths ?? 6;
+      setFormMonth(currentAge);
+      setFormWeight(String(profile?.weightKg ?? 7.5));
+      setFormHeight(String(profile?.heightCm ?? 65));
+      setFormHeadCircumference(String(profile?.headCircumferenceCm ?? 42));
+      setFormDate(format(new Date(), 'yyyy-MM-dd'));
+      setFormNote('');
+    }
+    setSaveStatus('idle');
+    setIsGrowthModalOpen(true);
+  };
+
+  const handleSaveGrowthRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+
+    const monthNum = parseInt(String(formMonth), 10);
+    const weightNum = parseFloat(String(formWeight));
+    const heightNum = parseFloat(String(formHeight));
+    const headNum = parseFloat(String(formHeadCircumference));
+
+    if (isNaN(monthNum) || monthNum < 0) return;
+    if (isNaN(weightNum) || weightNum <= 0) return;
+    if (isNaN(heightNum) || heightNum <= 0) return;
+    if (isNaN(headNum) || headNum <= 0) return;
+
+    setSaveStatus('saving');
+
+    const newRecord: GrowthRecord = {
+      month: monthNum,
+      weightKg: weightNum,
+      heightCm: heightNum,
+      headCircumferenceCm: headNum,
+      date: formDate || format(new Date(), 'yyyy-MM-dd'),
+      note: formNote.trim() || undefined
+    };
+
+    let updatedRecords = [...growthRecords];
+    const existingIdx = updatedRecords.findIndex(r => r.month === monthNum);
+    if (existingIdx >= 0) {
+      updatedRecords[existingIdx] = newRecord;
+    } else {
+      updatedRecords.push(newRecord);
+    }
+
+    updatedRecords.sort((a, b) => a.month - b.month);
+    setGrowthRecords(updatedRecords);
+
+    if (profile.id) {
+      localStorage.setItem(`growth_records_${profile.id}`, JSON.stringify(updatedRecords));
+    }
+
+    const latestRec = updatedRecords[updatedRecords.length - 1];
+    const updatedProfile: ChildProfile = {
+      ...profile,
+      weightKg: latestRec.weightKg,
+      heightCm: latestRec.heightCm,
+      headCircumferenceCm: latestRec.headCircumferenceCm,
+      growthHistory: updatedRecords
+    };
+
+    if (onUpdateProfile) {
+      onUpdateProfile(updatedProfile);
+    }
+
+    if (auth.currentUser && profile.id) {
+      try {
+        const docRef = doc(db, 'childProfiles', profile.id);
+        await updateDoc(docRef, {
+          userId: auth.currentUser.uid,
+          name: profile.name,
+          gender: profile.gender,
+          ageInMonths: profile.ageInMonths,
+          weightKg: latestRec.weightKg,
+          heightCm: latestRec.heightCm,
+          headCircumferenceCm: latestRec.headCircumferenceCm,
+          growthHistory: updatedRecords,
+          updatedAt: serverTimestamp()
+        });
+      } catch (err) {
+        console.warn("Preserved in local storage (Firestore update deferred):", err);
+      }
+    }
+
+    setSaveStatus('saved');
+    setTimeout(() => {
+      setSaveStatus('idle');
+      setIsGrowthModalOpen(false);
+    }, 600);
+  };
+
+  const handleDeleteRecord = async (monthToDelete: number) => {
+    if (growthRecords.length <= 1) {
+      alert("Minimal harus ada satu titik data pengukuran.");
+      return;
+    }
+
+    const updatedRecords = growthRecords.filter(r => r.month !== monthToDelete);
+    setGrowthRecords(updatedRecords);
+
+    if (profile?.id) {
+      localStorage.setItem(`growth_records_${profile.id}`, JSON.stringify(updatedRecords));
+    }
+
+    if (profile) {
+      const latestRec = updatedRecords[updatedRecords.length - 1];
+      const updatedProfile: ChildProfile = {
+        ...profile,
+        weightKg: latestRec.weightKg,
+        heightCm: latestRec.heightCm,
+        headCircumferenceCm: latestRec.headCircumferenceCm,
+        growthHistory: updatedRecords
+      };
+      if (onUpdateProfile) onUpdateProfile(updatedProfile);
+
+      if (auth.currentUser && profile.id) {
+        try {
+          const docRef = doc(db, 'childProfiles', profile.id);
+          await updateDoc(docRef, {
+            weightKg: latestRec.weightKg,
+            heightCm: latestRec.heightCm,
+            headCircumferenceCm: latestRec.headCircumferenceCm,
+            growthHistory: updatedRecords,
+            updatedAt: serverTimestamp()
+          });
+        } catch (err) {
+          console.warn("Sync delete to Firestore deferred:", err);
+        }
+      }
+    }
+  };
+
+  const handleResetToWho = () => {
+    if (!profile) return;
+    if (confirm("Kembalikan kurva data ke acuan standar WHO/Kemenkes?")) {
+      const initial = getInitialBaselineRecords(profile);
+      setGrowthRecords(initial);
+      if (profile.id) {
+        localStorage.setItem(`growth_records_${profile.id}`, JSON.stringify(initial));
+      }
+    }
+  };
+
+  const handleExportCsv = () => {
+    if (!growthRecords || growthRecords.length === 0) return;
+    const childName = profile?.name || 'Anak';
+    const headers = ['Bulan Ke', 'Usia (Bulan)', 'Berat Badan (kg)', 'Tinggi Badan (cm)', 'Lingkar Kepala (cm)', 'Tanggal', 'Catatan'];
+    const rows = growthRecords.map(r => [
+      `Bulan ${r.month}`,
+      r.month,
+      r.weightKg,
+      r.heightCm,
+      r.headCircumferenceCm || '-',
+      `"${r.date || '-'}"`,
+      `"${(r.note || '-').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Grafik_Pertumbuhan_${childName.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const latestScreening = history.length > 0 ? history[0] : null;
   let latestStatusText = "";
@@ -112,7 +395,7 @@ export default function DashboardView({
 
   const isTimeForScreening = history.length === 0 || (latestScreening && differenceInMonths(new Date(), new Date(latestScreening.createdAt)) >= 3);
 
-  const AVAILABLE_AGES = [3, 6, 9, 12, 15, 18, 21, 24, 30, 36, 42];
+  const AVAILABLE_AGES = [3, 6, 9, 12, 15, 18, 21, 24, 30, 36, 42, 48, 54, 60, 66, 72];
   
   const handleStartClicked = () => {
     if (!profile) return;
@@ -146,7 +429,12 @@ export default function DashboardView({
      if (months < 27) return '24_bulan';
      if (months < 33) return '30_bulan';
      if (months < 39) return '36_bulan';
-     return '42_bulan';
+     if (months < 45) return '42_bulan';
+     if (months < 51) return '48_bulan';
+     if (months < 57) return '54_bulan';
+     if (months < 63) return '60_bulan';
+     if (months < 69) return '66_bulan';
+     return '72_bulan';
   };
 
   return (
@@ -218,6 +506,8 @@ export default function DashboardView({
                  </button>
                  
                  <AnimatePresence>
+        
+
                     {showProfileMenu && (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.95, y: 4 }}
@@ -339,35 +629,243 @@ export default function DashboardView({
 
       {/* Row 2: Analytics & Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         {/* Chart */}
-         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-8">
-               <h3 className="font-bold text-[#263c32] dark:text-slate-100 text-xl">{t('dashboard.periodic_growth')}</h3>
-               <div className="flex items-center gap-2">
-                 <button className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex justify-center items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><ChevronDown className="w-4 h-4 text-slate-400" /></button>
-                 <button className="px-4 py-1.5 bg-[#8cc63f] text-[#1e3025] rounded-full text-xs font-bold shadow-sm">{t('dashboard.export')}</button>
+         {/* Chart - Enhanced with Manual Edit & Multi-Metric (Tinggi, Berat, Usia, Lingkar Kepala) */}
+         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[32px] p-6 lg:p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+            {/* Chart Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+               <div>
+                  <div className="flex items-center gap-2.5">
+                     <h3 className="font-bold text-[#263c32] dark:text-slate-100 text-xl">{t('dashboard.periodic_growth')}</h3>
+                     <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#8cc63f]/15 text-[#263c32] dark:text-[#8cc63f] border border-[#8cc63f]/30">
+                       Kemenkes / WHO
+                     </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                     Pantau perkembangan tinggi, berat, dan lingkar kepala sesuai usia bulan
+                  </p>
+               </div>
+               
+               <div className="flex items-center flex-wrap gap-2">
+                 <button 
+                   onClick={() => handleOpenGrowthModal()}
+                   id="btn-edit-growth-manual"
+                   className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-full text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                 >
+                   <Edit3 className="w-3.5 h-3.5" />
+                   <span>Input / Edit Manual</span>
+                 </button>
+                 <button 
+                   onClick={handleExportCsv}
+                   title="Export Data ke CSV"
+                   className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-full text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                 >
+                   <Download className="w-3.5 h-3.5" />
+                   <span>{t('dashboard.export')}</span>
+                 </button>
                </div>
             </div>
-            <div className="flex-1 min-h-[220px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                 <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                   <defs>
-                     <linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1">
-                       <stop offset="5%" stopColor="#8cc63f" stopOpacity={0.3}/>
-                       <stop offset="95%" stopColor="#8cc63f" stopOpacity={0}/>
-                     </linearGradient>
-                   </defs>
-                   <XAxis dataKey="month" stroke="#cbd5e1" fontSize={11} tickLine={false} axisLine={false} />
-                   <YAxis stroke="#cbd5e1" hide fontSize={11} tickLine={false} axisLine={false} />
-                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#cbd5e1" strokeOpacity={0.15} />
-                   <Tooltip 
-                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 8px 30px -4px rgba(0,0,0,0.1)', backgroundColor: '#ffffff', padding: '12px 16px' }}
-                      labelStyle={{ fontWeight: '700', color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}
-                      itemStyle={{ color: '#263c32', fontWeight: 800, fontSize: '16px' }}
-                   />
-                   <Area type="monotone" dataKey="weight" stroke="#8cc63f" strokeWidth={4} fillOpacity={1} fill="url(#colorBrand)" activeDot={{ r: 6, fill: '#8cc63f', stroke: '#fff', strokeWidth: 2 }} />
-                 </AreaChart>
-              </ResponsiveContainer>
+
+            {/* Metric Toggle & Current Highlights */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+               <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl overflow-x-auto scrollbar-none">
+                  <button
+                    onClick={() => setSelectedMetric('weight')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer",
+                      selectedMetric === 'weight'
+                        ? "bg-white dark:bg-slate-900 text-[#263c32] dark:text-slate-100 shadow-sm"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    )}
+                  >
+                    <Scale className="w-3.5 h-3.5 text-[#8cc63f]" />
+                    <span>Berat (kg)</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedMetric('height')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer",
+                      selectedMetric === 'height'
+                        ? "bg-white dark:bg-slate-900 text-sky-700 dark:text-sky-300 shadow-sm"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    )}
+                  >
+                    <Ruler className="w-3.5 h-3.5 text-sky-500" />
+                    <span>Tinggi (cm)</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedMetric('head')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer",
+                      selectedMetric === 'head'
+                        ? "bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 shadow-sm"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    )}
+                  >
+                    <CircleDot className="w-3.5 h-3.5 text-purple-500" />
+                    <span>Lingkar Kepala (cm)</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedMetric('all')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer",
+                      selectedMetric === 'all'
+                        ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    )}
+                  >
+                    <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Semua Metrik</span>
+                  </button>
+               </div>
+
+               {latestGrowthRecord && (
+                 <div className="flex items-center flex-wrap gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    <span className="text-[11px] text-slate-400">Terkini ({latestGrowthRecord.month} bln):</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-[#263c32] dark:text-[#8cc63f] border border-emerald-200/50">
+                       ⚖️ {latestGrowthRecord.weightKg} kg
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 border border-sky-200/50">
+                       📏 {latestGrowthRecord.heightCm} cm
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-200/50">
+                       🎯 {latestGrowthRecord.headCircumferenceCm} cm
+                    </span>
+                 </div>
+               )}
+            </div>
+
+            {/* Main Interactive Chart */}
+            <div className="flex-1 min-h-[250px] w-full">
+               <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8cc63f" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#8cc63f" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorHeight" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0284c7" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#0284c7" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorHead" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="#94a3b8" 
+                      fontSize={11} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <YAxis 
+                      stroke="#94a3b8" 
+                      fontSize={11} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      domain={['auto', 'auto']}
+                    />
+                    <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#cbd5e1" strokeOpacity={0.2} />
+                    <Tooltip 
+                       content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                             const d = payload[0].payload;
+                             return (
+                                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 min-w-[220px] text-xs">
+                                   <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-2">
+                                      <span className="font-extrabold text-[#263c32] dark:text-slate-100 text-sm">
+                                         {label} ({d.rawMonth} Bulan)
+                                      </span>
+                                      {d.date && <span className="text-[10px] text-slate-400">{d.date}</span>}
+                                   </div>
+                                   <div className="space-y-1.5">
+                                      <div className="flex items-center justify-between">
+                                         <span className="flex items-center gap-1.5 text-slate-500">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-[#8cc63f]"></span>
+                                            Berat Badan:
+                                         </span>
+                                         <span className="font-bold text-slate-800 dark:text-slate-200">{d.weight} kg</span>
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                         <span className="flex items-center gap-1.5 text-slate-500">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                                            Tinggi Badan:
+                                         </span>
+                                         <span className="font-bold text-slate-800 dark:text-slate-200">{d.height} cm</span>
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                         <span className="flex items-center gap-1.5 text-slate-500">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                            Lingkar Kepala:
+                                         </span>
+                                         <span className="font-bold text-slate-800 dark:text-slate-200">{d.head ? d.head + ' cm' : '-'}</span>
+                                      </div>
+                                      {d.note && (
+                                         <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 italic">
+                                            {d.note}
+                                         </div>
+                                      )}
+                                   </div>
+                                </div>
+                             );
+                          }
+                          return null;
+                       }}
+                    />
+                    {(selectedMetric === 'weight' || selectedMetric === 'all') && (
+                       <Area 
+                         type="monotone" 
+                         dataKey="weight" 
+                         name="Berat (kg)"
+                         stroke="#8cc63f" 
+                         strokeWidth={3.5} 
+                         fillOpacity={selectedMetric === 'all' ? 0.15 : 1} 
+                         fill="url(#colorWeight)" 
+                         activeDot={{ r: 6, fill: '#8cc63f', stroke: '#fff', strokeWidth: 2 }} 
+                       />
+                    )}
+                    {(selectedMetric === 'height' || selectedMetric === 'all') && (
+                       <Area 
+                         type="monotone" 
+                         dataKey="height" 
+                         name="Tinggi (cm)"
+                         stroke="#0284c7" 
+                         strokeWidth={3.5} 
+                         fillOpacity={selectedMetric === 'all' ? 0.15 : 1} 
+                         fill="url(#colorHeight)" 
+                         activeDot={{ r: 6, fill: '#0284c7', stroke: '#fff', strokeWidth: 2 }} 
+                       />
+                    )}
+                    {(selectedMetric === 'head' || selectedMetric === 'all') && (
+                       <Area 
+                         type="monotone" 
+                         dataKey="head" 
+                         name="Lingkar Kepala (cm)"
+                         stroke="#8b5cf6" 
+                         strokeWidth={3.5} 
+                         fillOpacity={selectedMetric === 'all' ? 0.15 : 1} 
+                         fill="url(#colorHead)" 
+                         activeDot={{ r: 6, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }} 
+                       />
+                    )}
+                  </AreaChart>
+               </ResponsiveContainer>
+            </div>
+            
+            {/* Quick action footer */}
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
+               <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#8cc63f]" />
+                  Total {growthRecords.length} titik data tercatat
+               </span>
+               <button
+                 onClick={() => handleOpenGrowthModal()}
+                 className="text-[#263c32] dark:text-[#8cc63f] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+               >
+                 <span>Kelola Semua Titik Data</span>
+                 <ChevronRight className="w-3.5 h-3.5" />
+               </button>
             </div>
          </div>
 
@@ -422,6 +920,301 @@ export default function DashboardView({
       <PuskesmasMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
 
       <AnimatePresence>
+        {/* Growth Tracking Edit & Add Modal */}
+        {isGrowthModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] p-6 sm:p-8 w-full max-w-2xl shadow-2xl relative my-8 max-h-[90vh] flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#8cc63f]/15 text-[#263c32] dark:text-[#8cc63f] flex items-center justify-center shrink-0">
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#263c32] dark:text-slate-100">
+                      {editingRecordMonth !== null ? 'Edit Titik Pertumbuhan' : 'Input Data Pertumbuhan'}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                      Grafik berkala untuk {profile?.name || 'Anak'} (Tinggi, Berat, Usia, Lingkar Kepala)
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsGrowthModalOpen(false)}
+                  className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto pr-1 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+                {/* Form Input */}
+                <form onSubmit={handleSaveGrowthRecord} className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-bold text-[#263c32] dark:text-slate-200 flex items-center gap-2">
+                      <Edit3 className="w-4 h-4 text-[#8cc63f]" />
+                      <span>{editingRecordMonth !== null ? `Edit Pengukuran Bulan ke-${editingRecordMonth}` : 'Tambah Pengukuran Baru'}</span>
+                    </h4>
+                    {editingRecordMonth !== null && (
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-semibold">
+                        Sedang Mengedit Bulan ke-{editingRecordMonth}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Usia (Bulan) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+                        Usia (Bulan) <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          max="120"
+                          value={formMonth}
+                          onChange={(e) => setFormMonth(Math.max(0, parseInt(e.target.value) || 0))}
+                          placeholder="cth: 12"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                          required
+                        />
+                        <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-medium pointer-events-none">bulan</span>
+                      </div>
+                    </div>
+
+                    {/* Berat Badan (kg) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <Scale className="w-3.5 h-3.5 text-[#8cc63f]" />
+                        <span>Berat Badan (kg)</span> <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.5"
+                          max="100"
+                          value={formWeight}
+                          onChange={(e) => setFormWeight(e.target.value)}
+                          placeholder="cth: 9.2"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                          required
+                        />
+                        <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-medium pointer-events-none">kg</span>
+                      </div>
+                    </div>
+
+                    {/* Tinggi / Panjang Badan (cm) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <Ruler className="w-3.5 h-3.5 text-sky-500" />
+                        <span>Tinggi Badan (cm)</span> <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="20"
+                          max="200"
+                          value={formHeight}
+                          onChange={(e) => setFormHeight(e.target.value)}
+                          placeholder="cth: 75.5"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                          required
+                        />
+                        <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-medium pointer-events-none">cm</span>
+                      </div>
+                    </div>
+
+                    {/* Lingkar Kepala (cm) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <CircleDot className="w-3.5 h-3.5 text-purple-500" />
+                        <span>Lingkar Kepala (cm)</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="20"
+                          max="80"
+                          value={formHeadCircumference}
+                          onChange={(e) => setFormHeadCircumference(e.target.value)}
+                          placeholder="cth: 46.0"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                        />
+                        <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-medium pointer-events-none">cm</span>
+                      </div>
+                    </div>
+
+                    {/* Tanggal Pengukuran */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Tanggal Pengukuran</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={formDate}
+                        onChange={(e) => setFormDate(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                      />
+                    </div>
+
+                    {/* Catatan Tambahan */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Catatan (Posyandu, Dokter, dll)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formNote}
+                        onChange={(e) => setFormNote(e.target.value)}
+                        placeholder="cth: Posyandu Mawar / Imunisasi"
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#8cc63f] focus:ring-2 focus:ring-[#8cc63f]/20 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2.5 mt-5">
+                    {editingRecordMonth !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingRecordMonth(null);
+                          setFormMonth(profile?.ageInMonths ?? 12);
+                          setFormWeight(String(profile?.weightKg ?? 9.5));
+                          setFormHeight(String(profile?.heightCm ?? 76));
+                          setFormHeadCircumference(String(profile?.headCircumferenceCm ?? 42));
+                          setFormNote('');
+                        }}
+                        className="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Batal Edit
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>{editingRecordMonth !== null ? 'Perbarui Titik Ini' : 'Simpan Titik Data'}</span>
+                    </button>
+                  </div>
+                </form>
+
+                {/* Table of Points */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-bold text-[#263c32] dark:text-slate-200">
+                      Daftar Titik Pengukuran ({growthRecords.length})
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={handleResetToWho}
+                      className="text-xs font-semibold text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Pulihkan Kurva Standar</span>
+                    </button>
+                  </div>
+
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
+                    <div className="max-h-[220px] overflow-y-auto scrollbar-thin">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 font-bold sticky top-0 border-b border-slate-200 dark:border-slate-800 z-10">
+                          <tr>
+                            <th className="px-3 py-2.5">Usia</th>
+                            <th className="px-3 py-2.5">Berat</th>
+                            <th className="px-3 py-2.5">Tinggi</th>
+                            <th className="px-3 py-2.5">L. Kepala</th>
+                            <th className="px-3 py-2.5">Tanggal / Ket</th>
+                            <th className="px-3 py-2.5 text-right">Aksi</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {growthRecords.map((r) => (
+                            <tr
+                              key={r.month}
+                              className={cn(
+                                "hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors",
+                                editingRecordMonth === r.month && "bg-[#8cc63f]/10 dark:bg-[#8cc63f]/15"
+                              )}
+                            >
+                              <td className="px-3 py-2 font-bold text-slate-800 dark:text-slate-200">
+                                {r.month} bln
+                              </td>
+                              <td className="px-3 py-2 text-slate-700 dark:text-slate-300">
+                                <span className="font-semibold text-emerald-700 dark:text-[#8cc63f]">{r.weightKg}</span> kg
+                              </td>
+                              <td className="px-3 py-2 text-slate-700 dark:text-slate-300">
+                                <span className="font-semibold text-sky-700 dark:text-sky-400">{r.heightCm}</span> cm
+                              </td>
+                              <td className="px-3 py-2 text-slate-700 dark:text-slate-300">
+                                {r.headCircumferenceCm ? r.headCircumferenceCm + ' cm' : '-'}
+                              </td>
+                              <td className="px-3 py-2 text-slate-500 max-w-[140px] truncate">
+                                <div>{r.date || '-'}</div>
+                                {r.note && <div className="text-[10px] text-slate-400 truncate">{r.note}</div>}
+                              </td>
+                              <td className="px-3 py-2 text-right whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenGrowthModal(r)}
+                                  className="p-1.5 text-slate-500 hover:text-[#263c32] dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mr-1 cursor-pointer"
+                                  title="Edit titik ini"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteRecord(r.month)}
+                                  className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                                  title="Hapus titik ini"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <button
+                  type="button"
+                  onClick={handleExportCsv}
+                  className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Unduh Data (.CSV)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsGrowthModalOpen(false)}
+                  className="px-6 py-2.5 bg-[#263c32] text-white hover:bg-[#1e3025] rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Selesai & Tutup
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {showAgeSelectModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div

@@ -12,7 +12,7 @@ export interface UserProfile {
   isVerified?: boolean; // For nakes
 }
 
-export type AgeCategory = '3_bulan' | '6_bulan' | '9_bulan' | '12_bulan' | '15_bulan' | '18_bulan' | '21_bulan' | '24_bulan' | '30_bulan' | '36_bulan' | '42_bulan';
+export type AgeCategory = '3_bulan' | '6_bulan' | '9_bulan' | '12_bulan' | '15_bulan' | '18_bulan' | '21_bulan' | '24_bulan' | '30_bulan' | '36_bulan' | '42_bulan' | '48_bulan' | '54_bulan' | '60_bulan' | '66_bulan' | '72_bulan';
 export type DevelopmentCategory = 'Gerak Kasar' | 'Gerak Halus' | 'Sosialisasi dan Kemandirian' | 'Bicara dan Bahasa';
 
 export interface Question {
@@ -30,6 +30,16 @@ export interface Answer {
   skor: number;
 }
 
+export interface GrowthRecord {
+  id?: string;
+  month: number;
+  heightCm: number;
+  weightKg: number;
+  headCircumferenceCm?: number;
+  date?: string;
+  note?: string;
+}
+
 export interface ChildProfile {
   id?: string;
   userId?: string;
@@ -40,6 +50,7 @@ export interface ChildProfile {
   weightKg: number;
   headCircumferenceCm?: number;
   gender: 'Laki-laki' | 'Perempuan';
+  growthHistory?: GrowthRecord[];
 }
 
 export interface QuestionnaireResult {

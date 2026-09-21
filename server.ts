@@ -140,6 +140,32 @@ function getAgeRecommendations(ageStr: string): { id: string; en: string; enNext
     };
   }
 
+  if (norm.includes('48 month') || norm.includes('48 bulan') || norm.includes('54 month') || norm.includes('54 bulan')) {
+    return {
+      id: `- **Gerak Kasar**: Latih berdiri 1 kaki selama 6-10 detik, melompat dengan 1 kaki beberapa kali ke depan, menuruni tangga bergantian kaki, dan mengayuh sepeda roda tiga.
+- **Gerak Halus**: Latih menggambar tanda silang (+), lingkaran rapi, membedakan mana garis yang lebih panjang, melipat kertas rapi, dan membuat jembatan dari 3 kubus balok.
+- **Bicara & Bahasa**: Minta anak menyebutkan warna-warna dasar (merah, hijau, kuning, biru), memahami kata depan (di atas, di bawah, di belakang), dan menceritakan apa yang dilakukan hari ini.
+- **Sosial & Mandiri**: Latih berpakaian dan memakai sepatu sendiri, mandiri dalam mencuci dan mengeringkan tangan, serta ajarkan konsep empati dan berbagi giliran dengan teman.`,
+      en: `- **Gross Motor**: Practice standing on one foot for 6-10 seconds, hopping forward on one foot, walking down stairs alternating feet, and pedaling a tricycle.
+- **Fine Motor**: Exercise drawing a cross (+), a neat circle, distinguishing longer vs shorter lines, folding paper neatly, and constructing a bridge from 3 blocks.
+- **Speech & Language**: Prompt naming primary colors (red, green, yellow, blue), understanding prepositions (on, under, behind), and recounting their day in sentences.
+- **Social & Independence**: Practice dressing and putting on shoes independently, washing/drying hands properly, and fostering empathy and turn-taking with peers.`
+    };
+  }
+
+  if (norm.includes('60 month') || norm.includes('60 bulan') || norm.includes('66 month') || norm.includes('66 bulan') || norm.includes('72 month') || norm.includes('72 bulan')) {
+    return {
+      id: `- **Gerak Kasar**: Latih berdiri 1 kaki lebih dari 10 detik, berjalan lurus tumit menyentuh jari kaki (tandem walk), melompat tali, dan menangkap bola dengan mantap.
+- **Gerak Halus**: Latih meniru gambar bujur sangkar/persegi, menggambar orang lengkap (kepala, badan, tangan, kaki), menulis nama panggilannya, serta memegang pensil dengan posisi tripod yang benar.
+- **Bicara & Bahasa**: Latih pemahaman fungsi benda ("cangkir untuk minum", "pensil untuk menulis"), lawan kata ("besar-kecil", "panas-dingin"), dan menjawab pertanyaan logika sebab-akibat sederhana.
+- **Sosial & Mandiri**: Mempersiapkan kemandirian pra-sekolah (berpakaian lengkap tanpa bantuan, makan sendiri dengan rapi, merapikan tas/perlengkapan sendiri, dan mematuhi aturan bermain kelompok).`,
+      en: `- **Gross Motor**: Practice standing on one foot for 10+ seconds, heel-to-toe tandem walking along a straight line, rope jumping, and catching a bounced ball reliably.
+- **Fine Motor**: Practice drawing squares with distinct corners, drawing a person with body parts (head, torso, limbs), writing their name, and using a mature tripod pencil grasp.
+- **Speech & Language**: Strengthen understanding of object functions ("cups for drinking", "pencils for writing"), opposites ("hot-cold", "big-small"), and simple causal logic.
+- **Social & Independence**: Build school-readiness habits (getting fully dressed unassisted, eating neatly, packing their own bag, and following cooperative group rules).`
+    };
+  }
+
   return {
     id: `- **Fisik & Motorik**: Lakukan stimulasi fisik aktif yang menyenangkan setiap hari (berlari, bermain bola, merangkak). Latih kekuatan motorik halus dengan menggambar, meremas, atau melipat kertas.
 - **Interaksi & Bicara**: Ajak anak berkomunikasi secara dua arah seaktif mungkin, kurangi screen-time gadget, serta bacakan buku cerita interaktif.
@@ -356,13 +382,13 @@ Berikan respons akhir Anda dalam format JSON (bukan markdown block) dengan prope
       const ai = getAiClient();
       
       if (!ai) {
-        console.warn('Gemini API Key is not configured. Using high-quality local rule-based fallback.');
+        console.info('Gemini API Key is not configured. Seamlessly using local rule-based clinical analysis.');
         parsedResponse = getFallbackAnalysis(ageCategory, totalScore, qna);
         isFallback = true;
       } else {
         try {
           const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               responseMimeType: "application/json"
@@ -371,7 +397,10 @@ Berikan respons akhir Anda dalam format JSON (bukan markdown block) dengan prope
           parsedResponse = JSON.parse(response.text || '{}');
           isFallback = false;
         } catch (geminiError: any) {
-          console.warn('Gemini analysis failed, using high-quality local rule-based fallback:', geminiError.message || geminiError);
+          const reason = geminiError?.status === 429 || geminiError?.message?.includes('429') || geminiError?.message?.includes('credits') 
+            ? 'API quota / prepayment credits depleted' 
+            : (geminiError?.message?.slice(0, 80) || 'Service unavailable');
+          console.info(`Gemini analysis status [${reason}]. Active: high-quality local rule-based clinical fallback.`);
           parsedResponse = getFallbackAnalysis(ageCategory, totalScore, qna);
           isFallback = true;
         }
@@ -407,13 +436,13 @@ ${text}`;
       } else {
         try {
           const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
           });
           translatedText = response.text;
           isFallback = false;
         } catch (geminiError: any) {
-          console.warn('Gemini translation failed, using fallback (returning original text):', geminiError.message || geminiError);
+          console.info('Gemini translation unavailable, using original text as fallback.');
           translatedText = text;
           isFallback = true;
         }
@@ -456,7 +485,7 @@ Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesma
       } else {
         try {
           const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               tools: [{ googleSearch: {} }]
@@ -469,7 +498,7 @@ Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesma
           parsedResult = JSON.parse(jsonString);
           isFallback = false;
         } catch (geminiError: any) {
-          console.warn('Gemini finding puskesmas failed, using high-quality local calculation fallback:', geminiError.message || geminiError);
+          console.info('Gemini Puskesmas search unavailable, using accurate geographical distance calculation fallback.');
           parsedResult = { puskesmas: generateFallbackPuskesmas(lat, lng) };
           isFallback = true;
         }

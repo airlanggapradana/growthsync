@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
-import { QUESTIONS_DATA } from './data/questions';
+import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from './data/questions';
 import { cn } from './lib/utils';
 import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
@@ -178,6 +178,10 @@ export default function App() {
     setChildProfiles(prev => [...prev, profile]);
     setActiveProfileId(profile.id || null);
     setView('DASHBOARD');
+  };
+
+  const handleUpdateProfile = (updatedProfile: ChildProfile) => {
+    setChildProfiles(prev => prev.map(p => p.id === updatedProfile.id ? updatedProfile : p));
   };
 
   if (loadingUser || loadingProfile) {
@@ -365,6 +369,7 @@ export default function App() {
                 setSelectedHistory(history);
                 setView('HISTORY_DETAIL');
               }}
+              onUpdateProfile={handleUpdateProfile}
             />
           )}
           {view === 'QUESTIONNAIRE' && age && (
@@ -533,6 +538,13 @@ const QuestionnaireView: React.FC<{
           />
         </div>
       </div>
+
+      {AGE_EQUIPMENT_DATA[age] && (
+        <div className="bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 border border-[#8cc63f]/25 rounded-2xl p-4 flex items-start gap-3 text-xs md:text-sm text-[#263c32] dark:text-emerald-300 font-medium">
+          <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
+          <span>{AGE_EQUIPMENT_DATA[age]}</span>
+        </div>
+      )}
 
       <div className="space-y-6">
         <AnimatePresence mode="wait">

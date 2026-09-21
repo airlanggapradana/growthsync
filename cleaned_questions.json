@@ -1,0 +1,898 @@
+{
+  "3_bulan": {
+    "alat": "Alat yang perlu disiapkan: Benang Wool Merah",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah kaki dan tangan bayi dapat bergerak bebas saat terlentang?"
+      },
+      {
+        "no": "2",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah bayi menatap wajah anda saat terjaga?"
+      },
+      {
+        "no": "3",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah bayi membalas senyum anda saat diajak tersenyum?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah bayi dapat mengoceh sendiri?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah bayi terkadang tertawa meskipun tidak digelitik?"
+      },
+      {
+        "no": "6",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah kepala bayi dapat mengikuti gerakan benang ke kanan dan ke kiri?"
+      },
+      {
+        "no": "7",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat mengikuti arah benagn digerakkan ke samping sekitar 180 derajat?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mengangkat kepalanya seperti pada gambar?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mengangkat kepala membentuk sudut 45?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mengangkat kepalanya dengan tegak seperti pada gambar?"
+      }
+    ]
+  },
+  "6_bulan": {
+    "alat": "Alat yang perlu disiapkan: Gulungan Wool Merah, Pensil, Kismis, manik-manik atau uang logam, mainan bayi",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat mengikuti arah benang digerakkan ke samping sekitar 180 derajat?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mempertahankan lehernya saat kedua tangan diangkat/ditarik ke posisi duduk?"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mengangkat dada saat tengkurap dengan lengan sebagai penyangga?"
+      },
+      {
+        "no": "4",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah kepala bayi tetap tegak saat dipangku?"
+      },
+      {
+        "no": "5",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat menggenggam mainan atau pensil saat diletakkan ditelapak tangannya?"
+      },
+      {
+        "no": "6",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat mengamati benda kecil berwarna warni di sekitarnya?"
+      },
+      {
+        "no": "7",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat menggapai mainan yang diletakkan dekatnya?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat berbalik dari terlentang ke tengkuran dan sebaliknya?"
+      },
+      {
+        "no": "9",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah bayi dapat mengeluarkan suara keras/tertawa saat bergembira?"
+      },
+      {
+        "no": "10",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah bayi tersenyum saat melihat mainan atau benda yang menarik?"
+      }
+    ]
+  },
+  "9_bulan": {
+    "alat": "Alat yang perlu disiapkan: Gulungan Wool Merah, Pensil, Kismis-Kacang, atau uang logam, mainan",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat mengambil manik-manik/benda kecil dengan ibu jari dan jari telunjuk?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat mengambil dan memegang 2 kubus dengan kedua tangan?"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi mencari benda mencolok yang dijatuhkan dari ke lantai?"
+      },
+      {
+        "no": "4",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah bayi dapat menggapai mainan yang diletakkan agak jauh?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah bayi menengok saat ada orang diam-diam mendekat dari belakang?"
+      },
+      {
+        "no": "6",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "\"Apakah bayi dapat mengatakan 2 suku kata?\nContoh:\"Ma-ma\", \"da-da\", \"ba-ba\""
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah bayi dapat makan kue kering/biskuit sendiri?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah bayi dapat memindahkan mainan kecil atau kue dari tangan satu ke tangan lain?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat duduk sendiri selama 60 detik tanpa disangga?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah bayi dapat mengangkat \nbadannya ke posisi berdiri tanpa bantuan?"
+      }
+    ]
+  },
+  "12_bulan": {
+    "alat": "Alat yang perlu disiapkan: 2 mainan Kubus, Pensil, kacang-kacangan, manik-manik atau potongan biskuit",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menggenggam pensil dengan kuat?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mengambil manik-manik/benda kecil dengan ibu jari dan jari telunjuk?"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat membenturkan 2 kubus dengan kedua tangan?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahas",
+        "pertanyaan": "Apakah anak dapat menirukan 2-3 kata?\nContoh: mama, minum, tidur, dll"
+      },
+      {
+        "no": "5",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat mengangkat \nbadannya ke posisi berdiri tanpa bantuan?"
+      },
+      {
+        "no": "6",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat duduk sendiri tanpa bantuan dari posisi tidur atau tengkurap?"
+      },
+      {
+        "no": "7",
+        "kategori": "Bicara dan Bahas",
+        "pertanyaan": "Apakah anak dapat mengerti kata \"jangan\"?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosial dan Kemandirian",
+        "pertanyaan": "Apakah anak akan mencari ibu atau pengasuh saat bersembunyi dibelakang sesuatu?"
+      },
+      {
+        "no": "9",
+        "kategori": "Sosial dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat membedakan ibu atau pengasuh dengan orang lain yang belum dikenal?\nContoh: menangis atau tidak mau dipegang"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri dengan berpegangan pada kursi atau meja selama 30 detik atau lebih?"
+      }
+    ]
+  },
+  "15_bulan": {
+    "alat": "Alat yang perlu disiapkan: 2 mainan kubus, Cangkir",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat membenturkan 2 kubus dengan kedua tangan?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat memasukkan 1 kubus atau mainan kedalam cangkir?"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan dengan berpegangan?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengatakan papa atau ibu secara spesifik?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengucapkan 1 kata dengan jelas?"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat bertepuk tangan atau melambaikan tangan?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menunjukkan apa yang diinginkannya tanpa menangis atau merengek?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri sendiri selama 30 detik?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat membungkuk untu mengambil mainan di lantai tanpa berpegangan dan kemudian berdiri kembali?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan dengan baik tanpa terhuyung?"
+      }
+    ]
+  },
+  "18_bulan": {
+    "alat": "Alat yang perlu disiapkan: Mainan Kubus, Bola mainan, Pensil, Kertas",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mencorat coret kertas dengan pensil?"
+      },
+      {
+        "no": "2",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengucapkan 3 kata?\nContoh: Ibu, mama, nenek, susu, main, dll"
+      },
+      {
+        "no": "3",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menunjukkan apa yang diinginkannya tanpa menangis atau merengek?"
+      },
+      {
+        "no": "4",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat minum dari cangkir/gelas sendiri?"
+      },
+      {
+        "no": "5",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menirukan pekerjaan rumah seperti menyapu, mencuci, dll?"
+      },
+      {
+        "no": "6",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menggelindingkan/melempar bola ke arah anda?"
+      },
+      {
+        "no": "7",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat mengambil benda dilantai dengan cara membungkuk kemudian berdiri?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan dengan  baik tanpa terhuyung?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan mundur sebanyak 5 langkah tanpa kehilangan keseimbangan?"
+      },
+      {
+        "no": "10",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat melakukan 1 perintah dengan bantuan isyarat/gerak jari?\nContoh: ambil gelas, tutup pintu, taruh HP"
+      }
+    ]
+  },
+  "21_bulan": {
+    "alat": "Alat yang perlu disiapkan: 2 Mainan Kubus, Bola tenis, Pensil dan Kertas",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mencorat coret kertas dengan pensil?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menyusun 2 kubus?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Sebutkan gambar dibawah ini, Apakah anak dapat menunjukkan minimal 1 gambar?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menunjukkan 1 bagian tubuh?\nContoh: tangan mana? hidung mana?, dll"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengucapkan 7 kata?\nContoh: Ibu, mama, nenek, susu, main, bebek, ayam, bakso, dll"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat minum dari cangkir/gelas sendiri?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menirukan pekerjaan rumah seperti menyapu, mencuci, dll?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berlari tanpa terjatuh?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat mengambil benda dilantai dengan cara membungkuk kemudian berdiri?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan mundur sebanyak 5 langkah tanpa kehilangan keseimbangan?"
+      }
+    ]
+  },
+  "24_bulan": {
+    "alat": "Alat yang perlu disiapkan: 4 Mainan Kubus, Bola Mainan, Pensil dan Kertas",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mencorat coret kertas dengan pensil?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menyusun 4 kubus?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menunjukkan 2 bagian tubuh?\nContoh: tangan mana? hidung mana, dll"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat merangkai 2 kata?\nContoh: Minum susu, naik motor, beli jajan"
+      },
+      {
+        "no": "5",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat melepas baju dan celama sendiri?"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat makan menggunakan sendok sendiri?"
+      },
+      {
+        "no": "7",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berlari tanpa terjatuh?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat naik tangga sendiri hanya berpegangan pada pegangan tangga?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat menendang bola ke depan tanpa berpegangan?"
+      },
+      {
+        "no": "10",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat melakukan 1 perintah?\nContoh: ambil gelas, tutup pintu, taruh HP"
+      }
+    ]
+  },
+  "30_bulan": {
+    "alat": "Alat yang perlu disiapkan: 4 mainan kubus, Bola mainan, Pensil dan Kertas",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menyusun 4 kubus keatas membentuk kereta api?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak bisa menirukan membuat garis lurus seperti gambar dibawah ini?\nContoh: minta anak menirukan garis yang anda buat kira-kira 2 cm"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan nama 2 gambar dibawah? \njika anak menyebutkan suara hewannya maka tidak terhitung"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menunjuk 4 gambar di antara gambar-gambar di dibawah ini dengan benar ketika Anda sebutkan namanya?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menunjukkan 6 bagian tubuh?\nContoh: tangan mana? hidung mana, dll"
+      },
+      {
+        "no": "6",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengikuti 2 perintah sekaligus?\nContoh: ambilkan bola dan taruh di meja; ambilkan gelas dan kasih ke ke ibu"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat memakai baju atau celana sendiri?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menyuapi boneka?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat menendang bola kedepan?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melompat dengan mengangkat kedua kakinya secara bersamaan?"
+      }
+    ]
+  },
+  "36_bulan": {
+    "alat": "Alat yang perlu disiapkan: 6 Kubus Mainan, Bola, Pensil dan Kertas",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menyusun 6 kubus keatas membentuk menara?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak bisa menirukan membuat garis lurus kebawah?\nContoh: minta anak menirukan garis yang anda buat"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan nama 4 gambar dibawah (bukan suara)?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengikuti 2 perintah sekaligus?\nContoh: ambilkan bola dan taruh di meja; ambilkan gelas dan kasih ke ke ibu"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah orang lain bisa memahami sebagian isi perkataan/bicara anak?"
+      },
+      {
+        "no": "6",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat membuat kalimat dengan 3 kata?\nContoh: Aku mau minum; ibu beli es; aku makan roti"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menggosok gigi dengan dibantu (ibu manaruh odol)?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat memakai baju atau celana sendiri?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melempar bola kearah anak dengan jarak 1,5 meter?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melompati selembar kertas/benda sepanjang 22 cm dengan mengangkat kedua kakinya secara bersamaan?"
+      }
+    ]
+  },
+  "42_bulan": {
+    "alat": "Alat yang perlu disiapkan: 8 Kubus, Pensil, Kertas dan Kertas warna-warni",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak bisa menirukan membuat garis lurus kebawah?\nContoh: minta anak menirukan garis yang anda buat"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menyusun 8 kubus keatas membentuk menara?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menunjukkan 2 kegiatan dari gambar yang ada?\nContoh: Mana yang terbang?, mana yang berbicara? manan yang menggonggong, mana yang mengeong?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Tanyakan kepada anak pertanyaan dibawah ini satu persatu:\nContoh: kalo lapar, kamu . . . . , kalo haus maka kamu . . . . , kalo mengantuk, maka kamu . . . , kalo dingin, maka kamu . . . ."
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan 1 warna?"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat mencuci tangan dengan benar?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat menyebutkan nama teman atau saudara?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialiasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat memakai kaos sendiri?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melompati selembar kertas/benda sepanjang 22 cm dengan mengangkat kedua kakinya secara bersamaan, tanpa lari?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri dengan 1 kaki selama 1 detik atau lebih?"
+      }
+    ]
+  },
+  "48_bulan": {
+    "alat": "Alat yang perlu disiapkan: 3 Mainan Kubus, Kertas, Pensil",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak bisa membuat jembatan dari 3 kubus seperti contoh?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat meniru gambar lingkaran?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan bahasa",
+        "pertanyaan": "Apakah anak dapat menunjukkan 2 kegiatan dari gambar yang ada?\nContoh: Mana yang terbang?, mana yang berbicara? manan yang menggonggong, mana yang mengeong?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan nama lengkapnya dengan jelas?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengambil dan menghitung 1 kubus/benda?"
+      },
+      {
+        "no": "6",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan kegunaan atau bahan dari 3 benda? \nContoh: gelas untuk apa? piring untuk apa? kursi untuk apa? pensil untuk apa? meja terbuat terbuat dari apa? dll."
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak bisa bermain ular tangga, kartu, petak umpet, atau  permainan lainnya"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat memakai kaos sendiri?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melompati selembar kertas/benda sepanjang 22 cm?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri dengan 1 kaki selama 2 detik atau lebih?"
+      }
+    ]
+  },
+  "54_bulan": {
+    "alat": "Alat yang perlu disiapkan: Kertas, Kertas warna-warni (origami), Pensil",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menunjuk garis yang lebih panjang sebanyak 3 kali dengan benar pada posisi yang berbeda?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mencontoh tanda + ?\nJawablah \"Ya\" jika kedua garis berpotongan ditengah"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Minta anak menggambar orang tanpa diberi contoh, kemudian hitunglah jumlah bagian tubuh yang digambar.\nApakah anak bisa menggambar orang sebanyak 3 bagian tubuh?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan 2 warna?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah orang lain dapat mengerti semua perkataan/pembicaraan anak?"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan kemandirian",
+        "pertanyaan": "Apakah anak bisa bermain ular tangga, kartu, petak umpet, atau  permainan lainnya?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak bisa menggosok gigi tanpa di bantu?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat mengancingkan baju nya sendiri?"
+      },
+      {
+        "no": "9",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat melakukan minimal 2 perintah terkait kata depan?\nContoh: Taruh mainan/benda diatas meja, taruh boneka/mainan dibawah meja, taruh benda/mainan di depan ibu, taruh benda dibelakang pintu, dll"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri dengan 1 kaki selama 2 detik atau lebih?"
+      }
+    ]
+  },
+  "60_bulan": {
+    "alat": "Alat yang perlu disiapkan: Kertas, Kertas warna-warni (origami), Pensil",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat menunjukkan garis yang lebih panjang sebanyak 3 kali? (lihat contoh)"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Minta anak menggambar orang tanpa diberi contoh, kemudian hitunglah jumlah bagian tubuh yang digambar.\nApakah anak bisa menggambar orang sebanyak 3 bagian tubuh?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan 4 warna?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak mengerti 3 kata sifat?\nContoh: kalo lapar, kamu . . . . , kalo haus maka kamu . . . . , kalo mengantuk, maka kamu . . . , kalo dingin, maka kamu . . . ."
+      },
+      {
+        "no": "5",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat mengancingkan baju nya sendiri?"
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak tidak rewel dan tenang saat di tinggal orang tua beberapa saat?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan Kemandirian",
+        "pertanyaan": "Apakah anak dapat berpakaian sendiri tanpa dibantu?"
+      },
+      {
+        "no": "8",
+        "kategori": "Bicara dan bahasa",
+        "pertanyaan": "Apakah anak dapat melakukan perintah terkait kata depan?\nContoh: Taruh mainan/benda diatas meja, taruh boneka/mainan dibawah meja, taruh benda/mainan di depan ibu, taruh benda dibelakang pintu, dll"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Minta anak untuk berdiri 1 kaki tanpa berpegangan. \nDapatkah ia mempertahankan keseimbangan dalam waktu 2 detik atau lebih?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat melompat dengan 1 kaki?"
+      }
+    ]
+  },
+  "66_bulan": {
+    "alat": "Alat yang perlu disiapkan: Bola Kecil, Kertas, Pensil, 8 Mainan Kubus",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Apakah anak dapat mencontoh tanda + \nJawablah \"Ya\" jika kedua garis berpotongan ditengah"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Tunjukkan gambar kotak dibawah dan minta anak menirukan gambar tersebut.  \nApakah anak dapat menggambar seperti contoh?"
+      },
+      {
+        "no": "3",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Minta anak menggambar orang tanpa diberi contoh, kemudian hitunglah jumlah bagian tubuh yang digambar.\nApakah anak bisa menggambar orang sebanyak 3 bagian tubuh?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Minta anak mengambil dan menghitung 5 kubus, dapatkan anak melakukannya dengan benar?"
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengartikan 5 kata? \nContoh: apa itu bola, piring, baju, kursi, TV, mobil, jeruk, dll."
+      },
+      {
+        "no": "6",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Minta anak menyebutkan lawan kata seperti \"kalo gajah besar, maka tikus . . . .\"; kalo api panas, maka es . . . . .\", kalo siang terang, maka malam . . ..\"; kalo ayah tinggi, maka adek . . . .\" \nApakah anak bisa menjawab 3 pertanyaan dengan benar?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan kemandirian",
+        "pertanyaan": "Apakah anak tidak rewel dan tenang saat di tinggal orang tua beberapa saat?"
+      },
+      {
+        "no": "8",
+        "kategori": "Sosialisasi dan kemandirian",
+        "pertanyaan": "Apakah anak dapat berpakaian sendiri tanpa dibantu?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berdiri dengan 1 kaki selama 6 detik?"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat mengangkap bola dengan kedua tangannya?"
+      }
+    ]
+  },
+  "72_bulan": {
+    "alat": "Alat yang perlu disiapkan: Bola Kecil, Kertas, Pensil",
+    "count": 10,
+    "questions": [
+      {
+        "no": "1",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Tunjukkan gambar kotak dibawah dan minta anak menirukan gambar tersebut.  \nApakah anak dapat menggambar seperti contoh?"
+      },
+      {
+        "no": "2",
+        "kategori": "Gerak Halus",
+        "pertanyaan": "Minta anak menggambar orang tanpa diberi contoh, kemudian hitunglah jumlah bagian tubuh yang digambar.\nApakah anak bisa menggambar orang sebanyak 6 bagian tubuh?"
+      },
+      {
+        "no": "3",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Minta anak menyebutkan lawan kata seperti \"kalo gajah besar, maka tikus . . . .\"; kalo api panas, maka es . . . . .\", kalo siang terang, maka malam . . ..\"; kalo ayah tinggi, maka adek . . . .\" \nApakah anak bisa menjawab 3 pertanyaan dengan benar?"
+      },
+      {
+        "no": "4",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat mengartikan 7 kata? \nContoh: apa itu bola, piring, baju, kursi, TV, mobil, jeruk, dll."
+      },
+      {
+        "no": "5",
+        "kategori": "Bicara dan Bahasa",
+        "pertanyaan": "Apakah anak dapat menyebutkan kegunaan atau bahan dari 3 benda? \nContoh: gelas untuk apa? piring untuk apa? kursi untuk apa? pensil untuk apa? meja terbuat terbuat dari apa? dll."
+      },
+      {
+        "no": "6",
+        "kategori": "Sosialisasi dan kemandirian",
+        "pertanyaan": "Apakah anak dapat menggosok giginya tanpa bantuan?"
+      },
+      {
+        "no": "7",
+        "kategori": "Sosialisasi dan kemandirian",
+        "pertanyaan": "Apakah anak dapat mengambil makanan atau minuman sendiri tanpa tumpah?"
+      },
+      {
+        "no": "8",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat menangkap bola kecil sebesar bola tenis atau bola kasti hanya dengan menggunakan kedua tangannya?"
+      },
+      {
+        "no": "9",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "Apakah anak dapat berjalan digaris lurus seperti contoh? (posisi tumit kaki depan saat berjalan adalah berdekatan dengan jari kaki yang belakang)"
+      },
+      {
+        "no": "10",
+        "kategori": "Gerak Kasar",
+        "pertanyaan": "apakah anak dapat berdiri 1 kaki selama 11 detik?"
+      }
+    ]
+  }
+}
