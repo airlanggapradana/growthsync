@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from './data/questions';
 import { cn } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages, PanelLeftClose, PanelLeftOpen, Menu, X } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
@@ -65,6 +65,17 @@ export default function App() {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [unreadCountsBySender, setUnreadCountsBySender] = useState<Record<string, number>>({});
   const [showLanding, setShowLanding] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sidebar_collapsed') === 'true';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sidebar_collapsed', String(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
 
   useEffect(() => {
     if (!user) {
@@ -207,88 +218,391 @@ export default function App() {
   // Wrapped content component goes here...
   return (
     <div className="flex h-screen bg-[#263c32] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
-      {/* Sidebar (Hidden on mobile) */}
-      <aside className="w-[260px] hidden lg:flex flex-col pt-8 pb-6 px-5 shrink-0 overflow-y-auto">
-        <div className="flex items-center px-3 mb-5">
-           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Kuisioner Anak Logo" className="h-16 w-auto object-contain" />
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-[100] flex">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="relative w-4/5 max-w-xs bg-[#263c32] text-white flex flex-col p-6 shadow-2xl h-full overflow-y-auto z-10"
+            >
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Kuisioner Anak Logo" className="h-10 w-auto object-contain" />
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-2 mb-3">{t('sidebar.menu')}</div>
+              <nav className="space-y-1.5 mb-6">
+                 <button 
+                   onClick={() => {
+                     setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD');
+                     setMobileMenuOpen(false);
+                   }}
+                   className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                 >
+                   <div className="flex items-center gap-3">
+                     <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+                     {t('Dashboard')}
+                   </div>
+                   {unreadCount > 0 && userProfile?.role === 'nakes' && (
+                     <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                       {unreadCount > 99 ? '99+' : unreadCount}
+                     </span>
+                   )}
+                 </button>
+                 {userProfile?.role === 'orang_tua' && (
+                   <button 
+                     onClick={() => {
+                       setView('ONBOARDING');
+                       setMobileMenuOpen(false);
+                     }}
+                     className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                   >
+                     <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-70")} />
+                     {t('Tambah Anak')}
+                   </button>
+                 )}
+                 {userProfile?.role === 'orang_tua' && (
+                   <button 
+                     onClick={() => {
+                       setView('PARENT_CHAT_LIST');
+                       setMobileMenuOpen(false);
+                     }}
+                     className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                   >
+                     <div className="flex items-center gap-3">
+                       <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+                       {t('sidebar.chat')}
+                     </div>
+                     {unreadCount > 0 && (
+                       <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                         {unreadCount > 99 ? '99+' : unreadCount}
+                       </span>
+                     )}
+                   </button>
+                 )}
+              </nav>
+
+              <div className="mt-auto pt-4 border-t border-white/10 space-y-1">
+                <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-2 mb-2">{t('Pengaturan')}</div>
+                <button 
+                   onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+                   className="flex items-center justify-between w-full px-4 py-2.5 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
+                >
+                   <div className="flex items-center gap-3">
+                     <Languages className="w-5 h-5 opacity-70" />
+                     {t('Bahasa')}
+                   </div>
+                   <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full uppercase tracking-widest">{language}</span>
+                </button>
+                <button 
+                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                   className="flex items-center gap-3 w-full px-4 py-2.5 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
+                >
+                   {theme === 'dark' ? <Sun className="w-5 h-5 opacity-70" /> : <Moon className="w-5 h-5 opacity-70" />}
+                   {theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}
+                </button>
+                <button 
+                   onClick={handleLogout}
+                   className="flex items-center gap-3 w-full px-4 py-2.5 text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors text-sm font-semibold"
+                >
+                   <LogOut className="w-5 h-5 opacity-70" />
+                   {t('sidebar.logout')}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar (Collapsible on Desktop) */}
+      <aside 
+        className={cn(
+          "hidden lg:flex flex-col pt-7 pb-6 shrink-0 transition-all duration-300 ease-in-out relative z-40 select-none overflow-y-auto overflow-x-hidden",
+          isSidebarCollapsed ? "w-[80px] px-3 items-center" : "w-[260px] px-5"
+        )}
+      >
+        {/* Top Logo Header */}
+        <div className={cn("w-full flex items-center mb-6", isSidebarCollapsed ? "justify-center px-1" : "justify-center px-2")}>
+          {!isSidebarCollapsed ? (
+            <div className="flex items-center justify-center w-full overflow-hidden">
+              <img 
+                src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" 
+                alt="Kuisioner Anak Logo" 
+                className="h-14 w-auto object-contain transition-all duration-300" 
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform hover:scale-105 cursor-pointer focus:outline-none"
+              title="Perluas Navbar"
+              aria-label="Perluas Navbar"
+            >
+              <img 
+                src="/Resmi_Logo_UMS_Color.png" 
+                alt="Universitas Muhammadiyah Surakarta Logo" 
+                className="w-full h-full object-contain drop-shadow-sm" 
+                referrerPolicy="no-referrer"
+              />
+            </button>
+          )}
         </div>
 
-        <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">{t('sidebar.menu')}</div>
-        <nav className="space-y-1.5 mb-8">
-           <button 
-             onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
-             className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
-           >
-             <div className="flex items-center gap-3">
-               <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-               {t('Dashboard')}
-             </div>
-             {unreadCount > 0 && userProfile?.role === 'nakes' && (
-               <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                 {unreadCount > 99 ? '99+' : unreadCount}
-               </span>
-             )}
-           </button>
-           <button 
-             disabled
-             className="flex items-center gap-3 w-full px-4 py-3 text-white/40 font-semibold rounded-xl text-sm cursor-not-allowed"
-           >
-             <CheckCircle2 className="w-5 h-5 opacity-50" />
-             {t('sidebar.tasks')} <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">{t('sidebar.coming_soon')}</span>
-           </button>
-           {userProfile?.role === 'orang_tua' && (
-             <button 
-               onClick={() => setView('ONBOARDING')}
-               className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
-             >
-               <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-70")} />
-               {t('Tambah Anak')}
-             </button>
-           )}
-           {userProfile?.role === 'orang_tua' && (
-             <button 
-               onClick={() => setView('PARENT_CHAT_LIST')}
-               className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
-             >
-               <div className="flex items-center gap-3">
-                 <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
-                 {t('sidebar.chat')}
-               </div>
-               {unreadCount > 0 && (
-                 <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                   {unreadCount > 99 ? '99+' : unreadCount}
-                 </span>
-               )}
-             </button>
-           )}
+        {/* Navigation Menu Section */}
+        {!isSidebarCollapsed ? (
+          <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-3 w-full">
+            {t('sidebar.menu')}
+          </div>
+        ) : (
+          <div className="w-8 h-px bg-white/15 my-2 mx-auto shrink-0" />
+        )}
+
+        <nav className={cn("space-y-1.5 mb-8 w-full", isSidebarCollapsed && "flex flex-col items-center")}>
+          {/* Dashboard Item */}
+          {!isSidebarCollapsed ? (
+            <button 
+              onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
+              className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+            >
+              <div className="flex items-center gap-3">
+                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+                <span>{t('Dashboard')}</span>
+              </div>
+              {unreadCount > 0 && userProfile?.role === 'nakes' && (
+                <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+          ) : (
+            <div className="relative group w-full flex justify-center">
+              <button 
+                onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
+                className={cn(
+                  "w-11 h-11 flex items-center justify-center rounded-xl transition-all relative",
+                  view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT'
+                    ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" 
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                )}
+                title={t('Dashboard')}
+                aria-label="Dashboard"
+              >
+                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-[#1e3025]" : "opacity-80")} />
+                {unreadCount > 0 && userProfile?.role === 'nakes' && (
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full ring-2 ring-[#263c32]">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                {t('Dashboard')}
+              </div>
+            </div>
+          )}
+
+          {/* Tasks (Coming Soon) */}
+          {!isSidebarCollapsed ? (
+            <button 
+              disabled
+              className="flex items-center gap-3 w-full px-4 py-3 text-white/40 font-semibold rounded-xl text-sm cursor-not-allowed"
+            >
+              <CheckCircle2 className="w-5 h-5 opacity-50" />
+              <span>{t('sidebar.tasks')}</span> 
+              <span className="ml-auto text-[9px] bg-white/10 text-white/50 py-0.5 px-2 rounded-full uppercase tracking-wider">{t('sidebar.coming_soon')}</span>
+            </button>
+          ) : (
+            <div className="relative group w-full flex justify-center">
+              <button 
+                disabled
+                className="w-11 h-11 flex items-center justify-center text-white/30 rounded-xl cursor-not-allowed"
+                title={`${t('sidebar.tasks')} (${t('sidebar.coming_soon')})`}
+                aria-label="Tasks"
+              >
+                <CheckCircle2 className="w-5 h-5 opacity-40" />
+              </button>
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                {t('sidebar.tasks')} <span className="ml-1 text-[9px] text-white/50">({t('sidebar.coming_soon')})</span>
+              </div>
+            </div>
+          )}
+
+          {/* Tambah Anak */}
+          {userProfile?.role === 'orang_tua' && (
+            !isSidebarCollapsed ? (
+              <button 
+                onClick={() => setView('ONBOARDING')}
+                className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+              >
+                <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-70")} />
+                <span>{t('Tambah Anak')}</span>
+              </button>
+            ) : (
+              <div className="relative group w-full flex justify-center">
+                <button 
+                  onClick={() => setView('ONBOARDING')}
+                  className={cn(
+                    "w-11 h-11 flex items-center justify-center rounded-xl transition-all",
+                    view === 'ONBOARDING' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}
+                  title={t('Tambah Anak')}
+                  aria-label="Tambah Anak"
+                >
+                  <Smile className={cn("w-5 h-5", view === 'ONBOARDING' ? "text-[#1e3025]" : "opacity-80")} />
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                  {t('Tambah Anak')}
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Chat / Konsultasi */}
+          {userProfile?.role === 'orang_tua' && (
+            !isSidebarCollapsed ? (
+              <button 
+                onClick={() => setView('PARENT_CHAT_LIST')}
+                className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+              >
+                <div className="flex items-center gap-3">
+                  <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-70")} />
+                  <span>{t('sidebar.chat')}</span>
+                </div>
+                {unreadCount > 0 && (
+                  <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <div className="relative group w-full flex justify-center">
+                <button 
+                  onClick={() => setView('PARENT_CHAT_LIST')}
+                  className={cn(
+                    "w-11 h-11 flex items-center justify-center rounded-xl transition-all relative",
+                    view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "bg-[#8cc63f] text-[#1e3025] shadow-md shadow-[#8cc63f]/20" : "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}
+                  title={t('sidebar.chat')}
+                  aria-label="Konsultasi Chat"
+                >
+                  <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-[#1e3025]" : "opacity-80")} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full ring-2 ring-[#263c32]">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                  {t('sidebar.chat')}
+                </div>
+              </div>
+            )
+          )}
         </nav>
 
-        <div className="mt-auto">
-          <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-4">{t('Pengaturan')}</div>
-          <button 
-             onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
-             className="flex items-center justify-between w-full px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
-          >
-             <div className="flex items-center gap-3">
-               <Languages className="w-5 h-5 opacity-70" />
-               {t('Bahasa')}
-             </div>
-             <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full uppercase tracking-widest">{language}</span>
-          </button>
-          <button 
-             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-             className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
-          >
-             {theme === 'dark' ? <Sun className="w-5 h-5 opacity-70" /> : <Moon className="w-5 h-5 opacity-70" />}
-             {theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}
-          </button>
-          <button 
-             onClick={handleLogout}
-             className="flex items-center gap-3 w-full px-4 py-3 text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors text-sm font-semibold"
-          >
-             <LogOut className="w-5 h-5 opacity-70" />
-             {t('sidebar.logout')}
-          </button>
+        {/* Settings Area */}
+        <div className={cn("mt-auto w-full", isSidebarCollapsed ? "flex flex-col items-center space-y-2" : "")}>
+          {!isSidebarCollapsed ? (
+            <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest px-4 mb-3">{t('Pengaturan')}</div>
+          ) : (
+            <div className="w-8 h-px bg-white/15 my-2 mx-auto shrink-0" />
+          )}
+
+          {/* Bahasa */}
+          {!isSidebarCollapsed ? (
+            <button 
+              onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+              className="flex items-center justify-between w-full px-4 py-2.5 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
+            >
+              <div className="flex items-center gap-3">
+                <Languages className="w-5 h-5 opacity-70" />
+                <span>{t('Bahasa')}</span>
+              </div>
+              <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full uppercase tracking-widest">{language}</span>
+            </button>
+          ) : (
+            <div className="relative group w-full flex justify-center">
+              <button 
+                onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+                className="w-11 h-11 flex flex-col items-center justify-center text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors"
+                title={`${t('Bahasa')} (${language.toUpperCase()})`}
+                aria-label="Ganti Bahasa"
+              >
+                <Languages className="w-4 h-4 opacity-80" />
+                <span className="text-[8px] font-extrabold uppercase mt-0.5 tracking-tight">{language}</span>
+              </button>
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                {t('Bahasa')}: {language === 'id' ? 'Indonesia' : 'English'}
+              </div>
+            </div>
+          )}
+
+          {/* Theme */}
+          {!isSidebarCollapsed ? (
+            <button 
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors text-sm font-semibold"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5 opacity-70 text-amber-300" /> : <Moon className="w-5 h-5 opacity-70" />}
+              <span>{theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}</span>
+            </button>
+          ) : (
+            <div className="relative group w-full flex justify-center">
+              <button 
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="w-11 h-11 flex items-center justify-center text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-colors"
+                title={theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun className="w-5 h-5 opacity-80 text-amber-300" /> : <Moon className="w-5 h-5 opacity-80" />}
+              </button>
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                {theme === 'dark' ? t('Mode Terang') : t('Mode Gelap')}
+              </div>
+            </div>
+          )}
+
+          {/* Logout */}
+          {!isSidebarCollapsed ? (
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors text-sm font-semibold"
+            >
+              <LogOut className="w-5 h-5 opacity-70" />
+              <span>{t('sidebar.logout')}</span>
+            </button>
+          ) : (
+            <div className="relative group w-full flex justify-center">
+              <button 
+                onClick={handleLogout}
+                className="w-11 h-11 flex items-center justify-center text-white/70 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
+                title={t('sidebar.logout')}
+                aria-label="Logout"
+              >
+                <LogOut className="w-5 h-5 opacity-80" />
+              </button>
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-rose-950 text-rose-200 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-rose-500/20">
+                {t('sidebar.logout')}
+              </div>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -296,8 +610,17 @@ export default function App() {
       <main className="flex-1 lg:my-3 lg:mr-3 bg-white dark:bg-slate-900 lg:rounded-[32px] shadow-[0_2px_24px_-8px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-slate-700/50 flex flex-col overflow-hidden relative w-full h-full lg:h-[calc(100vh-24px)]">
         
         {/* Mobile Header */}
-        <header className="lg:hidden h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 shadow-sm z-30">
-          <div className="flex items-center">
+        <header className="lg:hidden h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 shadow-sm z-30">
+          <div className="flex items-center gap-2.5">
+            <button 
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 -ml-1 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+              title="Buka Menu"
+              aria-label="Open Mobile Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-2">
@@ -311,10 +634,27 @@ export default function App() {
         </header>
 
         {/* Desktop Topbar */}
-        <header className="hidden lg:flex h-[88px] items-center justify-between px-10 shrink-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50 z-30">
-           {/* Search Placeholder */}
-           <div className="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-full px-5 py-3 w-[360px] text-slate-400 text-sm font-medium hover:bg-slate-100 dark:bg-slate-800 transition-colors cursor-text">
-              <span className="opacity-70">Cari data anak...</span>
+        <header className="hidden lg:flex h-[88px] items-center justify-between px-8 xl:px-10 shrink-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50 z-30">
+           {/* Sidebar Toggle & Search */}
+           <div className="flex items-center gap-3">
+             <button
+               type="button"
+               onClick={() => setIsSidebarCollapsed(prev => !prev)}
+               className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-200/80 dark:border-slate-800"
+               title={isSidebarCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+               aria-label="Toggle Sidebar"
+             >
+               {isSidebarCollapsed ? (
+                 <PanelLeftOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+               ) : (
+                 <PanelLeftClose className="w-5 h-5" />
+               )}
+             </button>
+
+             {/* Search Placeholder */}
+             <div className="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-full px-5 py-3 w-[300px] xl:w-[360px] text-slate-400 text-sm font-medium hover:bg-slate-100 dark:bg-slate-800 transition-colors cursor-text">
+                <span className="opacity-70">Cari data anak...</span>
+             </div>
            </div>
            
            <div className="flex items-center gap-8">
@@ -357,7 +697,9 @@ export default function App() {
           "flex-1 overflow-y-auto",
           (view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' || view === 'NAKES_CHAT')
             ? "p-3 sm:p-5 lg:p-6 bg-slate-50 dark:bg-slate-950 flex flex-col h-full"
-            : "px-6 py-8 lg:px-10 lg:py-10 bg-white dark:bg-slate-900"
+            : view === 'QUESTIONNAIRE'
+              ? "p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 flex flex-col min-h-full w-full"
+              : "px-6 py-8 lg:px-10 lg:py-10 bg-white dark:bg-slate-900"
         )}>
           <AnimatePresence mode="wait">
             {view === 'ONBOARDING' && (
@@ -524,18 +866,29 @@ const QuestionnaireView: React.FC<{
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="max-w-3xl mx-auto space-y-8 pb-32" 
+      className="w-full flex-1 flex flex-col space-y-6 pb-6" 
     >
-      <div className="bg-[#263c32] p-8 rounded-[32px] shadow-xl shadow-[#263c32]/20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
-        <div className="relative z-10 flex justify-between items-end mb-4">
+      {/* Top Progress Card */}
+      <div className="w-full bg-[#263c32] p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-xl shadow-[#263c32]/20 relative overflow-hidden shrink-0">
+        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-48 h-48 rounded-full bg-white/5 blur-2xl"></div>
+        <div className="relative z-10 flex flex-wrap justify-between items-end gap-3 mb-4">
           <div className="flex flex-col">
             <span className="text-xs font-bold uppercase tracking-widest text-white/50 mb-1.5">{t('app.progress')}</span>
-            <span className="text-3xl font-bold text-white leading-none">{answeredCount}<span className="text-white/40 text-xl font-medium ml-1">/ {questions.length}</span></span>
+            <span className="text-3xl lg:text-4xl font-extrabold text-white leading-none">
+              {answeredCount}
+              <span className="text-white/40 text-xl font-medium ml-1">/ {questions.length} Pertanyaan</span>
+            </span>
           </div>
-          <span className="text-sm text-white/70 font-semibold">{Math.round(progress)}% {t('app.finished')}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold px-3 py-1 bg-white/10 text-white rounded-full">
+              Pertanyaan {currentIndex + 1} dari {questions.length}
+            </span>
+            <span className="text-sm font-bold bg-[#8cc63f]/25 text-[#8cc63f] px-3.5 py-1 rounded-full">
+              {Math.round(progress)}% {t('app.finished')}
+            </span>
+          </div>
         </div>
-        <div className="h-2 bg-black/20 rounded-full overflow-hidden relative z-10">
+        <div className="h-3 bg-black/30 rounded-full overflow-hidden relative z-10">
           <motion.div
             className="h-full bg-[#8cc63f] rounded-full"
             initial={{ width: 0 }}
@@ -546,13 +899,14 @@ const QuestionnaireView: React.FC<{
       </div>
 
       {AGE_EQUIPMENT_DATA[age] && (
-        <div className="bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 border border-[#8cc63f]/25 rounded-2xl p-4 flex items-start gap-3 text-xs md:text-sm text-[#263c32] dark:text-emerald-300 font-medium">
+        <div className="w-full bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 border border-[#8cc63f]/25 rounded-2xl p-4 flex items-start gap-3 text-xs md:text-sm text-[#263c32] dark:text-emerald-300 font-medium shrink-0">
           <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
           <span>{AGE_EQUIPMENT_DATA[age]}</span>
         </div>
       )}
 
-      <div className="space-y-6">
+      {/* Main Question Card */}
+      <div className="flex-1 flex flex-col w-full">
         <AnimatePresence mode="wait">
           <motion.div 
             key={currentQuestion.id}
@@ -560,102 +914,122 @@ const QuestionnaireView: React.FC<{
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, x: -20, filter: 'blur(4px)' }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white p-8 md:p-12 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center"
+            className="w-full bg-white dark:bg-slate-900 p-6 sm:p-8 lg:p-12 rounded-2xl lg:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col flex-1 justify-between"
           >
-            <span className="inline-flex px-4 py-1.5 bg-[#8cc63f]/10 text-[#263c32] text-xs font-bold uppercase tracking-wider rounded-full mb-8 self-start">
-              {t(categoryI18nKeyMap[currentQuestion.kategori] || currentQuestion.kategori)}
-            </span>
-            <h3 className="text-2xl md:text-3xl font-bold leading-tight text-[#263c32] mb-6">
-              <span className="text-slate-300 font-medium mr-3">{currentIndex + 1}.</span>
-              {t(`question.${currentQuestion.id}`)}
-            </h3>
+            <div className={cn(
+              "w-full",
+              currentQuestion.imageUrl ? "grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start" : "flex flex-col"
+            )}>
+              <div className={cn(currentQuestion.imageUrl ? "lg:col-span-7 xl:col-span-8 flex flex-col" : "w-full flex flex-col")}>
+                <span className="inline-flex px-4 py-1.5 bg-[#8cc63f]/10 dark:bg-[#8cc63f]/20 text-[#263c32] dark:text-[#8cc63f] text-xs font-bold uppercase tracking-wider rounded-full mb-6 self-start">
+                  {t(categoryI18nKeyMap[currentQuestion.kategori] || currentQuestion.kategori)}
+                </span>
+                
+                <h3 className="text-2xl sm:text-3xl xl:text-4xl font-extrabold leading-tight text-[#263c32] dark:text-white mb-6">
+                  <span className="text-slate-300 dark:text-slate-600 font-medium mr-3">{currentIndex + 1}.</span>
+                  {t(`question.${currentQuestion.id}`)}
+                </h3>
 
-            {currentQuestion.imageUrl && (
-              <div className="mb-6 rounded-[24px] overflow-hidden border border-slate-100 flex justify-center bg-slate-50/50 p-4 max-w-full">
-                <img 
-                  src={currentQuestion.imageUrl} 
-                  alt={t(`question.${currentQuestion.id}`)}
-                  className="max-h-64 md:max-h-80 object-contain rounded-xl hover:scale-[1.02] transition-transform duration-300 shadow-sm"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="mb-8 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 text-sm text-slate-600 dark:text-slate-300">
+                   <div className="flex items-start gap-3">
+                     <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
+                     <div className="space-y-1.5 mt-0.5">
+                       <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_yes') }} /></p>
+                       <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_no') }} /></p>
+                     </div>
+                   </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mt-auto">
+                  <button
+                    onClick={() => handleAnswerClick(1)}
+                    className={cn(
+                      "p-6 lg:p-8 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
+                      currentAnswer === 1
+                        ? "border-[#8cc63f] bg-[#8cc63f]/10 dark:bg-[#8cc63f]/20 shadow-md ring-2 ring-[#8cc63f]/30"
+                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:border-[#8cc63f]/50 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    )}
+                  >
+                    <span className={cn("text-2xl lg:text-3xl font-black", currentAnswer === 1 ? "text-[#263c32] dark:text-[#8cc63f]" : "text-slate-400 dark:text-slate-500")}>{t('app.yes')}</span>
+                    <span className={cn("text-xs font-bold px-3.5 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400")}>{t('app.score', { score: '1' })}</span>
+                  </button>
+                  <button
+                    onClick={() => handleAnswerClick(0)}
+                    className={cn(
+                      "p-6 lg:p-8 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
+                      currentAnswer === 0
+                        ? "border-amber-500 bg-amber-500/10 dark:bg-amber-500/20 shadow-md ring-2 ring-amber-500/30"
+                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:border-amber-500/50 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    )}
+                  >
+                    <span className={cn("text-2xl lg:text-3xl font-black", currentAnswer === 0 ? "text-amber-600 dark:text-amber-400" : "text-slate-400 dark:text-slate-500")}>{t('app.no')}</span>
+                    <span className={cn("text-xs font-bold px-3.5 py-1 rounded-full", currentAnswer === 0 ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400")}>{t('app.score', { score: '0' })}</span>
+                  </button>
+                </div>
               </div>
-            )}
 
-            <div className="mb-10 bg-slate-50 border border-slate-100 rounded-2xl p-5 text-sm text-slate-600">
-               <div className="flex items-start gap-3">
-                 <Info className="w-5 h-5 flex-shrink-0 text-[#8cc63f] mt-0.5" />
-                 <div className="space-y-1.5 mt-0.5">
-                   <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_yes') }} /></p>
-                   <p>&bull; <span dangerouslySetInnerHTML={{ __html: t('app.instruction_no') }} /></p>
-                 </div>
-               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <button
-                onClick={() => handleAnswerClick(1)}
-                className={cn(
-                  "p-6 md:p-8 rounded-[24px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
-                  currentAnswer === 1
-                    ? "border-[#8cc63f] bg-[#8cc63f]/10"
-                    : "border-slate-100 bg-white hover:border-[#8cc63f]/50 hover:bg-slate-50"
-                )}
-              >
-                <span className={cn("text-2xl font-black", currentAnswer === 1 ? "text-[#263c32]" : "text-slate-400")}>{t('app.yes')}</span>
-                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 1 ? "bg-[#8cc63f] text-[#1e3025]" : "bg-slate-100 text-slate-400")}>{t('app.score', { score: '1' })}</span>
-              </button>
-              <button
-                onClick={() => handleAnswerClick(0)}
-                className={cn(
-                  "p-6 md:p-8 rounded-[24px] border-2 transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
-                  currentAnswer === 0
-                    ? "border-amber-500 bg-amber-500/10"
-                    : "border-slate-100 bg-white hover:border-amber-500/50 hover:bg-slate-50"
-                )}
-              >
-                <span className={cn("text-2xl font-black", currentAnswer === 0 ? "text-amber-600" : "text-slate-400")}>{t('app.no')}</span>
-                <span className={cn("text-xs font-bold px-3 py-1 rounded-full", currentAnswer === 0 ? "bg-amber-500 text-white" : "bg-slate-100 text-slate-400")}>{t('app.score', { score: '0' })}</span>
-              </button>
+              {currentQuestion.imageUrl && (
+                <div className="lg:col-span-5 xl:col-span-4 rounded-2xl lg:rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 flex flex-col items-center justify-center bg-slate-50/80 dark:bg-slate-800/40 p-6 w-full h-full min-h-[300px]">
+                  <img 
+                    src={currentQuestion.imageUrl} 
+                    alt={t(`question.${currentQuestion.id}`)}
+                    className="max-h-72 lg:max-h-[420px] w-auto max-w-full object-contain rounded-xl hover:scale-[1.02] transition-transform duration-300 shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-4 text-center font-medium">
+                    Panduan Ilustrasi Pertanyaan
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-64px)] max-w-3xl bg-[#263c32]/90 backdrop-blur-xl text-white p-3 rounded-full z-30 shadow-2xl shadow-[#263c32]/30 flex items-center justify-between gap-4 border border-white/10">
-        <div className="flex gap-2">
+      {/* Full-width Sticky Bottom Control Bar */}
+      <div className="sticky bottom-0 w-full bg-[#263c32]/95 dark:bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-2xl z-30 shadow-2xl shadow-black/20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 border border-white/10 dark:border-slate-800">
+        <div className="flex items-center gap-2">
            <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
               className={cn(
-                 "w-12 h-12 rounded-full transition-all flex items-center justify-center",
-                 currentIndex === 0 ? "text-white/20 cursor-not-allowed" : "text-white/70 hover:bg-white/10 hover:text-white"
+                 "h-11 px-4 rounded-xl transition-all flex items-center gap-2 font-semibold text-sm",
+                 currentIndex === 0 ? "text-white/20 cursor-not-allowed" : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
            >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Sebelumnya</span>
            </button>
            <button
               onClick={handleNext}
               disabled={currentIndex === questions.length - 1}
               className={cn(
-                 "w-12 h-12 rounded-full transition-all flex items-center justify-center",
-                 currentIndex === questions.length - 1 ? "text-white/20 cursor-not-allowed" : "text-white/70 hover:bg-white/10 hover:text-white"
+                 "h-11 px-4 rounded-xl transition-all flex items-center gap-2 font-semibold text-sm",
+                 currentIndex === questions.length - 1 ? "text-white/20 cursor-not-allowed" : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
            >
-             <ArrowRight className="w-5 h-5" />
+              <span className="hidden sm:inline">Berikutnya</span>
+              <ArrowRight className="w-4 h-4" />
            </button>
         </div>
-        <button
-          disabled={!isComplete}
-          onClick={onSubmit}
-          className={cn(
-            "py-3.5 px-8 rounded-full font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-white/20",
-            isComplete 
-              ? "bg-[#8cc63f] text-[#1e3025] hover:bg-[#7cb435] shadow-lg shadow-[#8cc63f]/20" 
-              : "bg-white/5 text-white/30 cursor-not-allowed"
-          )}
-        >
-          {isComplete ? t('app.submit_result') : t('app.answer_all', { count: questions.length.toString() })}
-        </button>
+
+        <div className="flex items-center gap-4">
+          <span className="hidden md:inline-block text-xs text-slate-300">
+            {answeredCount} dari {questions.length} telah dijawab
+          </span>
+          <button
+            disabled={!isComplete}
+            onClick={onSubmit}
+            className={cn(
+              "py-3 px-6 sm:px-8 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-white/20 shrink-0",
+              isComplete 
+                ? "bg-[#8cc63f] text-[#1e3025] hover:bg-[#7cb435] shadow-lg shadow-[#8cc63f]/20 cursor-pointer" 
+                : "bg-white/10 text-white/30 cursor-not-allowed"
+            )}
+          >
+            {isComplete ? t('app.submit_result') : t('app.answer_all', { count: questions.length.toString() })}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
