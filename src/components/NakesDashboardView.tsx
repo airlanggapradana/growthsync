@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, orderBy, updateDoc, doc } from 'firebase/firestore';
 import { UserProfile, ChildProfile, QuestionnaireResult } from '../types';
-import { Loader2, Users, Search, ChevronRight, Activity, Smile, MapPin, MessageSquare, User as UserIcon, ShieldCheck, FileText, CalendarClock } from 'lucide-react';
+import { 
+  Loader2, Users, Search, ChevronRight, Activity, Smile, MapPin, 
+  MessageSquare, User as UserIcon, ShieldCheck, FileText, CalendarClock, 
+  AlertTriangle, AlertOctagon, CheckCircle2, ShieldAlert
+} from 'lucide-react';
 import { cn } from '../lib/utils';
+import StatusBadge, { getKpspStatusInfo } from './domain/StatusBadge';
 import { useLanguage } from '../contexts/LanguageContext';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
@@ -38,14 +43,12 @@ export default function NakesDashboardView({
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetch all orang_tua users
       const usersQ = query(collection(db, 'users'), where('role', '==', 'orang_tua'));
       const usersSnap = await getDocs(usersQ);
       
       const parentPromises = usersSnap.docs.map(async (userDoc) => {
         const userData = userDoc.data() as UserProfile;
         const uid = userData.uid || userDoc.id;
-        // Fetch children for this parent
         const childrenQ = query(collection(db, 'childProfiles'), where('userId', '==', uid));
         const childrenSnap = await getDocs(childrenQ);
         
@@ -63,7 +66,6 @@ export default function NakesDashboardView({
             } as QuestionnaireResult;
           });
           
-          // Sort descending based on createdAt string / date
           historyData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
           return {
@@ -104,7 +106,6 @@ export default function NakesDashboardView({
       await updateDoc(doc(db, 'users', parentId), {
         assignedNakesId: userProfile.uid
       });
-      // Refresh list
       await fetchData();
     } catch (err) {
       console.error("Failed to claim parent", err);
@@ -113,213 +114,278 @@ export default function NakesDashboardView({
     }
   };
 
-  const filteredParents = parents.filter(p => p.email.toLowerCase().includes(searchTerm.toLowerCase()) || p.children.some(c => c.name.toLowerCase().includes(searchTerm.toLowerCase())));
+  // Helper to determine worst status for sorting priority (Penyimpangan top, then Meragukan, then Sesuai)
+  const getParentPriorityScore = (parent: ParentData): number => {
+    let minScore = 10;
+    parent.children.forEach(c => {
+      const latest = c.history?.[0];
+      if (latest && typeof latest.totalScore === 'number') {
+        if (latest.totalScore < minScore) minScore = latest.totalScore;
+      }
+    });
+    return minScore; // Lower score = higher priority
+  };
+
+  const filteredParents = useMemo(() => {
+    const list = parents.filter(p => 
+      p.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.children.some(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    // Prioritas visual: Urutkan pasien dengan skor terendah (Penyimpangan) di paling atas per Section 4.8
+    return list.sort((a, b) => getParentPriorityScore(a) - getParentPriorityScore(b));
+  }, [parents, searchTerm]);
 
   const myPatients = filteredParents.filter(p => p.assignedNakesId === userProfile.uid);
   const unassignedParents = filteredParents.filter(p => !p.assignedNakesId || p.assignedNakesId === null);
 
   const displayList = activeTab === 'my_patients' ? myPatients : unassignedParents;
 
+  // Header Summary Stats per Section 4.8
+  const stats = useMemo(() => {
+    let unreadTotal = 0;
+    let deviationCount = 0;
+    myPatients.forEach(p => {
+      if (unreadCountsBySender[p.uid]) {
+        unreadTotal += unreadCountsBySender[p.uid];
+      }
+      p.children.forEach(c => {
+        const latest = c.history?.[0];
+        if (latest && latest.totalScore < 9) {
+          deviationCount += 1;
+        }
+      });
+    });
+    return {
+      totalPatients: myPatients.length,
+      unreadTotal,
+      deviationCount
+    };
+  }, [myPatients, unreadCountsBySender]);
+
   return (
-    <div className="w-full h-full flex flex-col items-center">
-      <div className="w-full max-w-5xl space-y-8">
+    <div className="w-full h-full flex flex-col items-center font-sans pb-16">
+      <div className="w-full max-w-5xl space-y-6">
+        
+        {/* Unverified Account Alert Panel per Section 4.8 */}
+        {!userProfile.isVerified && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-start gap-3 text-xs sm:text-sm text-[#B45309] dark:text-amber-300">
+            <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
+            <div>
+              <span className="font-bold block mb-0.5">Menunggu Verifikasi SIP</span>
+              <p className="leading-relaxed">
+                Akun tenaga kesehatan Anda sedang dalam peninjauan oleh Administrator. Fitur klaim pasien dan tindak lanjut aktif akan terbuka penuh segera setelah dokumen SIP Anda diverifikasi.
+              </p>
+            </div>
+          </div>
+        )}
+
         <header>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
              <div>
-               <h1 className="text-3xl font-bold tracking-tight text-[#263c32] dark:text-slate-100">{t('nakes.title')}</h1>
-               <p className="text-sm font-medium text-slate-500 mt-1">
+               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                 {t('nakes.title')}
+               </h1>
+               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                  {t('nakes.subtitle')}
                </p>
              </div>
-             <div className="flex flex-col items-end gap-2">
-               <div className="bg-[#8cc63f]/20 text-[#263c32] dark:text-[#bef264] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
-                 <Activity className="w-4 h-4" />
-                 {t('nakes.role_access')}
-               </div>
+             <div className="flex items-center gap-2">
                {userProfile.isVerified ? (
-                 <span className="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-                   <ShieldCheck className="w-3.5 h-3.5" /> {t('nakes.verified')}
+                 <span className="bg-[#F0FDF4] dark:bg-emerald-950/40 text-[#15803D] dark:text-emerald-300 border border-[#BBF7D0] dark:border-emerald-800/60 text-xs px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-2xs">
+                   <ShieldCheck className="w-4 h-4 text-emerald-600" /> {t('nakes.verified')}
                  </span>
                ) : (
-                 <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-xs px-2.5 py-1 rounded-full font-semibold">
-                   {t('nakes.waiting_verification')}
+                 <span className="bg-[#FFFBEB] dark:bg-amber-950/40 text-[#B45309] dark:text-amber-300 border border-[#FDE68A] dark:border-amber-800/60 text-xs px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-2xs">
+                   <ShieldAlert className="w-4 h-4 text-amber-600" /> {t('nakes.waiting_verification')}
                  </span>
                )}
              </div>
           </div>
-          
-          <div className="flex items-center gap-4 mt-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-full w-max">
-             <button
-               onClick={() => setActiveTab('my_patients')}
-               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'my_patients' ? "bg-white dark:bg-slate-900 text-[#263c32] dark:text-[#bef264] shadow-sm flex items-center gap-2" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white line-clamp-1")}
-             >
-               {activeTab === 'my_patients' && <ShieldCheck className="w-4 h-4" />}
-               {t('nakes.my_patients')} ({myPatients.length})
-             </button>
-             <button
-               onClick={() => setActiveTab('unassigned')}
-               className={cn("px-6 py-2.5 rounded-full text-sm font-bold transition-all", activeTab === 'unassigned' ? "bg-white dark:bg-slate-900 text-[#263c32] dark:text-[#bef264] shadow-sm flex items-center gap-2" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")}
-             >
-               {activeTab === 'unassigned' && <Users className="w-4 h-4" />}
-               {t('nakes.parent_list')} ({unassignedParents.length})
-             </button>
-          </div>
 
-          <div className="relative mt-6">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder={t('nakes.search')} 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full outline-none focus:border-[#8cc63f] focus:ring-4 focus:ring-[#8cc63f]/10 transition-all font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
-            />
+          {/* 3 Header Ringkasan KPI Cards per Section 4.8 */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+            <div className="bg-white dark:bg-[#111A2B] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Pasien Dampingan</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums mt-1">
+                {stats.totalPatients}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#111A2B] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Pesan Masuk Belum Dibaca</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums mt-1 flex items-center gap-2">
+                <span>{stats.unreadTotal}</span>
+                {stats.unreadTotal > 0 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold">Baru</span>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#111A2B] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Kasus Butuh Perhatian Khusus</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#B91C1C] dark:text-rose-400 tabular-nums mt-1 flex items-center gap-2">
+                <span>{stats.deviationCount}</span>
+                {stats.deviationCount > 0 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/40 text-[#B91C1C] dark:text-rose-300 font-bold">
+                    Perhatian
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2 bg-slate-100/90 dark:bg-slate-800/90 p-1 rounded-xl w-max">
+               <button
+                 onClick={() => setActiveTab('my_patients')}
+                 className={cn(
+                   "px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2", 
+                   activeTab === 'my_patients' ? "bg-white dark:bg-slate-900 text-[#0F766E] dark:text-[#5EEAD4] shadow-xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                 )}
+               >
+                 <ShieldCheck className="w-4 h-4" />
+                 <span>{t('nakes.my_patients')}</span>
+                 <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 tabular-nums">({myPatients.length})</span>
+               </button>
+               <button
+                 onClick={() => setActiveTab('unassigned')}
+                 className={cn(
+                   "px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2", 
+                   activeTab === 'unassigned' ? "bg-white dark:bg-slate-900 text-[#0F766E] dark:text-[#5EEAD4] shadow-xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                 )}
+               >
+                 <Users className="w-4 h-4" />
+                 <span>{t('nakes.parent_list')}</span>
+                 <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 tabular-nums">({unassignedParents.length})</span>
+               </button>
+            </div>
+
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder={t('nakes.search')} 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 h-10 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none"
+              />
+            </div>
           </div>
         </header>
 
         {loading ? (
-             <div className="flex justify-center py-20">
-               <Loader2 className="w-8 h-8 animate-spin text-[#8cc63f]" />
-             </div>
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#0F766E]" />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 pb-20">
+          <div className="space-y-4">
              {displayList.map((parent) => (
-               <div key={parent.uid} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-6 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+               <div key={parent.uid} className="bg-white dark:bg-[#111A2B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-card hover:shadow-raised transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
                  
-                 <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-700">
-                      <UserIcon className="w-6 h-6 text-[#8cc63f]" />
+                 <div className="flex items-start gap-4 flex-1">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] dark:bg-teal-950/40 text-[#0F766E] dark:text-[#5EEAD4] flex items-center justify-center shrink-0 border border-[#CCFBF1] dark:border-teal-800/60 font-bold">
+                      {parent.name?.charAt(0) || parent.email.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <h3 className="font-bold text-[#263c32] dark:text-slate-100 text-lg flex items-center gap-2">
-                        {parent.email.split('@')[0]}
-                      </h3>
-                      <p className="text-sm text-slate-500 font-medium">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base truncate">
+                          {parent.name || parent.email.split('@')[0]}
+                        </h3>
+                        {parent.regency && (
+                          <span className="text-[11px] text-slate-400 font-medium shrink-0">
+                            • {parent.regency}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 font-medium truncate">
                         {parent.email}
                       </p>
                       
-                      <div className="mt-4">
-                         {parent.children.length === 0 && (
+                      <div className="mt-3">
+                         {parent.children.length === 0 ? (
                             <span className="text-xs text-slate-400 italic">{t('nakes.no_child_profile')}</span>
+                         ) : (
+                           <div className="flex flex-wrap gap-2">
+                             {parent.children.map(child => {
+                               const latestHistory = child.history?.[0];
+                               const hasDeviation = latestHistory && latestHistory.totalScore < 7;
+                               const isDoubtful = latestHistory && latestHistory.totalScore >= 7 && latestHistory.totalScore < 9;
+
+                               return (
+                                 <div 
+                                   key={child.id} 
+                                   className={cn(
+                                     "px-3 py-1.5 rounded-xl border flex items-center gap-2 text-xs font-semibold",
+                                     hasDeviation 
+                                       ? "bg-rose-50 border-rose-200 text-[#B91C1C] dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-300"
+                                       : isDoubtful
+                                         ? "bg-amber-50 border-amber-200 text-[#B45309] dark:bg-amber-950/30 dark:border-amber-900/50 dark:text-amber-300"
+                                         : "bg-slate-50 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
+                                   )}
+                                 >
+                                   <Smile className="w-3.5 h-3.5" />
+                                   <span>{child.name}</span>
+                                   <span className="opacity-60 tabular-nums">({child.ageInMonths} bln)</span>
+                                   {latestHistory && (
+                                     <span className="ml-1 px-1.5 py-0.2 rounded-md bg-white/70 dark:bg-black/30 text-[10px] tabular-nums font-bold">
+                                       {latestHistory.totalScore}/10
+                                     </span>
+                                   )}
+                                 </div>
+                               );
+                             })}
+                           </div>
                          )}
-                         <div className={cn(activeTab === 'my_patients' ? "flex flex-col gap-4 w-full" : "flex flex-wrap gap-2")}>
-                           {parent.children.map(child => {
-                             if (activeTab === 'my_patients') {
-                                const latestHistory = child.history?.[0];
-                                const nextSchedule = latestHistory ? dayjs(latestHistory.createdAt).add(3, 'month') : null;
-                                
-                                return (
-                                  <details key={child.id} className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/60 rounded-2xl group">
-                                    <summary className="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-                                       <div className="flex items-center gap-2 font-bold text-[#263c32] dark:text-slate-200">
-                                          <Smile className="w-4 h-4 text-[#8cc63f]" />
-                                          {child.name} <span className="text-slate-400 font-medium ml-1">({child.ageInMonths} {t('dashboard.month')})</span>
-                                       </div>
-                                       <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" />
-                                    </summary>
-                                    <div className="px-4 pb-4 flex flex-col gap-3">
-                                      <div className="flex items-center gap-6 text-xs font-medium">
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-400">{t('nakes.weight')}</span>
-                                          <span className="font-bold text-slate-700 dark:text-slate-300">{child.weightKg || '-'} kg</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-400">{t('nakes.height')}</span>
-                                          <span className="font-bold text-slate-700 dark:text-slate-300">{child.heightCm || '-'} cm</span>
-                                        </div>
-                                      </div>
-                                      <div className="mt-1 pt-3 border-t border-slate-200/60 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                                         <div className="flex items-start gap-2">
-                                           <FileText className="w-4 h-4 text-slate-400 shrink-0" />
-                                           <div className="flex flex-col">
-                                             <span className="text-slate-400 font-medium">{t('nakes.screening_history')}</span>
-                                             <span className="font-bold text-slate-700 dark:text-slate-300">{child.history?.length || 0} {t('nakes.times')}</span>
-                                             {latestHistory && <span className="text-slate-500 mt-0.5">{t('nakes.latest')} {dayjs(latestHistory.createdAt).format('DD MMM YYYY')}</span>}
-                                           </div>
-                                         </div>
-                                         <div className="flex items-start gap-2">
-                                           <CalendarClock className="w-4 h-4 text-amber-500 shrink-0" />
-                                           <div className="flex flex-col">
-                                             <span className="text-slate-400 font-medium">{t('nakes.next_schedule')}</span>
-                                             <span className="font-bold text-amber-600">
-                                                {nextSchedule ? nextSchedule.format('DD MMMM YYYY') : t('nakes.now')}
-                                             </span>
-                                           </div>
-                                         </div>
-                                      </div>
-                                    </div>
-                                  </details>
-                                );
-                             }
+                      </div>
+                    </div>
+                 </div>
 
-                             return (
-                                  <div key={child.id} className="bg-[#8cc63f]/10 dark:bg-[#8cc63f]/5 text-[#263c32] dark:text-[#bef264] border border-[#8cc63f]/20 dark:border-[#8cc63f]/15 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold">
-                                 <Smile className="w-3.5 h-3.5 text-[#8cc63f]" />
-                                 {child.name} • {child.ageInMonths} {t('dashboard.month')}
-                               </div>
-                             );
-                           })}
-                         </div>
-                       </div>
-                     </div>
-                  </div>
-
-                 <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
+                 <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
                     {activeTab === 'my_patients' ? (
                       <button 
                         onClick={() => onOpenChat(parent)}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#263c32] dark:bg-emerald-600 hover:bg-[#1e3025] dark:hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-sm relative"
+                        className="flex-1 md:flex-none h-11 px-5 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 relative cursor-pointer active:scale-98"
                       >
                         <MessageSquare className="w-4 h-4" />
-                        {t('nakes.chat_parent')}
-                        {unreadCountsBySender[parent.uid] > 0 && (
-                          <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                        <span>{t('nakes.chat_parent')}</span>
+                        {Boolean(unreadCountsBySender[parent.uid] && unreadCountsBySender[parent.uid] > 0) && (
+                          <span className="bg-rose-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full ring-2 ring-white">
                             {unreadCountsBySender[parent.uid] > 99 ? '99+' : unreadCountsBySender[parent.uid]}
                           </span>
                         )}
                       </button>
                     ) : (
                       <button 
-                        onClick={() => {
-                           if (!userProfile.isVerified) {
-                              alert(t('nakes.unverified_alert'));
-                              return;
-                           }
-                           handleClaimParent(parent.uid);
-                        }}
+                        onClick={() => handleClaimParent(parent.uid)}
                         disabled={actionLoadingId === parent.uid || !userProfile.isVerified}
-                        title={!userProfile.isVerified ? t('nakes.unverified_alert') : ""}
                         className={cn(
-                          "flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all shadow-md",
+                          "flex-1 md:flex-none h-11 px-5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2",
                           userProfile.isVerified 
-                            ? "bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] shadow-[#8cc63f]/20" 
-                            : "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
+                            ? "bg-[#0F766E] hover:bg-[#115E59] text-white cursor-pointer active:scale-98" 
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed shadow-none"
                         )}
                       >
                         {actionLoadingId === parent.uid ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : userProfile.isVerified ? (
-                          <ShieldCheck className="w-4 h-4" />
                         ) : (
-                          <ShieldCheck className="w-4 h-4 opacity-50" />
+                          <ShieldCheck className="w-4 h-4" />
                         )}
-                        {t('nakes.select_serve')}
+                        <span>{t('nakes.select_serve')}</span>
                       </button>
                     )}
                  </div>
-                 
                </div>
              ))}
              
              {displayList.length === 0 && (
-                <div className="py-20 text-center flex flex-col items-center gap-3">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
-                    <Users className="w-8 h-8 text-slate-300" />
+                <div className="py-20 text-center flex flex-col items-center gap-3 bg-white dark:bg-[#111A2B] rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+                  <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+                    <Users className="w-7 h-7" />
                   </div>
-                  <div className="text-slate-500 font-medium">
-                    {activeTab === 'my_patients' 
-                      ? t('nakes.empty_patients') 
-                      : t('nakes.empty_unassigned')}
+                  <div className="text-sm font-semibold text-slate-500">
+                    {activeTab === 'my_patients' ? t('nakes.empty_patients') : t('nakes.empty_unassigned')}
                   </div>
                 </div>
              )}

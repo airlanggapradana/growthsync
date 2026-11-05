@@ -104,8 +104,11 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
     };
   }, [isOpen, onClose]);
 
+  const [isUsingDefaultJakarta, setIsUsingDefaultJakarta] = useState(false);
+
   const requestLocation = () => {
     setLocationError(null);
+    setIsUsingDefaultJakarta(false);
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -113,15 +116,24 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
           setUserLocation(loc);
           setMapCenter(loc);
           setLocationError(null);
+          setIsUsingDefaultJakarta(false);
           fetchNearbyPuskesmas(loc);
         },
         (error) => {
-          console.error(error);
-          setLocationError("Tidak dapat mengakses lokasi. Pastikan izin lokasi diberikan pada browser Anda.");
+          console.warn("Geolocation denied or unavailable:", error);
+          const defaultLoc = { lat: -6.2088, lng: 106.8456 };
+          setUserLocation(defaultLoc);
+          setMapCenter(defaultLoc);
+          setIsUsingDefaultJakarta(true);
+          fetchNearbyPuskesmas(defaultLoc);
         }
       );
     } else {
-      setLocationError("Browser Anda tidak mendukung geolokasi.");
+      const defaultLoc = { lat: -6.2088, lng: 106.8456 };
+      setUserLocation(defaultLoc);
+      setMapCenter(defaultLoc);
+      setIsUsingDefaultJakarta(true);
+      fetchNearbyPuskesmas(defaultLoc);
     }
   };
 
@@ -252,6 +264,22 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                   </div>
                 ) : aiResult ? (
                   <div className="p-4 sm:p-6 flex flex-col h-full">
+                    {/* Location Fallback Warning Banner per Design System 4.7 */}
+                    {isUsingDefaultJakarta && (
+                      <div className="mb-3 p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-[#B45309] dark:text-amber-300 flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-[#B45309]" />
+                          <span><strong>Lokasi tidak terdeteksi.</strong> Hasil puskesmas ditampilkan untuk wilayah Jakarta.</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={requestLocation}
+                          className="text-[11px] font-bold text-[#0F766E] dark:text-[#5EEAD4] hover:underline shrink-0"
+                        >
+                          Coba Lagi
+                        </button>
+                      </div>
+                    )}
                     <div className="space-y-3 overflow-y-auto flex-1 pr-2 pb-4">
                       {aiResult.map((p, idx) => (
                         <button
@@ -260,7 +288,7 @@ export default function PuskesmasMapModal({ isOpen, onClose }: PuskesmasMapModal
                             setSelectedPuskesmas(p);
                             setMapCenter({ lat: p.lat, lng: p.lng });
                           }}
-                          className={`w-full text-left p-4 rounded-xl border transition-all ${selectedPuskesmas?.name === p.name ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
+                          className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer ${selectedPuskesmas?.name === p.name ? 'border-[#0F766E] bg-[#F0FDFA] dark:bg-teal-950/30 ring-2 ring-[#0F766E]/30' : 'border-slate-200 dark:border-slate-700 hover:border-teal-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                         >
                            <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-start justify-between gap-2">
                               <span>{p.name}</span>

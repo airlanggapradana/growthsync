@@ -232,7 +232,7 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
   ];
 
   if (loading) {
-     return <div className="flex items-center justify-center p-12"><Activity className="w-8 h-8 text-[#8cc63f] animate-spin" /></div>;
+     return <div className="flex items-center justify-center p-12"><Activity className="w-8 h-8 text-[#0F766E] animate-spin" /></div>;
   }
 
   return (
@@ -337,7 +337,7 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
                                  e.stopPropagation();
                                  verifyNakes(nakes.uid, nakes.email);
                               }}
-                              className="px-4 py-2 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-xl text-sm font-bold transition-colors shadow-sm whitespace-nowrap self-start sm:self-auto"
+                              className="px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-sm font-bold transition-colors shadow-sm whitespace-nowrap self-start sm:self-auto cursor-pointer"
                            >
                               Verifikasi
                            </button>
@@ -349,7 +349,7 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
 
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-8 shadow-sm">
                <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-                 <UserPlus className="w-6 h-6 text-[#8cc63f]" />
+                 <UserPlus className="w-6 h-6 text-[#0F766E]" />
                  <h3 className="font-bold text-slate-900 dark:text-white text-xl">Tambah Tenaga Kesehatan</h3>
                </div>
                
@@ -498,7 +498,7 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
                         cursor={{ fill: 'transparent' }} 
                         contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }}
                      />
-                     <Bar dataKey="total" fill="#8cc63f" radius={[6, 6, 6, 6]} barSize={40} />
+                     <Bar dataKey="total" fill="#0F766E" radius={[6, 6, 6, 6]} barSize={40} />
                   </BarChart>
                </ResponsiveContainer>
             </div>
@@ -514,8 +514,8 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
                {logs.map(log => (
                   <div key={log.id} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50">
-                     <div className="w-8 h-8 rounded-full bg-[#8cc63f]/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <CheckCircle2 className="w-4 h-4 text-[#8cc63f]" />
+                     <div className="w-8 h-8 rounded-full bg-[#0F766E]/15 text-[#0F766E] flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 className="w-4 h-4" />
                      </div>
                      <div>
                         <p className="text-sm font-semibold text-slate-900 dark:text-white">Memverifikasi Nakes: {log.targetEmail}</p>
@@ -593,7 +593,7 @@ export default function AdminDashboardView({ userProfile }: { userProfile: UserP
                        verifyNakes(selectedDetailNakes.uid, selectedDetailNakes.email);
                        setSelectedDetailNakes(null);
                     }}
-                    className="flex-1 px-4 py-3 bg-[#8cc63f] hover:bg-[#7cb435] text-[#1e3025] rounded-[16px] text-sm font-bold transition-colors shadow-sm"
+                    className="flex-1 px-4 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-[16px] text-sm font-bold transition-colors shadow-sm"
                  >
                     Verifikasi Nakes
                  </button>

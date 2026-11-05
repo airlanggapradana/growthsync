@@ -1277,10 +1277,17 @@ export default function KonsultasiNakesView({
         </header>
 
         {/* Chat Feed Area */}
+        {/* Chat Feed Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/60 dark:bg-slate-950/40">
           
+          {/* Emergency Alert Banner - Mandatory per Design System 4.6 */}
+          <div className="max-w-lg mx-auto p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-center justify-center gap-2 text-xs text-[#B91C1C] dark:text-rose-300 font-semibold text-center shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+            <span>Chat ini bukan untuk kondisi darurat. Hubungi 119 atau datang ke IGD.</span>
+          </div>
+
           {/* Medical Notice Banner */}
-          <div className="max-w-lg mx-auto p-3.5 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 rounded-2xl text-center text-xs text-emerald-900 dark:text-emerald-300">
+          <div className="max-w-lg mx-auto p-3 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 rounded-2xl text-center text-xs text-emerald-900 dark:text-emerald-300">
             <span className="font-bold flex items-center justify-center gap-1.5 mb-0.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               {txt.verifiedNoticeTitle}
@@ -1291,15 +1298,15 @@ export default function KonsultasiNakesView({
           {/* Messages Stream */}
           {messages.map(msg => {
             if (msg.isMe) {
-              // Outgoing Message (Brand Forest Green, crisp white text)
+              // Outgoing Message (Brand Primary Teal #0F766E, crisp white text, radius 16px ekor 4px)
               return (
                 <div key={msg.id} className="flex flex-col items-end">
-                  <div className="bg-[#1b4332] dark:bg-emerald-700 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl rounded-br-none text-xs sm:text-sm font-normal leading-relaxed max-w-[85%] sm:max-w-[70%] shadow-xs">
+                  <div className="bg-[#0F766E] text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl rounded-tr-xs text-xs sm:text-sm font-normal leading-relaxed max-w-[85%] sm:max-w-[70%] shadow-xs">
                     {msg.isVoice ? (
                       <div className="flex items-center gap-2 font-medium">
-                        <Mic className="w-4 h-4 text-emerald-300 animate-pulse" />
+                        <Mic className="w-4 h-4 text-teal-200 animate-pulse" />
                         <span>{msg.text}</span>
-                        <span className="text-[11px] text-emerald-200">({msg.voiceDuration})</span>
+                        <span className="text-[11px] text-teal-100">({msg.voiceDuration})</span>
                       </div>
                     ) : (
                       msg.text
@@ -1307,15 +1314,15 @@ export default function KonsultasiNakesView({
                   </div>
                   <span className="text-[10px] text-slate-400 mt-1 pr-1 flex items-center gap-1 font-medium">
                     {msg.timestamp}
-                    <CheckCheck className="w-3.5 h-3.5 text-[#1b4332] dark:text-emerald-400 inline" />
+                    <CheckCheck className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400 inline" />
                   </span>
                 </div>
               );
             } else {
-              // Incoming Message (Soft Slate/White Card)
+              // Incoming Message (Soft bg-subtle Slate/White Card, radius 16px ekor 4px)
               return (
                 <div key={msg.id} className="flex flex-col items-start">
-                  <div className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl rounded-tl-none text-xs sm:text-sm font-normal leading-relaxed max-w-[85%] sm:max-w-[70%] shadow-xs">
+                  <div className="bg-[#F1F5F9] dark:bg-[#1B2942] text-[#0F172A] dark:text-[#F1F5F9] border border-slate-200/80 dark:border-slate-700/60 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl rounded-tl-xs text-xs sm:text-sm font-normal leading-relaxed max-w-[85%] sm:max-w-[70%] shadow-xs">
                     {msg.text}
                   </div>
                   <span className="text-[10px] text-slate-400 mt-1 pl-1 font-medium">
@@ -1427,7 +1434,7 @@ export default function KonsultasiNakesView({
               <button
                 type="submit"
                 title={txt.sendMessageTooltip}
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#1b4332] hover:bg-[#143527] text-white rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105"
               >
                 <Send className="w-4 h-4 ml-0.5" />
               </button>

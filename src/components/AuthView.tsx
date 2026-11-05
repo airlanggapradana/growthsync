@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { auth, db } from '../lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { Loader2, Users, Briefcase, Lock, ArrowLeft } from 'lucide-react';
+import { Loader2, Users, Stethoscope, ArrowLeft, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { UserRole } from '../types';
@@ -91,25 +91,25 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
     setError('');
     
     if (!email || !password) {
-      setError('Email dan password harus diisi');
+      setError('Email dan kata sandi harus diisi.');
       return;
     }
 
     if (!isLogin) {
       if (!fullName) {
-        setError(role === 'orang_tua' ? 'Nama Orang Tua harus diisi' : 'Nama Lengkap harus diisi');
+        setError(role === 'orang_tua' ? 'Nama Orang Tua harus diisi.' : 'Nama Lengkap Tenaga Kesehatan harus diisi.');
         return;
       }
       if (role === 'nakes' && !sip) {
-        setError('Nomor SIP harus diisi untuk Tenaga Kesehatan');
+        setError('Nomor SIP (Surat Izin Praktik) harus diisi.');
         return;
       }
       if (password !== confirmPassword) {
-        setError('Konfirmasi password tidak cocok');
+        setError('Konfirmasi kata sandi tidak cocok.');
         return;
       }
       if (!selectedProvince || !selectedRegency || !selectedDistrict || !selectedVillage) {
-        setError('Mohon lengkapi data alamat Anda (Provinsi hingga Kelurahan/Desa)');
+        setError('Mohon lengkapi data wilayah tempat tinggal / faskes.');
         return;
       }
     }
@@ -139,7 +139,7 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
         
         if (role === 'nakes') {
           userData.sip = sip;
-          userData.isVerified = false; // Admin must verify
+          userData.isVerified = false; // Admin verifikasi
         }
 
         await setDoc(doc(db, 'users', userCredential.user.uid), userData);
@@ -147,13 +147,13 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
-        setError('Email sudah terdaftar. Silakan daftar menggunakan email lain atau langsung masuk.');
+        setError('Email ini sudah terdaftar. Silakan login atau gunakan email lain.');
       } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setError('Email atau password salah. Pastikan akun sudah terdaftar dan kredensial sudah benar.');
+        setError('Email atau kata sandi tidak sesuai. Silakan periksa kembali.');
       } else if (err.code === 'auth/weak-password') {
-        setError('Password terlalu lemah. Minimal 6 karakter.');
+        setError('Kata sandi terlalu pendek. Gunakan minimal 6 karakter.');
       } else {
-        setError(`Terjadi kesalahan: ${err.message || 'Silakan coba lagi.'}`);
+        setError(`Terjadi kendala: ${err.message || 'Silakan coba lagi.'}`);
       }
     } finally {
       setLoading(false);
@@ -161,313 +161,292 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 lg:p-8 font-sans bg-[#263c32] relative overflow-hidden">
-      {/* Floating Background Effects */}
-      <div className="absolute top-[10%] left-[5%] w-16 h-16 rounded-full bg-white/5 blur-sm border border-white/10" />
-      <div className="absolute top-[20%] left-[20%] w-32 h-32 rounded-full bg-white/5 blur-md" />
-      <div className="absolute bottom-[20%] right-[10%] w-24 h-24 rounded-full bg-[#6b9d8d]/10 blur-sm" />
-      <div className="absolute bottom-[5%] left-[25%] w-40 h-40 rounded-full bg-white/5 blur-lg" />
-      
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans bg-[#F8FAFC] dark:bg-[#0B1220] text-[#0F172A] dark:text-[#F1F5F9] relative overflow-hidden">
+      {/* Subtle background ambient blur */}
+      <div className="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full bg-[#CCFBF1]/60 dark:bg-teal-950/20 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 rounded-full bg-[#E0F2FE]/60 dark:bg-sky-950/20 blur-3xl pointer-events-none" />
+
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-6xl flex flex-col lg:flex-row bg-[#335041] lg:rounded-[40px] rounded-3xl overflow-hidden shadow-2xl relative z-10 lg:h-[750px]"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-[480px] bg-white dark:bg-[#111A2B] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl p-6 sm:p-8 lg:p-10 relative z-10"
       >
-        {/* LEFT COMPARTMENT - White */}
-        <div className="lg:w-[45%] bg-white p-8 lg:p-12 flex flex-col relative z-20 overflow-hidden">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-10 relative z-10 w-48">
+        {/* Top Header & Back Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
             <img 
-              src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779884930/Resmi_Logo_UMS_Color_FullText_nppltl.webp" 
-              alt="Logo" 
-              className="h-full w-full object-contain" 
+              src="/Resmi_Logo_UMS_Color.png" 
+              alt="Kindo Logo" 
+              className="w-10 h-10 object-contain drop-shadow-xs" 
+              referrerPolicy="no-referrer"
+            />
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white leading-tight">
+                KINDO
+              </h1>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Tumbuh Kembang Anak
+              </p>
+            </div>
+          </div>
+
+          {onBack && (
+            <button 
+              type="button"
+              onClick={onBack}
+              className="text-xs font-semibold text-slate-500 hover:text-[#0F766E] dark:hover:text-[#5EEAD4] flex items-center gap-1.5 transition-colors p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Kembali
+            </button>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {isLogin ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {isLogin 
+              ? 'Lanjutkan pemantauan tumbuh kembang buah hati secara terpadu.'
+              : 'Daftar untuk mulai skrining KPSP dan konsultasi tenaga medis.'}
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-5 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl text-xs sm:text-sm text-[#B91C1C] dark:text-rose-300 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span className="leading-relaxed">{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Pilih Peran Pengguna
+              </label>
+              {/* Dua Kartu Besar Sesuai Section 4.2 */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole('orang_tua')}
+                  className={cn(
+                    "p-3.5 rounded-2xl border-2 text-left transition-all flex flex-col justify-between cursor-pointer",
+                    role === 'orang_tua'
+                      ? "border-[#0F766E] bg-[#F0FDFA] dark:bg-teal-950/40 text-[#0F766E] dark:text-[#5EEAD4] shadow-xs ring-1 ring-[#0F766E]"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-400"
+                  )}
+                >
+                  <Users className="w-6 h-6 mb-2 text-[#0F766E] dark:text-[#5EEAD4]" />
+                  <div>
+                    <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Orang Tua</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Pantau tumbuh kembang anak</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRole('nakes')}
+                  className={cn(
+                    "p-3.5 rounded-2xl border-2 text-left transition-all flex flex-col justify-between cursor-pointer",
+                    role === 'nakes'
+                      ? "border-[#0F766E] bg-[#F0FDFA] dark:bg-teal-950/40 text-[#0F766E] dark:text-[#5EEAD4] shadow-xs ring-1 ring-[#0F766E]"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-400"
+                  )}
+                >
+                  <Stethoscope className="w-6 h-6 mb-2 text-[#0F766E] dark:text-[#5EEAD4]" />
+                  <div>
+                    <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Tenaga Kesehatan</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Dokter, bidan, kader</div>
+                  </div>
+                </button>
+              </div>
+
+              {role === 'nakes' && (
+                <div className="p-3 bg-[#F0F9FF] dark:bg-sky-950/30 border border-[#BAE6FD] dark:border-sky-800/60 rounded-xl flex items-start gap-2.5 text-xs text-[#0369A1] dark:text-sky-300">
+                  <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-[#0284C7]" />
+                  <span>Akun Nakes akan aktif setelah nomor SIP diverifikasi oleh Admin.</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isLogin && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                {role === 'orang_tua' ? 'Nama Orang Tua' : 'Nama Lengkap & Gelar'}
+              </label>
+              <input 
+                type="text" 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full h-12 px-4 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] focus:ring-2 focus:ring-[#99F6E4] rounded-xl outline-none transition-all text-sm text-slate-900 dark:text-white"
+                placeholder={role === 'orang_tua' ? "Contoh: Siti Rahmawati" : "Contoh: dr. Budi Santoso, Sp.A"}
+                required
+              />
+            </div>
+          )}
+
+          {role === 'nakes' && !isLogin && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Nomor SIP (Surat Izin Praktik)
+              </label>
+              <input 
+                type="text" 
+                value={sip}
+                onChange={(e) => setSip(e.target.value)}
+                className="w-full h-12 px-4 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] focus:ring-2 focus:ring-[#99F6E4] rounded-xl outline-none transition-all text-sm text-slate-900 dark:text-white"
+                placeholder="Nomor SIP resmi Anda"
+                required
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Alamat Email
+            </label>
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              className="w-full h-12 px-4 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] focus:ring-2 focus:ring-[#99F6E4] rounded-xl outline-none transition-all text-sm text-slate-900 dark:text-white"
+              placeholder="nama@email.com"
+              required
             />
           </div>
 
-          {/* Curve matching the right side - optional but nice for aesthetics */}
-          <div className="hidden lg:block absolute -right-[120px] top-1/2 -translate-y-1/2 w-[240px] h-[150%] bg-[#335041] rounded-[50%] pointer-events-none"></div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Kata Sandi
+            </label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              className="w-full h-12 px-4 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] focus:ring-2 focus:ring-[#99F6E4] rounded-xl outline-none transition-all text-sm text-slate-900 dark:text-white"
+              placeholder="Minimal 6 karakter"
+              required
+              minLength={6}
+            />
+          </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center relative z-10 pl-4 lg:pr-16">
-            <div className="relative w-full max-w-[300px] aspect-square flex items-center justify-center">
-                <div className="absolute w-[110%] h-[110%] bg-emerald-50 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] transition-all animate-[spin_20s_linear_infinite]" style={{ animationDirection: 'reverse' }}></div>
-                <div className="absolute w-full h-full bg-teal-50 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] mix-blend-multiply transition-all animate-[spin_15s_linear_infinite]"></div>
-                
-                <div className="relative z-10 text-center">
-                  <h1 className="text-3xl font-extrabold text-[#233a30] mb-2 font-serif">
-                    Skrining<br/>Tumbuh Kembang
-                  </h1>
-                  <p className="text-[#335041] text-sm mt-4 font-medium px-4">
-                    Pantau tahapan perkembangan anak secara berkala dan terpercaya.
-                  </p>
-                </div>
+          {!isLogin && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Konfirmasi Kata Sandi
+              </label>
+              <input 
+                type="password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="w-full h-12 px-4 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] focus:ring-2 focus:ring-[#99F6E4] rounded-xl outline-none transition-all text-sm text-slate-900 dark:text-white"
+                placeholder="Ulangi kata sandi"
+                required
+                minLength={6}
+              />
             </div>
-          </div>
+          )}
 
-          <div className="pt-10 relative z-10">
-            <p className="text-xs text-slate-400 font-medium">© 2026 Aplikasi Tumbuh Kembang Anak</p>
-            <p className="text-[10px] text-slate-400">Created by Universitas Muhammadiyah Surakarta</p>
-          </div>
-        </div>
+          {!isLogin && (
+            <div className="space-y-3 pt-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Domisili / Wilayah Faskes
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <select
+                  value={selectedProvince}
+                  onChange={(e) => setSelectedProvince(e.target.value)}
+                  className="w-full h-12 px-3 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white"
+                  required
+                >
+                  <option value="" disabled>Pilih Provinsi</option>
+                  {provinces.map((p) => (
+                    <option key={p.code} value={p.code}>{p.name}</option>
+                  ))}
+                </select>
 
-        {/* RIGHT COMPARTMENT - Dark Green Form */}
-        <div className="flex-1 lg:w-[55%] flex flex-col px-6 py-10 lg:p-16 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-          <div className="max-w-md w-full mx-auto my-auto relative">
-            {onBack && (
-              <button 
-                type="button"
-                onClick={onBack}
-                className="absolute -top-12 lg:-top-16 -left-2 lg:left-0 text-white/50 hover:text-white flex items-center gap-2 text-sm font-semibold transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Kembali
-              </button>
+                <select
+                  value={selectedRegency}
+                  onChange={(e) => setSelectedRegency(e.target.value)}
+                  disabled={!selectedProvince}
+                  className="w-full h-12 px-3 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white disabled:opacity-50"
+                  required
+                >
+                  <option value="" disabled>Pilih Kab/Kota</option>
+                  {regencies.map((r) => (
+                    <option key={r.code} value={r.code}>{r.name}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => setSelectedDistrict(e.target.value)}
+                  disabled={!selectedRegency}
+                  className="w-full h-12 px-3 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white disabled:opacity-50"
+                  required
+                >
+                  <option value="" disabled>Pilih Kecamatan</option>
+                  {districts.map((d) => (
+                    <option key={d.code} value={d.code}>{d.name}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedVillage}
+                  onChange={(e) => setSelectedVillage(e.target.value)}
+                  disabled={!selectedDistrict}
+                  className="w-full h-12 px-3 bg-white dark:bg-slate-900 border border-[#7C8BA1] dark:border-[#5B6F92] focus:border-[#0F766E] rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white disabled:opacity-50"
+                  required
+                >
+                  <option value="" disabled>Pilih Kelurahan/Desa</option>
+                  {villages.map((v) => (
+                    <option key={v.code} value={v.code}>{v.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full h-12 mt-4 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-[0.99]"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              isLogin ? 'Masuk' : 'Daftar Sekarang'
             )}
-            <h2 className="text-4xl font-bold text-white mb-8 tracking-tight">
-              {isLogin ? 'Login' : 'Register'}
-            </h2>
+          </button>
+        </form>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl text-sm font-medium">
-                  {error}
-                </div>
-              )}
-              
-              {!isLogin && (
-                <div className="space-y-4 pb-2">
-                  <label className="text-sm text-white/80 font-medium ml-2">
-                    {role === 'orang_tua' ? 'Nama Orang Tua' : 'Nama Lengkap'}
-                  </label>
-                  <input 
-                    type="text" 
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                    placeholder={role === 'orang_tua' ? "Masukkan nama orang tua" : "Masukkan nama lengkap"}
-                    required
-                  />
-                </div>
-              )}
-              
-              <div className="space-y-4">
-                <label className="text-sm text-white/80 font-medium ml-2">Email Address</label>
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-4">
-                <label className="text-sm text-white/80 font-medium ml-2">Password</label>
-                <input 
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                  placeholder="Enter your password"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              {isLogin && (
-                <div className="flex justify-end">
-                  <button type="button" className="text-sm text-[#6b9d8d] hover:text-[#8bc7b5] transition-colors mt-1 hover:underline">
-                    Forgot Password?
-                  </button>
-                </div>
-              )}
-
-              {!isLogin && (
-                <div className="space-y-4 pt-2">
-                <div className="space-y-4">
-                    <label className="text-sm text-white/80 font-medium ml-2">Konfirmasi Password</label>
-                    <input 
-                      type="password" 
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      autoComplete="new-password"
-                      className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                      placeholder="Ulangi password"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <label className="text-sm text-white/80 font-medium ml-2">Daftar Sebagai</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setRole('orang_tua')}
-                        className={cn(
-                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
-                          role === 'orang_tua' 
-                            ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
-                            : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
-                        )}
-                      >
-                        <Users className="w-3.5 h-3.5 hidden sm:block" />
-                        Orang Tua
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRole('nakes')}
-                        className={cn(
-                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
-                          role === 'nakes' 
-                            ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
-                            : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
-                        )}
-                      >
-                        <Briefcase className="w-3.5 h-3.5 hidden sm:block" />
-                        Nakes
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRole('admin')}
-                        className={cn(
-                          "flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border transition-all text-xs font-semibold",
-                          role === 'admin' 
-                            ? "border-[#6b9d8d] bg-[#6b9d8d]/20 text-white" 
-                            : "border-transparent bg-[#20362b] text-white/50 hover:bg-[#20362b]/80 hover:text-white/80"
-                        )}
-                      >
-                        <Lock className="w-3.5 h-3.5 hidden sm:block" />
-                        Admin
-                      </button>
-                    </div>
-                  </div>
-
-                  {role === 'nakes' && (
-                    <div className="space-y-4">
-                      <label className="text-sm text-white/80 font-medium ml-2">Nomor SIP (Surat Izin Praktik)</label>
-                      <input 
-                        type="text" 
-                        value={sip}
-                        onChange={(e) => setSip(e.target.value)}
-                        className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white placeholder:text-white/30 text-sm"
-                        placeholder="Masukkan Nomor SIP"
-                        required
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <label className="text-sm text-white/80 font-medium ml-2">Provinsi</label>
-                    <select
-                      value={selectedProvince}
-                      onChange={(e) => setSelectedProvince(e.target.value)}
-                      className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white text-sm appearance-none"
-                      required
-                    >
-                      <option value="" disabled className="bg-[#20362b]">Pilih Provinsi</option>
-                      {provinces.map((p) => (
-                        <option key={p.code} value={p.code} className="bg-[#20362b] text-white">{p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {selectedProvince && (
-                    <div className="space-y-4">
-                      <label className="text-sm text-white/80 font-medium ml-2">Kabupaten/Kota</label>
-                      <select
-                        value={selectedRegency}
-                        onChange={(e) => setSelectedRegency(e.target.value)}
-                        className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white text-sm appearance-none"
-                        required
-                      >
-                        <option value="" disabled className="bg-[#20362b]">Pilih Kabupaten/Kota</option>
-                        {regencies.map((r) => (
-                          <option key={r.code} value={r.code} className="bg-[#20362b] text-white">{r.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {selectedRegency && (
-                    <div className="space-y-4">
-                      <label className="text-sm text-white/80 font-medium ml-2">Kecamatan</label>
-                      <select
-                        value={selectedDistrict}
-                        onChange={(e) => setSelectedDistrict(e.target.value)}
-                        className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white text-sm appearance-none"
-                        required
-                      >
-                        <option value="" disabled className="bg-[#20362b]">Pilih Kecamatan</option>
-                        {districts.map((d) => (
-                          <option key={d.code} value={d.code} className="bg-[#20362b] text-white">{d.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {selectedDistrict && (
-                    <div className="space-y-4">
-                      <label className="text-sm text-white/80 font-medium ml-2">Kelurahan/Desa</label>
-                      <select
-                        value={selectedVillage}
-                        onChange={(e) => setSelectedVillage(e.target.value)}
-                        className="w-full px-6 py-4 bg-[#20362b] border border-transparent focus:border-[#6b9d8d]/50 focus:bg-[#20362b]/80 rounded-full outline-none transition-all text-white text-sm appearance-none"
-                        required
-                      >
-                        <option value="" disabled className="bg-[#20362b]">Pilih Kelurahan/Desa</option>
-                        {villages.map((v) => (
-                          <option key={v.code} value={v.code} className="bg-[#20362b] text-white">{v.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full py-4 mt-8 bg-[#6b9d8d] hover:bg-[#5a8678] text-white font-semibold rounded-full transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#6b9d8d]/20 active:scale-[0.98]"
-              >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  isLogin ? 'Login Apps' : 'Register Account'
-                )}
-              </button>
-            </form>
-
-            <div className="mt-8 text-center text-sm">
-              <span className="text-white/60">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
-              </span>
-              <br/>
-              <button 
-                onClick={() => {
-                  setError('');
-                  setPassword('');
-                  setConfirmPassword('');
-                  if (isLogin) {
-                    navigate('/auth/register');
-                  } else {
-                    navigate('/auth/login');
-                  }
-                }}
-                className="text-[#6b9d8d] hover:text-[#8bc7b5] font-semibold hover:underline transition-all mt-1"
-              >
-                {isLogin ? 'Register Now' : 'Login Now'}
-              </button>
-            </div>
-
-            <div className="mt-12 lg:mt-24 text-center">
-              <a href="#" className="text-white/40 hover:text-white/60 text-xs border-b border-white/20 pb-0.5">
-                Terms and Services
-              </a>
-            </div>
-          </div>
+        <div className="mt-6 text-center text-xs sm:text-sm">
+          <span className="text-slate-500 dark:text-slate-400">
+            {isLogin ? 'Belum memiliki akun?' : 'Sudah memiliki akun?'}
+          </span>{' '}
+          <button 
+            type="button"
+            onClick={() => {
+              setError('');
+              setPassword('');
+              setConfirmPassword('');
+              if (isLogin) {
+                navigate('/auth/register');
+              } else {
+                navigate('/auth/login');
+              }
+            }}
+            className="text-[#0F766E] dark:text-[#5EEAD4] font-bold hover:underline"
+          >
+            {isLogin ? 'Daftar di sini' : 'Masuk di sini'}
+          </button>
         </div>
       </motion.div>
     </div>
