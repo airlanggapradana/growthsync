@@ -4,6 +4,7 @@ import { Shield, Sparkles, Activity, ArrowRight, HeartPulse, LineChart, Stethosc
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import ThreeBackground from './ThreeBackground';
+import { applySEO, PAGE_SEO } from '../lib/seo';
 
 export default function LandingView() {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ export default function LandingView() {
   const backgroundY = useTransform(scrollY, [0, 4000], ['0%', '-20%']);
 
   const [activeSection, setActiveSection] = React.useState('beranda');
+
+  // Apply landing page SEO metadata
+  React.useEffect(() => {
+    applySEO(PAGE_SEO.landing());
+  }, []);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -50,7 +56,9 @@ export default function LandingView() {
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <motion.img 
           src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp" 
-          alt="Mossy Background" 
+          alt="Latar belakang alam hijau yang menenangkan"
+          width={1920}
+          height={1080}
           className="w-full h-[130vh] object-cover absolute top-0 left-0"
           style={{ y: backgroundY }}
         />
@@ -92,9 +100,9 @@ export default function LandingView() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="fixed top-6 inset-x-0 z-50 flex justify-center px-4"
       >
-        <nav className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
+        <nav aria-label="Navigasi utama Kindo" className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
           <div className="flex items-center gap-3 pl-2">
-             <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain brightness-0 invert" />
+             <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo Kindo" width={32} height={32} className="h-8 w-auto object-contain brightness-0 invert" />
              <span className="font-bold tracking-widest text-sm text-white/90 hidden sm:block">KINDO</span>
           </div>
           
@@ -207,7 +215,7 @@ export default function LandingView() {
             </p>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 relative">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#d9f99d]/20 blur-xl rounded-full" />
-              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=300" alt="Data" className="w-full h-24 object-cover rounded-xl opacity-30 mix-blend-screen" />
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=300" alt="Visualisasi data perkembangan anak" width={300} height={96} loading="lazy" className="w-full h-24 object-cover rounded-xl opacity-30 mix-blend-screen" />
             </div>
           </motion.div>
 
@@ -389,12 +397,12 @@ export default function LandingView() {
       <footer className="py-12 border-t border-white/10 relative z-10 bg-black/20 text-center flex flex-col items-center">
         <p className="text-xs tracking-widest uppercase text-white/40 font-semibold mb-8">Didukung oleh Institusi Besar</p>
         <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 mb-16 px-6">
-           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="UMS Logo" className="h-10 w-auto object-contain brightness-0 invert" />
+           <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Logo Universitas Muhammadiyah Surakarta" width={160} height={40} loading="lazy" className="h-10 w-auto object-contain brightness-0 invert" />
         </div>
         
         <div className="w-full max-w-5xl border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 px-6 text-xs text-white/40">
            <div className="flex items-center gap-2">
-              <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo" className="w-6 h-6 brightness-0 invert opacity-50" />
+              <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo Kindo" width={24} height={24} loading="lazy" className="w-6 h-6 brightness-0 invert opacity-50" />
               <span>© {new Date().getFullYear()} Kindo. All rights reserved.</span>
            </div>
            <div className="flex gap-6">

@@ -21,6 +21,7 @@ import QuestionnaireView from './components/QuestionnaireView';
 import ResultView from './components/ResultView';
 import BottomNav from './components/domain/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
+import { applySEO, PAGE_SEO } from './lib/seo';
 
 type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
 
@@ -69,6 +70,33 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', String(isSidebarCollapsed));
   }, [isSidebarCollapsed]);
+
+  // Apply SEO metadata on authenticated view changes (all private — noindex)
+  useEffect(() => {
+    if (!user) return; // Public routes handle their own SEO (LandingView, AuthView)
+    switch (view) {
+      case 'DASHBOARD':
+      case 'HISTORY_DETAIL':
+        applySEO(PAGE_SEO.dashboard());
+        break;
+      case 'QUESTIONNAIRE':
+        applySEO(PAGE_SEO.questionnaire(age ? age.replace(/_/g, ' ') : undefined));
+        break;
+      case 'RESULT':
+        applySEO(PAGE_SEO.result());
+        break;
+      case 'NAKES_DASHBOARD':
+      case 'NAKES_CHAT':
+        applySEO(PAGE_SEO.nakesDashboard());
+        break;
+      case 'ADMIN_DASHBOARD':
+        applySEO(PAGE_SEO.adminDashboard());
+        break;
+      default:
+        // ONBOARDING, PARENT_CHAT_LIST, PARENT_CHAT — keep dashboard noindex
+        applySEO(PAGE_SEO.dashboard());
+    }
+  }, [view, age, user]);
 
   useEffect(() => {
     if (!user) {

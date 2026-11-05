@@ -7,6 +7,7 @@ import { Loader2, Users, Stethoscope, ArrowLeft, AlertCircle, ShieldCheck } from
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { UserRole } from '../types';
+import { applySEO, PAGE_SEO } from '../lib/seo';
 
 export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: () => void, initialMode?: 'login' | 'register' }) {
   const navigate = useNavigate();
@@ -14,6 +15,15 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
 
   useEffect(() => {
     setIsLogin(initialMode === 'login');
+  }, [initialMode]);
+
+  // Apply per-page SEO metadata with noindex for auth pages
+  useEffect(() => {
+    if (initialMode === 'login') {
+      applySEO(PAGE_SEO.login());
+    } else {
+      applySEO(PAGE_SEO.register());
+    }
   }, [initialMode]);
 
   const [email, setEmail] = useState('');

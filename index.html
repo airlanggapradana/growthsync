@@ -1,29 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kindo - Aplikasi Kuisioner Tumbuh Kembang Anak</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/Resmi_Logo_UMS_Color.png" />
+    <link rel="apple-touch-icon" href="/Resmi_Logo_UMS_Color.png" />
+    <title>Kindo - Aplikasi Pemantauan Tumbuh Kembang Anak</title>
     <meta
       name="description"
-      content="Kindo adalah aplikasi kuisioner tumbuh kembang anak yang membantu orang tua memantau pertumbuhan dan perkembangan anak secara digital."
+      content="Kindo adalah platform digital pemantauan tumbuh kembang anak berbasis KPSP. Pantau perkembangan anak usia 0–72 bulan, konsultasi dengan nakes, dan dapatkan analisis AI secara gratis."
     />
     <meta
       name="keywords"
-      content="tumbuh kembang anak, kuisioner anak, pertumbuhan anak, perkembangan anak, Kindo"
+      content="tumbuh kembang anak, kuisioner KPSP, pemantauan perkembangan anak, aplikasi parenting, pertumbuhan balita, konsultasi nakes, bidan online, Kindo"
     />
-    <meta name="author" content="Kindo" />
+    <meta name="author" content="Kindo - Universitas Muhammadiyah Surakarta" />
+    <meta name="theme-color" content="#0F766E" />
+    <meta name="application-name" content="Kindo" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.kindo.fun/" />
     <meta
       property="og:title"
-      content="Kindo - Aplikasi Kuisioner Tumbuh Kembang Anak"
+      content="Kindo - Aplikasi Pemantauan Tumbuh Kembang Anak"
     />
     <meta
       property="og:description"
-      content="Kindo adalah aplikasi kuisioner tumbuh kembang anak yang membantu orang tua memantau pertumbuhan dan perkembangan anak secara digital."
+      content="Platform digital pemantauan tumbuh kembang anak berbasis KPSP. Pantau perkembangan anak usia 0–72 bulan, konsultasi dengan nakes, dan dapatkan analisis AI secara gratis."
     />
     <meta
       property="og:image"
@@ -33,7 +38,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Kindo - Aplikasi Kuisioner Tumbuh Kembang Anak"
+      content="Kindo - Platform Pemantauan Tumbuh Kembang Anak"
     />
     <meta property="og:site_name" content="Kindo" />
     <meta property="og:locale" content="id_ID" />
@@ -43,11 +48,11 @@
     <meta name="twitter:url" content="https://www.kindo.fun/" />
     <meta
       name="twitter:title"
-      content="Kindo - Aplikasi Kuisioner Tumbuh Kembang Anak"
+      content="Kindo - Aplikasi Pemantauan Tumbuh Kembang Anak"
     />
     <meta
       name="twitter:description"
-      content="Kindo adalah aplikasi kuisioner tumbuh kembang anak yang membantu orang tua memantau pertumbuhan dan perkembangan anak secara digital."
+      content="Platform digital pemantauan tumbuh kembang anak berbasis KPSP. Pantau perkembangan anak usia 0–72 bulan, konsultasi dengan nakes, dan dapatkan analisis AI secara gratis."
     />
     <meta
       name="twitter:image"
@@ -55,17 +60,165 @@
     />
     <meta
       name="twitter:image:alt"
-      content="Kindo - Aplikasi Kuisioner Tumbuh Kembang Anak"
+      content="Kindo - Platform Pemantauan Tumbuh Kembang Anak"
     />
     <meta name="twitter:site" content="@Kindo" />
     <meta name="twitter:creator" content="@Kindo" />
 
-    <!-- WhatsApp / Telegram (also uses Open Graph) -->
-    <!-- LinkedIn (also uses Open Graph) -->
+    <!-- WhatsApp / Telegram / LinkedIn (uses Open Graph) -->
 
-    <!-- Additional SEO -->
-    <meta name="robots" content="index, follow" />
+    <!-- SEO Directives -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <link rel="canonical" href="https://www.kindo.fun/" />
+
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="7a529e106c03a0e9" />
+
+    <!-- JSON-LD Structured Data: Organization + WebSite + SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://www.kindo.fun/#organization",
+          "name": "Kindo",
+          "url": "https://www.kindo.fun/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp",
+            "width": 512,
+            "height": 512
+          },
+          "description": "Platform digital pemantauan tumbuh kembang anak berbasis KPSP dari Universitas Muhammadiyah Surakarta.",
+          "foundingOrganization": {
+            "@type": "EducationalOrganization",
+            "name": "Universitas Muhammadiyah Surakarta",
+            "url": "https://www.ums.ac.id/"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "availableLanguage": ["Indonesian", "English"]
+          },
+          "inLanguage": "id-ID"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.kindo.fun/#website",
+          "url": "https://www.kindo.fun/",
+          "name": "Kindo",
+          "description": "Platform digital pemantauan tumbuh kembang anak berbasis KPSP.",
+          "publisher": {
+            "@id": "https://www.kindo.fun/#organization"
+          },
+          "inLanguage": "id-ID",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://www.kindo.fun/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://www.kindo.fun/#app",
+          "name": "Kindo",
+          "url": "https://www.kindo.fun/",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web",
+          "description": "Aplikasi web pemantauan tumbuh kembang anak usia 0–72 bulan berbasis kuisioner KPSP. Dilengkapi analisis AI dan konsultasi tenaga kesehatan.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "IDR"
+          },
+          "inLanguage": ["id-ID", "en-US"],
+          "featureList": [
+            "Kuisioner KPSP untuk usia 0–72 bulan",
+            "Analisis tumbuh kembang berbasis AI",
+            "Konsultasi virtual dengan bidan dan dokter",
+            "Laporan evaluasi perkembangan anak",
+            "Peta Puskesmas terdekat"
+          ],
+          "publisher": {
+            "@id": "https://www.kindo.fun/#organization"
+          }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://www.kindo.fun/#webpage",
+          "url": "https://www.kindo.fun/",
+          "name": "Kindo - Aplikasi Pemantauan Tumbuh Kembang Anak",
+          "description": "Platform digital pemantauan tumbuh kembang anak berbasis KPSP. Pantau perkembangan anak usia 0–72 bulan, konsultasi dengan nakes, dan dapatkan analisis AI secara gratis.",
+          "isPartOf": {
+            "@id": "https://www.kindo.fun/#website"
+          },
+          "about": {
+            "@id": "https://www.kindo.fun/#app"
+          },
+          "primaryImageOfPage": {
+            "@type": "ImageObject",
+            "url": "https://res.cloudinary.com/airlanggapradana/image/upload/v1780069902/landing-page_z1k25e.webp",
+            "width": 1200,
+            "height": 630
+          },
+          "inLanguage": "id-ID",
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Beranda",
+                "item": "https://www.kindo.fun/"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.kindo.fun/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Apa itu Kindo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kindo adalah platform digital pemantauan tumbuh kembang anak berbasis KPSP (Kuesioner Pra Skrining Perkembangan) yang membantu orang tua memantau perkembangan anak usia 0–72 bulan secara mudah dan akurat."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Apakah Kindo gratis?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Ya, Kindo sepenuhnya gratis digunakan. Orang tua dapat melakukan evaluasi tumbuh kembang anak, mendapatkan analisis AI, dan berkonsultasi dengan tenaga kesehatan tanpa biaya."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Anak usia berapa yang bisa menggunakan Kindo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kindo mendukung pemantauan tumbuh kembang anak usia 3 bulan hingga 72 bulan (6 tahun), dengan kuisioner yang disesuaikan untuk setiap kelompok usia."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Siapa tenaga kesehatan yang ada di Kindo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kindo menghubungkan orang tua dengan bidan dan dokter yang telah terverifikasi untuk konsultasi virtual mengenai tumbuh kembang anak."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
