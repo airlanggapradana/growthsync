@@ -354,6 +354,61 @@ async function startServer() {
   const app = express();
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
+  const SITE_URL = 'https://kindo.fun';
+
+  // ── Static SEO files: registered FIRST, before ALL middleware ──────────────
+  // Must be at the top so neither Vite nor express.static can intercept them.
+  app.get('/sitemap.xml', (_req, res) => {
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="${SITE_URL}/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/"/>
+  </url>
+  <url>
+    <loc>${SITE_URL}/auth/login</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/auth/register</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>`;
+    res.set('Content-Type', 'application/xml; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(sitemap);
+  });
+
+  app.get('/robots.txt', (_req, res) => {
+    const robotsTxt = [
+      'User-agent: *',
+      'Allow: /',
+      'Allow: /auth/login',
+      'Allow: /auth/register',
+      '',
+      'Disallow: /dashboard',
+      'Disallow: /onboarding',
+      'Disallow: /questionnaire',
+      'Disallow: /result',
+      'Disallow: /admin',
+      'Disallow: /nakes',
+      'Disallow: /chat',
+      'Disallow: /api/',
+      '',
+      `Sitemap: ${SITE_URL}/sitemap.xml`,
+    ].join('\n');
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(robotsTxt);
+  });
+  // ─────────────────────────────────────────────────────────────────────────
+
   app.use(express.json());
 
   // API routes FIRST
@@ -561,44 +616,6 @@ Keluarkan struktur data murni dalam format JSON object dengan satu key "puskesma
       console.error(error);
       res.status(500).json({ error: "Failed to fetch villages" });
     }
-  });
-
-  const SITE_URL = 'https://kindo.fun';
-
-  // Serve sitemap.xml with correct Content-Type and canonical domain
-  app.get('/sitemap.xml', (req, res) => {
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url>
-    <loc>${SITE_URL}/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="id" href="${SITE_URL}/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/"/>
-  </url>
-  <url>
-    <loc>${SITE_URL}/auth/login</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/auth/register</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-</urlset>`;
-    res.set('Content-Type', 'application/xml; charset=utf-8');
-    res.set('Cache-Control', 'public, max-age=86400'); // 24h cache
-    res.send(sitemap);
-  });
-
-  // Serve robots.txt with correct Content-Type and canonical domain
-  app.get('/robots.txt', (req, res) => {
-    const robotsTxt = `User-agent: *\nAllow: /\nAllow: /auth/login\nAllow: /auth/register\n\nDisallow: /dashboard\nDisallow: /onboarding\nDisallow: /questionnaire\nDisallow: /result\nDisallow: /admin\nDisallow: /nakes\nDisallow: /chat\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`;
-    res.set('Content-Type', 'text/plain; charset=utf-8');
-    res.set('Cache-Control', 'public, max-age=86400'); // 24h cache
-    res.send(robotsTxt);
   });
 
   // Vite middleware for development
