@@ -16,7 +16,7 @@ export interface SEOMeta {
   ogType?: string;
 }
 
-const BASE_URL = 'https://www.kindo.fun';
+const BASE_URL = 'https://kindo.fun';
 const DEFAULT_OG_IMAGE =
   'https://res.cloudinary.com/airlanggapradana/image/upload/v1780069902/landing-page_z1k25e.webp';
 
