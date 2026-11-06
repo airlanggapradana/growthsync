@@ -11,6 +11,15 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "isOnline": {
+          "type": "boolean",
+          "description": "Real-time live presence status"
+        },
+        "lastActive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last user activity"
         }
       },
       "required": ["email", "createdAt"]

@@ -68,7 +68,7 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
       id: "q_3_9",
       kategori: "Gerak Kasar",
       pertanyaan: "Apakah bayi dapat mengangkat kepala membentuk sudut 45?",
-      imageUrl: "https://lh3.googleusercontent.com/d/1OKuuvZsRvXi6eMbw8HM-kq5Xt7GgQoi7"
+      imageUrl: "/illustrations/baby_head_45_deg.jpg"
     },
     {
       id: "q_3_10",
@@ -180,7 +180,7 @@ export const QUESTIONS_DATA: Record<AgeCategory, Question[]> = {
       id: "q_9_9",
       kategori: "Gerak Kasar",
       pertanyaan: "Apakah bayi dapat duduk sendiri selama 60 detik tanpa disangga?",
-      imageUrl: "https://lh3.googleusercontent.com/d/1t7PAorkZXFYsfMVTaGYQsFqQ80GfIrWn"
+      imageUrl: "/illustrations/baby_sitting_alone.jpg"
     },
     {
       id: "q_9_10",

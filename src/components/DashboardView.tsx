@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { format, differenceInMonths } from 'date-fns';
 import { id as idLocale, enUS } from 'date-fns/locale';
-import { cn, formatIndonesianName } from '../lib/utils';
+import { cn, formatIndonesianName, formatAgeCategory } from '../lib/utils';
 import PuskesmasMapModal from './PuskesmasMapModal';
 import StatusBadge from './domain/StatusBadge';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -898,7 +898,7 @@ export default function DashboardView({
                               </div>
                               <div>
                                  <div className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                                   KPSP {result.ageCategory.replace('_', ' ')}
+                                   KPSP {formatAgeCategory(result.ageCategory)}
                                  </div>
                                  <div className="text-[11px] text-slate-400 font-medium">{formattedDate}</div>
                               </div>

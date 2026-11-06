@@ -47,3 +47,16 @@ export function formatIndonesianName(name?: string | null, email?: string | null
     .join(' ');
 }
 
+/**
+ * Formats age category strings (e.g. '3_bulan', 'BULAN_3', '12_bulan') into proper Indonesian text without underscores:
+ * '3 Bulan', '6 Bulan', '12 Bulan', etc.
+ */
+export function formatAgeCategory(age?: string | null): string {
+  if (!age) return '';
+  const match = age.match(/\d+/);
+  if (match) {
+    return `${match[0]} Bulan`;
+  }
+  return age.replace(/[_-]+/g, ' ').trim();
+}
+

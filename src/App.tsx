@@ -6,7 +6,7 @@ import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from './data/questions';
 import { cn, formatIndonesianName } from './lib/utils';
 import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages, PanelLeftClose, PanelLeftOpen, Menu, X } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
 import LandingView from './components/LandingView';
 import AuthView from './components/AuthView';
@@ -115,6 +115,49 @@ export default function App() {
       setUnreadCountsBySender(counts);
     });
     return () => unsubscribeUnread();
+  }, [user]);
+
+  // Live user presence tracking in Firestore
+  useEffect(() => {
+    if (!user) return;
+    const userRef = doc(db, 'users', user.uid);
+    updateDoc(userRef, {
+      isOnline: true,
+      lastActive: serverTimestamp()
+    }).catch(() => {});
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateDoc(userRef, {
+          isOnline: true,
+          lastActive: serverTimestamp()
+        }).catch(() => {});
+      } else {
+        updateDoc(userRef, {
+          isOnline: false,
+          lastActive: serverTimestamp()
+        }).catch(() => {});
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      updateDoc(userRef, {
+        isOnline: false,
+        lastActive: serverTimestamp()
+      }).catch(() => {});
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      updateDoc(userRef, {
+        isOnline: false,
+        lastActive: serverTimestamp()
+      }).catch(() => {});
+    };
   }, [user]);
 
   useEffect(() => {
@@ -715,12 +758,12 @@ export default function App() {
         </header>
 
         <div className={cn(
-          "flex-1 overflow-y-auto pb-20 lg:pb-0",
+          "flex-1 overflow-y-auto",
           (view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' || view === 'NAKES_CHAT')
-            ? "p-3 sm:p-5 lg:p-6 bg-slate-50 dark:bg-slate-950 flex flex-col h-full"
+            ? "p-3 sm:p-5 lg:p-6 pb-24 lg:pb-8 bg-slate-50 dark:bg-slate-950 flex flex-col h-full"
             : view === 'QUESTIONNAIRE'
-              ? "p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 flex flex-col min-h-full w-full"
-              : "px-6 py-8 lg:px-10 lg:py-10 bg-white dark:bg-slate-900"
+              ? "p-4 sm:p-6 lg:p-8 pb-32 lg:pb-24 bg-slate-50 dark:bg-slate-950 w-full"
+              : "px-6 py-8 lg:px-10 lg:py-10 pb-28 lg:pb-12 bg-white dark:bg-slate-900"
         )}>
           <AnimatePresence mode="wait">
             {view === 'ONBOARDING' && (

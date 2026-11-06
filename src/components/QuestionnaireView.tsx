@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AgeCategory } from '../types';
 import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from '../data/questions';
-import { cn } from '../lib/utils';
+import { cn, formatAgeCategory } from '../lib/utils';
 import { Info, ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, Check, X, ClipboardList, Eye } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -20,6 +20,11 @@ const categoryBadgeColor: Record<string, string> = {
   "Sosialisasi dan Kemandirian": "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
 };
 
+const ILLUSTRATION_FALLBACKS: Record<string, string> = {
+  q_3_9: "/illustrations/baby_head_45_deg.jpg",
+  q_9_9: "/illustrations/baby_sitting_alone.jpg"
+};
+
 interface QuestionnaireViewProps {
   age: AgeCategory;
   answers: Record<string, number>;
@@ -32,6 +37,7 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPrepared, setIsPrepared] = useState<boolean>(!AGE_EQUIPMENT_DATA[age]);
   const [showReviewModal, setShowReviewModal] = useState<boolean>(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   const questions = QUESTIONS_DATA[age] || [];
   const answeredCount = Object.keys(answers).length;
@@ -82,7 +88,7 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
             Panduan KPSP Kemenkes RI
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1 mb-3">
-            Persiapan Alat Skrining Usia {age.replace('BULAN_', '')} Bulan
+            Persiapan Alat Skrining Usia {formatAgeCategory(age)}
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
             Sebelum memulai 10 pertanyaan skrining perkembangan, mohon siapkan peralatan berikut agar proses pengamatan dapat dilakukan secara objektif.
@@ -138,7 +144,7 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.3 }}
-      className="w-full flex-1 flex flex-col space-y-6 pb-6 max-w-4xl mx-auto" 
+      className="w-full space-y-6 pb-12 max-w-4xl mx-auto" 
     >
       {/* Top Progress Card with Teal palette */}
       <div className="w-full bg-[#0F766E] dark:bg-slate-900 p-6 lg:p-7 rounded-[24px] shadow-sm relative overflow-hidden shrink-0 border border-teal-700/40 dark:border-slate-800 text-white">
@@ -183,7 +189,7 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
       )}
 
       {/* Main Question Card */}
-      <div className="flex-1 flex flex-col w-full">
+      <div className="w-full">
         <AnimatePresence mode="wait">
           <motion.div 
             key={currentQuestion.id}
@@ -191,7 +197,7 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
-            className="w-full bg-white dark:bg-slate-900 p-6 sm:p-8 lg:p-10 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col flex-1 justify-between"
+            className="w-full bg-white dark:bg-slate-900 p-6 sm:p-8 lg:p-10 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col"
           >
             <div className={cn(
               "w-full",
@@ -266,12 +272,35 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
 
               {currentQuestion.imageUrl && (
                 <div className="lg:col-span-5 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800/40 p-4 min-h-[260px]">
-                  <img 
-                    src={currentQuestion.imageUrl} 
-                    alt={t(`question.${currentQuestion.id}`)}
-                    className="max-h-64 w-auto max-w-full object-contain rounded-xl"
-                    referrerPolicy="no-referrer"
-                  />
+                  {!failedImages[currentQuestion.id] ? (
+                    <img 
+                      src={currentQuestion.imageUrl} 
+                      alt={t(`question.${currentQuestion.id}`)}
+                      className="max-h-64 w-auto max-w-full object-contain rounded-xl shadow-xs"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const fallback = ILLUSTRATION_FALLBACKS[currentQuestion.id];
+                        const img = e.currentTarget as HTMLImageElement;
+                        if (fallback && img.getAttribute('src') !== fallback) {
+                          img.src = fallback;
+                        } else {
+                          setFailedImages((prev) => ({ ...prev, [currentQuestion.id]: true }));
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full flex flex-col items-center justify-center py-6 px-4 text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 text-[#0F766E] dark:text-teal-400 flex items-center justify-center mb-3">
+                        <ClipboardList className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs font-bold text-[#0F766E] dark:text-teal-400 uppercase tracking-wider mb-1">
+                        Panduan Observasi KPSP
+                      </span>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 max-w-xs leading-relaxed">
+                        Lakukan pengamatan langsung pada respon dan gerakan tubuh anak sesuai arahan pertanyaan.
+                      </p>
+                    </div>
+                  )}
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-3 text-center font-medium">
                     Ilustrasi Panduan Gerakan
                   </p>
@@ -282,8 +311,8 @@ export default function QuestionnaireView({ age, answers, onAnswer, onSubmit }: 
         </AnimatePresence>
       </div>
 
-      {/* Sticky Bottom Control Bar */}
-      <div className="sticky bottom-0 w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-4 rounded-2xl z-30 shadow-lg border border-slate-200 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+      {/* Floating Bottom Control Bar */}
+      <div className="sticky bottom-4 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-900 dark:text-white p-4 rounded-2xl z-30 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mt-4">
         <div className="flex items-center gap-2">
            <button
               type="button"

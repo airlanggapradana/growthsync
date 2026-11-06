@@ -463,7 +463,7 @@ export default function KonsultasiNakesView({
   const txt = KONSULTASI_I18N[language] || KONSULTASI_I18N.id;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<'all' | 'dokter' | 'bidan' | 'gizi' | 'posyandu'>('all');
+  const [filterCategory, setFilterCategory] = useState<'all' | 'online' | 'dokter' | 'bidan' | 'gizi' | 'posyandu'>('all');
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [selectedContact, setSelectedContact] = useState<ContactItem | null>(() => {
@@ -479,7 +479,7 @@ export default function KonsultasiNakesView({
           : getNakesPlaceholder('dokter', (initialTargetUser as any).name),
         lastMessage: 'Memulai sesi konsultasi...',
         timestamp: '',
-        online: true
+        online: Boolean((initialTargetUser as any).isOnline)
       };
     }
     return null;
@@ -630,6 +630,40 @@ export default function KonsultasiNakesView({
             ? getNakesPlaceholder(category, data.name || (data.email ? data.email.split('@')[0] : ''))
             : (data.photoURL || data.avatar || getParentPlaceholder(data.name || (data.email ? data.email.split('@')[0] : '')));
 
+          // Real-time automatic live presence from Firestore
+          // Genuinely online only when the nakes account is logged in and active in Firestore
+          let isOnline = false;
+          let statusText = '';
+          if (data.isOnline === true) {
+            if (data.lastActive) {
+              const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
+              const diffMinutes = (Date.now() - actDate.getTime()) / (1000 * 60);
+              // Active within the last 5 minutes
+              isOnline = diffMinutes <= 5;
+            } else {
+              isOnline = true;
+            }
+          } else {
+            isOnline = false;
+          }
+
+          if (isOnline) {
+            statusText = isAssigned 
+              ? (language === 'en' ? 'Online • Your Primary Health Worker' : 'Online • Nakes Pendamping Profil Anda')
+              : (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi');
+          } else {
+            if (data.lastActive) {
+              const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
+              const timeFormatted = dayjs(actDate).format('HH:mm');
+              const isToday = dayjs(actDate).isSame(dayjs(), 'day');
+              statusText = isToday 
+                ? (language === 'en' ? `Last active today ${timeFormatted}` : `Terakhir aktif hari ini ${timeFormatted}`)
+                : (language === 'en' ? `Last active ${dayjs(actDate).format('DD MMM')}` : `Terakhir aktif ${dayjs(actDate).format('DD MMM')}`);
+            } else {
+              statusText = language === 'en' ? 'Offline • Outside service hours' : 'Offline • Di luar jam praktik';
+            }
+          }
+
           return {
             id: docId,
             uid: uid,
@@ -640,8 +674,8 @@ export default function KonsultasiNakesView({
             lastMessage: msgMeta ? msgMeta.lastText : (isAssigned ? 'Konsultasi nakes aktif' : 'Belum ada riwayat pesan'),
             timestamp: msgMeta ? msgMeta.timeStr : '',
             unreadCount: msgMeta ? msgMeta.unread : 0,
-            online: true,
-            statusText: isAssigned ? 'Online • Nakes Pendamping Profil Anda' : 'Online',
+            online: isOnline,
+            statusText: statusText,
             isAssignedNakes: isAssigned,
             specialty: data.specialty || (data.role === 'nakes' ? 'Pemantauan Antropometri & Skrining KPSP' : 'Tumbuh Kembang Balita'),
             sipNumber: data.sip || '-',
@@ -867,6 +901,8 @@ export default function KonsultasiNakesView({
     handleSendMessage(textMsg);
   };
 
+  const onlineCount = contacts.filter(c => c.online).length;
+
   // Filter contacts
   const filteredContacts = contacts.filter(c => {
     const matchesSearch = 
@@ -875,9 +911,10 @@ export default function KonsultasiNakesView({
       (c.specialty && c.specialty.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCategory = 
-      filterCategory === 'all' || 
-      c.category === filterCategory ||
-      (filterCategory === 'posyandu' && c.isGroup);
+      filterCategory === 'all' ? true :
+      filterCategory === 'online' ? c.online :
+      filterCategory === 'posyandu' ? (c.category === 'posyandu' || c.isGroup) :
+      c.category === filterCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -947,6 +984,7 @@ export default function KonsultasiNakesView({
             </div>
           </div>
 
+
           {/* Search Box */}
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -972,6 +1010,7 @@ export default function KonsultasiNakesView({
           <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar pt-1">
             {[
               { id: 'all', label: txt.categories.all },
+              { id: 'online', label: `🟢 Online (${onlineCount})` },
               { id: 'dokter', label: txt.categories.dokter },
               { id: 'bidan', label: txt.categories.bidan },
               { id: 'gizi', label: txt.categories.gizi },
@@ -1045,15 +1084,19 @@ export default function KonsultasiNakesView({
                       : "bg-white dark:bg-slate-900 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/60"
                   )}
                 >
-                  {/* Avatar with Online Indicator */}
+                  {/* Avatar with Online / Offline Indicator */}
                   <div className="relative shrink-0">
                     <img 
                       src={contact.avatar} 
                       alt={contact.name} 
                       className="w-11 h-11 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-xs"
                     />
-                    {contact.online && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                    {contact.online ? (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full">
+                        <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                      </span>
+                    ) : (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-slate-400 dark:bg-slate-500 border-2 border-white dark:border-slate-900 rounded-full" />
                     )}
                   </div>
 
@@ -1073,10 +1116,19 @@ export default function KonsultasiNakesView({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1 mb-1 flex-wrap">
-                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-[130px]">
                         {getTranslatedRole(contact.role, language)}
                       </span>
+                      {contact.online ? (
+                        <span className="text-[9px] text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded-full border border-emerald-200/80 dark:border-emerald-800 shrink-0">
+                          Online
+                        </span>
+                      ) : (
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded-full shrink-0">
+                          Offline
+                        </span>
+                      )}
                       {contact.isAssignedNakes && (
                         <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold px-1.5 py-0.2 rounded-full shrink-0">
                           {currentUser.role === 'nakes' ? txt.badgeYourPatient : txt.badgeYourNakes}
@@ -1171,7 +1223,7 @@ export default function KonsultasiNakesView({
                   <ChevronLeft className="w-5 h-5" />
                 </button>
 
-                {/* Doctor/Nakes Avatar */}
+                {/* Doctor/Nakes Avatar with Live Indicator */}
                 <div 
                   className="relative cursor-pointer shrink-0"
                   onClick={() => setShowInfoModal(true)}
@@ -1182,8 +1234,12 @@ export default function KonsultasiNakesView({
                     alt={selectedContact.name} 
                     className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-xs"
                   />
-                  {selectedContact.online && (
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                  {selectedContact.online ? (
+                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full">
+                      <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                    </span>
+                  ) : (
+                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-slate-400 dark:bg-slate-500 border-2 border-white dark:border-slate-900 rounded-full" />
                   )}
                 </div>
 
@@ -1198,8 +1254,20 @@ export default function KonsultasiNakesView({
                       <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 inline" />
                     )}
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                    {getTranslatedRole(selectedContact.role, language)} • <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{selectedContact.online ? txt.online : txt.offline}</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center gap-1.5">
+                    <span>{getTranslatedRole(selectedContact.role, language)}</span>
+                    <span>•</span>
+                    {selectedContact.online ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] border border-emerald-200/80 dark:border-emerald-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        {txt.online}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] border border-slate-200 dark:border-slate-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                        {txt.offline}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1294,6 +1362,21 @@ export default function KonsultasiNakesView({
             </span>
             {txt.verifiedNoticeDesc}
           </div>
+
+          {/* Offline Health Worker Notice Banner */}
+          {!selectedContact.online && (
+            <div className="max-w-lg mx-auto p-3.5 bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-start gap-3 text-xs text-slate-700 dark:text-slate-300 shadow-2xs">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-400 mt-1 shrink-0" />
+              <div className="flex-1">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block">
+                  {language === 'en' ? 'Health Worker is currently Offline' : 'Tenaga Medis Sedang Offline'}
+                </span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                  {selectedContact.statusText || (language === 'en' ? 'You can still leave messages or submit KPSP records. The health worker will reply once online.' : 'Anda tetap dapat mengirimkan pesan konsultasi atau data skrining. Tenaga medis akan merespons saat kembali bertugas.')}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Messages Stream */}
           {messages.map(msg => {
@@ -1689,6 +1772,33 @@ export default function KonsultasiNakesView({
                 <div>
                   <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.hoursLabel}</span>
                   <span>{selectedContact.activeHours || (language === 'en' ? 'Monday - Friday, 08:00 - 15:00 WIB' : 'Senin - Jumat, 08:00 - 15:00 WIB')}</span>
+                </div>
+              </div>
+
+              {/* Live Presence Status in Profile Modal (Real-time read-only) */}
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 block text-xs">
+                    Status Layanan Nakes
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
+                    {selectedContact.statusText || (selectedContact.online 
+                      ? (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi') 
+                      : (language === 'en' ? 'Offline • Outside Service Hours' : 'Offline • Di Luar Jam Pelayanan'))}
+                  </span>
+                </div>
+                <div className="shrink-0">
+                  {selectedContact.online ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      Online
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                      <span className="w-2 h-2 rounded-full bg-slate-400" />
+                      Offline
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

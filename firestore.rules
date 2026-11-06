@@ -38,7 +38,14 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && (userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
-      allow update: if isSignedIn() && (userId == request.auth.uid || incoming().diff(existing()).affectedKeys().hasOnly(['assignedNakesId']) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow update: if isSignedIn() && (
+        userId == request.auth.uid || 
+        incoming().diff(existing()).affectedKeys().hasOnly(['assignedNakesId']) || 
+        incoming().diff(existing()).affectedKeys().hasOnly(['isOnline', 'lastActive']) || 
+        incoming().diff(existing()).affectedKeys().hasOnly(['isOnline']) || 
+        incoming().diff(existing()).affectedKeys().hasOnly(['lastActive']) || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
       allow delete: if isSignedIn() && userId == request.auth.uid;
     }
 

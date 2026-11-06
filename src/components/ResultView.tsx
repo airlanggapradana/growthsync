@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AgeCategory, ChildProfile } from '../types';
 import { QUESTIONS_DATA } from '../data/questions';
-import { cn } from '../lib/utils';
+import { cn, formatAgeCategory } from '../lib/utils';
 import { Sparkles, Loader2, Download, ArrowLeft, Check, RefreshCcw, ChevronDown, ChevronUp, MapPin, MessageSquare, Activity } from 'lucide-react';
 import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
@@ -191,7 +191,7 @@ export default function ResultView({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.3 }}
-      className="max-w-5xl mx-auto pb-12 space-y-6"
+      className="max-w-5xl mx-auto pb-24 space-y-6"
     >
       {/* Top Bento Box: Main Status & Score Ring */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -200,7 +200,7 @@ export default function ResultView({
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                KPSP Kemenkes RI • Skrining Usia {age.replace('BULAN_', '')} Bulan
+                KPSP Kemenkes RI • Skrining Usia {formatAgeCategory(age)}
               </span>
               <StatusBadge status={kpspStatus} size="md" />
             </div>
