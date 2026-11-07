@@ -102,7 +102,7 @@ const DEFAULT_CONTACTS: ContactItem[] = [
     role: 'Dokter Spesialis Anak (Sp.A)',
     category: 'dokter',
     avatar: getNakesPlaceholder('dokter', 'Dr. Airlangga Pradana, Sp.A'),
-    lastMessage: 'Bagaimana hasil evaluasi perkembangan KPSP ananda minggu ini?',
+    lastMessage: 'Bagaimana hasil evaluasi perkembangan KPSP si kecil minggu ini?',
     timestamp: '09:15',
     online: true,
     statusText: 'Online • Siap Melayani Konsultasi Tumbuh Kembang',
@@ -204,7 +204,7 @@ const INITIAL_CONSULTATION_MESSAGES: ChatMessage[] = [
   {
     id: 'm-2',
     senderId: 'nakes_airlangga',
-    text: 'Bagaimana kondisi ananda hari ini? Apakah ada keluhan pada perkembangan motorik, bicara, atau asupan makannya?',
+    text: 'Bagaimana kondisi si kecil hari ini? Apakah ada keluhan pada perkembangan motorik, bicara, atau asupan makannya?',
     timestamp: '08:31',
     isMe: false
   },
@@ -361,19 +361,19 @@ const KONSULTASI_I18N = {
     badgeNeedReferral: 'Perlu Rujukan',
     badgeNotReferred: 'Bukan Nakes Rujukan',
     lockedChatBannerTitle: 'Konsultasi Terkunci: Khusus Nakes Rujukan',
-    lockedChatBannerDesc: 'Sesuai regulasi medis resmi, pasien hanya dapat melakukan interaksi chat klinis kepada Tenaga Kesehatan yang telah merujuk dan mendampingi ananda. Rujukan diterbitkan langsung oleh pihak Tenaga Kesehatan, bukan dari pasien.',
+    lockedChatBannerDesc: 'Sesuai regulasi medis resmi, pasien hanya dapat melakukan interaksi chat klinis kepada Tenaga Kesehatan yang telah merujuk dan mendampingi buah hati Anda. Rujukan diterbitkan langsung oleh pihak Tenaga Kesehatan, bukan dari pasien.',
     noReferralAlertTitle: 'Belum Ada Nakes Rujukan',
     noReferralAlertDesc: 'Surat rujukan klinis hanya dapat diterbitkan langsung oleh Tenaga Kesehatan pendamping (dokter/bidan/posyandu) berdasarkan hasil evaluasi tumbuh kembang atau skrining KPSP. Pasien tidak dapat memilih nakes rujukan secara mandiri.',
     switchToReferredAction: 'Buka Chat Nakes Rujukan',
-    callRestricted: 'Panggilan suara dan telekonsultasi hanya dapat dilakukan kepada Tenaga Medis rujukan pendamping ananda.',
+    callRestricted: 'Panggilan suara dan telekonsultasi hanya dapat dilakukan kepada Tenaga Medis rujukan pendamping anak Anda.',
     officialReferralTitle: 'Tenaga Medis Rujukan Resmi Terverifikasi',
-    officialReferralDesc: 'Anda terhubung langsung dengan Nakes rujukan pendamping ananda untuk pemantauan tumbuh kembang dan konsultasi klinis.',
+    officialReferralDesc: 'Anda terhubung langsung dengan Nakes rujukan pendamping anak Anda untuk pemantauan tumbuh kembang dan konsultasi klinis.',
     awaitingNakesReferral: 'Menunggu Surat Rujukan dari Nakes',
-    awaitingNakesReferralNote: 'Tenaga Kesehatan wilayah/Posyandu akan meninjau kondisi ananda dan menerbitkan rujukan pendampingan secara langsung.',
+    awaitingNakesReferralNote: 'Tenaga Kesehatan wilayah/Posyandu akan meninjau kondisi anak Anda dan menerbitkan rujukan pendampingan secara langsung.',
     parentHeaderTitle: 'Nakes Rujukan Anda',
     parentHeaderSubtitle: 'Komunikasi privat dengan dokter / bidan pendamping',
     emptyReferralTitle: 'Belum Ada Nakes Rujukan',
-    emptyReferralSubtitle: 'Layanan konsultasi chat langsung hanya tersedia untuk Tenaga Medis (Dokter/Bidan) yang telah memberikan rujukan pendampingan resmi untuk ananda.',
+    emptyReferralSubtitle: 'Layanan konsultasi chat langsung hanya tersedia untuk Tenaga Medis (Dokter/Bidan) yang telah memberikan rujukan pendampingan resmi untuk buah hati Anda.',
     howToGetReferralTitle: 'Alur Penerbitan Rujukan:',
     step1Title: 'Skrining KPSP Balita',
     step1Desc: 'Lakukan skrining berkala 10 pertanyaan perkembangan anak di menu Dashboard.',
@@ -1347,45 +1347,50 @@ export default function KonsultasiNakesView({
       >
         {!selectedContact ? (
           currentUser.role === 'orang_tua' ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-gradient-to-b from-slate-50/70 via-white to-slate-50/50 dark:from-slate-950/60 dark:via-slate-900 dark:to-slate-950/80 relative overflow-y-auto">
-              {/* Language Toggle in Top-Right */}
-              <div 
-                className="absolute top-4 right-4 flex items-center bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
-                role="group"
-                aria-label={txt.languageToggleTitle}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLanguage('id')}
-                  className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
-                    language === 'id'
-                      ? "bg-[#1b4332] text-white shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                  )}
-                  title="Bahasa Indonesia"
+            <div className="flex-1 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-10 text-center bg-gradient-to-b from-slate-50/70 via-white to-slate-50/50 dark:from-slate-950/60 dark:via-slate-900 dark:to-slate-950/80 relative overflow-y-auto">
+              {/* Top Bar with Header Title & Language Toggle */}
+              <div className="w-full max-w-2xl flex items-center justify-between mb-4 shrink-0">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  {txt.parentHeaderTitle}
+                </span>
+                <div 
+                  className="flex items-center bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                  role="group"
+                  aria-label={txt.languageToggleTitle}
                 >
-                  <span className="text-[10px]">🇮🇩</span>
-                  <span>ID</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLanguage('en')}
-                  className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
-                    language === 'en'
-                      ? "bg-[#1b4332] text-white shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                  )}
-                  title="English"
-                >
-                  <span className="text-[10px]">🇬🇧</span>
-                  <span>EN</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguage('id')}
+                    className={cn(
+                      "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                      language === 'id'
+                        ? "bg-[#1b4332] text-white shadow-xs"
+                        : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    )}
+                    title="Bahasa Indonesia"
+                  >
+                    <span className="text-[10px]">🇮🇩</span>
+                    <span>ID</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguage('en')}
+                    className={cn(
+                      "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                      language === 'en'
+                        ? "bg-[#1b4332] text-white shadow-xs"
+                        : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    )}
+                    title="English"
+                  >
+                    <span className="text-[10px]">🇬🇧</span>
+                    <span>EN</span>
+                  </button>
+                </div>
               </div>
 
               {/* Hero Icon with glowing badge */}
-              <div className="relative mb-4 mt-6 sm:mt-0">
+              <div className="relative mb-4 mt-2 sm:mt-0">
                 <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#1b4332] to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-900/20">
                   <Stethoscope className="w-10 h-10" />
                 </div>

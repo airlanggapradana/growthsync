@@ -1124,7 +1124,7 @@ export default function DashboardView({
                 Pilih Kelompok Usia Skrining
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-                Usia ananda saat ini ({profile.ageInMonths} bulan) berada di antara kelompok usia KPSP standar. Silakan pilih kuesioner yang paling sesuai:
+                Usia anak Anda saat ini ({profile.ageInMonths} bulan) berada di antara kelompok usia KPSP standar. Silakan pilih kuesioner yang paling sesuai:
               </p>
               <div className="space-y-3">
                 {ageOptions.map((opt) => (
