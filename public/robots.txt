@@ -1,0 +1,33 @@
+# Robots.txt untuk Kindo (kindo.fun)
+# Platform Pemantauan Tumbuh Kembang Anak Berbasis KPSP
+
+User-agent: *
+# Izinkan akses halaman publik
+Allow: /
+Allow: /privacy-policy
+Allow: /terms-of-service
+
+# Blokir crawling halaman autentikasi dan dashboard privat (dilindungi login & noindex)
+Disallow: /auth/
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /questionnaire
+Disallow: /result
+Disallow: /admin
+Disallow: /nakes
+Disallow: /chat
+Disallow: /api/
+Disallow: /*.json$
+
+# Izinkan resource penting agar Googlebot dapat merender halaman dengan sempurna
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.webp$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.svg$
+Allow: /sitemap.xml
+
+# Sitemap
+Sitemap: https://kindo.fun/sitemap.xml

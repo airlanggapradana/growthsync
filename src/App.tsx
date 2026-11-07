@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from './data/questions';
 import { cn, formatIndonesianName } from './lib/utils';
@@ -20,6 +20,8 @@ import KonsultasiNakesView from './components/KonsultasiNakesView';
 import QuestionnaireView from './components/QuestionnaireView';
 import ResultView from './components/ResultView';
 import EdukasiTumbuhKembang from './components/EdukasiTumbuhKembang';
+import PrivacyPolicyView from './components/PrivacyPolicyView';
+import TermsOfServiceView from './components/TermsOfServiceView';
 import BottomNav from './components/domain/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import { applySEO, PAGE_SEO } from './lib/seo';
@@ -28,6 +30,7 @@ type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -269,12 +272,21 @@ export default function App() {
     );
   }
 
+  if (location.pathname === '/privacy-policy') {
+    return <PrivacyPolicyView />;
+  }
+  if (location.pathname === '/terms-of-service') {
+    return <TermsOfServiceView />;
+  }
+
   if (!user) {
     return (
       <Routes>
         <Route path="/" element={<LandingView />} />
         <Route path="/auth/login" element={<AuthView initialMode="login" onBack={() => navigate('/')} />} />
         <Route path="/auth/register" element={<AuthView initialMode="register" onBack={() => navigate('/')} />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyView />} />
+        <Route path="/terms-of-service" element={<TermsOfServiceView />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );

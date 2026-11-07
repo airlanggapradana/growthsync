@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Halaman Beranda (Landing Page) -->
+  <url>
+    <loc>https://kindo.fun/</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://kindo.fun/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kindo.fun/"/>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/airlanggapradana/image/upload/v1780069902/landing-page_z1k25e.webp</image:loc>
+      <image:caption>Kindo - Platform Pemantauan Tumbuh Kembang Anak</image:caption>
+      <image:title>Kindo Beranda</image:title>
+    </image:image>
+  </url>
+
+  <!-- Halaman Kebijakan Privasi -->
+  <url>
+    <loc>https://kindo.fun/privacy-policy</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Halaman Syarat dan Ketentuan -->
+  <url>
+    <loc>https://kindo.fun/terms-of-service</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

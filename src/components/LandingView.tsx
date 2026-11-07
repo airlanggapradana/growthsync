@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { Shield, Sparkles, Activity, ArrowRight, HeartPulse, LineChart, Stethoscope, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import ThreeBackground from './ThreeBackground';
 import { applySEO, PAGE_SEO } from '../lib/seo';
@@ -143,7 +143,7 @@ export default function LandingView() {
       </motion.div>
 
       {/* Hero Section */}
-      <section id="beranda" className="pt-40 pb-20 px-6 min-h-[85vh] flex flex-col items-center justify-center relative z-10 text-center">
+      <section id="beranda" aria-label="Beranda Kindo" className="pt-40 pb-20 px-6 min-h-[85vh] flex flex-col items-center justify-center relative z-10 text-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,7 +160,7 @@ export default function LandingView() {
             Kesehatan yang <span className="italic font-serif text-[#d9f99d] pr-2">tumbuh</span> bersama anak Anda.
           </h1>
           
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed hero-description">
             Platform komprehensif bagi orang tua yang mendambakan kejelasan, kecepatan, dan pertumbuhan berkelanjutan dalam memantau perkembangan buah hati.
           </p>
 
@@ -181,7 +181,7 @@ export default function LandingView() {
       </section>
 
       {/* Glowing Cards / Features Section */}
-      <section id="fitur" className="py-24 relative z-10 w-full max-w-6xl mx-auto px-6">
+      <section id="fitur" aria-label="Fitur Kindo" className="py-24 relative z-10 w-full max-w-6xl mx-auto px-6">
         <motion.div 
           initial="hidden"
           whileInView="visible"
@@ -277,7 +277,7 @@ export default function LandingView() {
       </section>
 
       {/* How It Works Layer */}
-      <section id="cara-kerja" className="py-32 relative z-10 border-t border-white/5 bg-white/[0.02]">
+      <section id="cara-kerja" aria-label="Cara Kerja Kindo" className="py-32 relative z-10 border-t border-white/5 bg-white/[0.02]">
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
@@ -330,7 +330,7 @@ export default function LandingView() {
       </section>
 
       {/* Our Team */}
-      <section id="tim-kami" className="py-32 relative z-10 border-t border-white/5">
+      <section id="tim-kami" aria-label="Tim Pengembang Kindo" className="py-32 relative z-10 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -393,8 +393,8 @@ export default function LandingView() {
         </div>
       </section>
 
-      {/* Trusted By / Footer */}
-      <footer className="py-12 border-t border-white/10 relative z-10 bg-black/20 text-center flex flex-col items-center">
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/10 relative z-10 bg-black/20 text-center flex flex-col items-center" aria-label="Footer Kindo">
         <p className="text-xs tracking-widest uppercase text-white/40 font-semibold mb-8">Didukung oleh Institusi Besar</p>
         <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 mb-16 px-6">
            <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Logo Universitas Muhammadiyah Surakarta" width={160} height={40} loading="lazy" className="h-10 w-auto object-contain brightness-0 invert" />
@@ -405,10 +405,10 @@ export default function LandingView() {
               <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo Kindo" width={24} height={24} loading="lazy" className="w-6 h-6 brightness-0 invert opacity-50" />
               <span>© {new Date().getFullYear()} Kindo. All rights reserved.</span>
            </div>
-           <div className="flex gap-6">
-             <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
-             <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-           </div>
+           <nav aria-label="Footer links" className="flex gap-6">
+             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+             <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+           </nav>
         </div>
       </footer>
     </div>

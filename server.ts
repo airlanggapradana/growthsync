@@ -361,23 +361,32 @@ async function startServer() {
   app.get('/sitemap.xml', (_req, res) => {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>${SITE_URL}/</loc>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="id" href="${SITE_URL}/"/>
     <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/"/>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/airlanggapradana/image/upload/v1780069902/landing-page_z1k25e.webp</image:loc>
+      <image:caption>Kindo - Platform Pemantauan Tumbuh Kembang Anak</image:caption>
+      <image:title>Kindo Beranda</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>${SITE_URL}/auth/login</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>${SITE_URL}/privacy-policy</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
-    <loc>${SITE_URL}/auth/register</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>${SITE_URL}/terms-of-service</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>`;
     res.set('Content-Type', 'application/xml; charset=utf-8');
@@ -387,11 +396,13 @@ async function startServer() {
 
   app.get('/robots.txt', (_req, res) => {
     const robotsTxt = [
+      '# Robots.txt untuk Kindo (kindo.fun)',
       'User-agent: *',
       'Allow: /',
-      'Allow: /auth/login',
-      'Allow: /auth/register',
+      'Allow: /privacy-policy',
+      'Allow: /terms-of-service',
       '',
+      'Disallow: /auth/',
       'Disallow: /dashboard',
       'Disallow: /onboarding',
       'Disallow: /questionnaire',
@@ -400,6 +411,16 @@ async function startServer() {
       'Disallow: /nakes',
       'Disallow: /chat',
       'Disallow: /api/',
+      'Disallow: /*.json$',
+      '',
+      'Allow: /*.js$',
+      'Allow: /*.css$',
+      'Allow: /*.webp$',
+      'Allow: /*.png$',
+      'Allow: /*.jpg$',
+      'Allow: /*.jpeg$',
+      'Allow: /*.svg$',
+      'Allow: /sitemap.xml',
       '',
       `Sitemap: ${SITE_URL}/sitemap.xml`,
     ].join('\n');
