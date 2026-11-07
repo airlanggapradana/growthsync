@@ -19,6 +19,8 @@ const resources = {
       'Mode Gelap': 'Mode Gelap',
       'Dashboard': 'Dashboard',
       'Tambah Anak': 'Tambah Anak',
+      'Edukasi': 'Edukasi',
+      'sidebar.education': 'Edukasi Tumbuh Kembang',
       
       'app.back_to_dashboard': 'Kembali ke Dashboard',
       'app.save_error': 'Gagal menyimpan hasil. Silakan coba lagi.',
@@ -182,6 +184,8 @@ const resources = {
       'Mode Gelap': 'Dark Mode',
       'Dashboard': 'Dashboard',
       'Tambah Anak': 'Add Child',
+      'Edukasi': 'Education',
+      'sidebar.education': 'Child Education Hub',
   
       'app.back_to_dashboard': 'Back to Dashboard',
       'app.save_error': 'Failed to save result. Please try again.',

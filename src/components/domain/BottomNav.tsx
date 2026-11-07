@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ClipboardCheck, TrendingUp, MessageSquare, User, Baby } from 'lucide-react';
+import { Activity, ClipboardCheck, MessageSquare, User } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -31,11 +31,9 @@ export default function BottomNav({
     { id: 'chat' as BottomNavTab, label: t('sidebar.chat'), icon: MessageSquare, badge: unreadCount },
     { id: 'profile' as BottomNavTab, label: t('Profil'), icon: User }
   ] : [
-    { id: 'dashboard' as BottomNavTab, label: 'Beranda', icon: Activity },
     { id: 'screening' as BottomNavTab, label: 'Skrining', icon: ClipboardCheck },
-    { id: 'growth' as BottomNavTab, label: 'Tumbuh', icon: TrendingUp },
-    { id: 'chat' as BottomNavTab, label: 'Konsultasi', icon: MessageSquare, badge: unreadCount },
-    { id: 'profile' as BottomNavTab, label: 'Profil', icon: User }
+    { id: 'dashboard' as BottomNavTab, label: 'Beranda', icon: Activity },
+    { id: 'chat' as BottomNavTab, label: 'Konsultasi', icon: MessageSquare, badge: unreadCount }
   ];
 
   return (

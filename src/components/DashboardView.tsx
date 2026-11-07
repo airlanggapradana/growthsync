@@ -8,7 +8,7 @@ import {
   Baby, LineChart, Play, ChevronRight, Calculator, Ruler, Scale, History, 
   CheckCircle2, AlertCircle, Activity, ChevronDown, Plus, ArrowUpRight, 
   Bell, AlertTriangle, Map as MapIcon, Edit3, Trash2, Save, X, CircleDot, 
-  Download, RotateCcw, Calendar, FileText, Sparkles, User, Info, ArrowRight
+  Download, RotateCcw, Calendar, FileText, Sparkles, User, Info, ArrowRight, BookOpen
 } from 'lucide-react';
 import { format, differenceInMonths } from 'date-fns';
 import { id as idLocale, enUS } from 'date-fns/locale';
@@ -54,7 +54,8 @@ export default function DashboardView({
   onAddProfile, 
   onStartQuestionnaire,
   onViewHistoryDetail,
-  onUpdateProfile
+  onUpdateProfile,
+  onOpenEdukasi
 }: { 
   key?: string;
   profiles: ChildProfile[];
@@ -65,6 +66,7 @@ export default function DashboardView({
   onStartQuestionnaire: (age: AgeCategory) => void;
   onViewHistoryDetail: (history: QuestionnaireResult) => void;
   onUpdateProfile?: (profile: ChildProfile) => void;
+  onOpenEdukasi?: () => void;
 }) {
   const [history, setHistory] = useState<QuestionnaireResult[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -926,6 +928,45 @@ export default function DashboardView({
                </button>
             </div>
          </div>
+      </div>
+
+      {/* Fitur Edukasi & Rekomendasi Stimulasi Tumbuh Kembang Spotlight Card */}
+      <div className="bg-gradient-to-r from-teal-900/5 via-emerald-900/5 to-slate-50 dark:from-teal-950/40 dark:via-emerald-950/20 dark:to-[#111A2B] rounded-3xl p-6 sm:p-8 border border-teal-100 dark:border-teal-900/50 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#0F766E] text-white flex items-center justify-center shrink-0 shadow-md">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] font-bold text-[#0F766E] dark:text-teal-400 uppercase tracking-wider">
+                {language === 'en' ? 'Child Development Hub' : 'Fitur Edukasi & Stimulasi'}
+              </span>
+              <span className="text-slate-300 dark:text-slate-700">·</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                {language === 'en' ? 'KPSP Kemenkes RI Standard' : 'Standar Kemenkes RI'}
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight">
+              {language === 'en' ? 'Parenting Guidance & Recommended Activities' : 'Panduan Stimulasi & Rekomendasi Aktivitas Orang Tua'}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              {language === 'en'
+                ? 'Explore customized parenting tips, aspect-based home activities, and trusted medical resources from Kemenkes RI, IDAI, WHO, and UNICEF.'
+                : 'Temukan rekomendasi aktivitas fisik, bicara, kemandirian, dan panduan resmi dari Kemenkes RI, IDAI, WHO, dan UNICEF sesuai kategori hasil skrining (Sesuai, Meragukan, atau Penyimpangan).'}
+            </p>
+          </div>
+        </div>
+
+        {onOpenEdukasi && (
+          <button
+            type="button"
+            onClick={onOpenEdukasi}
+            className="w-full md:w-auto h-11 px-5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shrink-0 cursor-pointer active:scale-98"
+          >
+            <span>{language === 'en' ? 'Explore Education Hub' : 'Buka Panduan Edukasi'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <PuskesmasMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />

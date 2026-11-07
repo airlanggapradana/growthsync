@@ -13,6 +13,8 @@ import ScoreRing from './domain/ScoreRing';
 import AspectCard from './domain/AspectCard';
 import DisclaimerNote from './domain/DisclaimerNote';
 import PuskesmasMapModal from './PuskesmasMapModal';
+import EdukasiTumbuhKembang from './EdukasiTumbuhKembang';
+import { EDUKASI_CATEGORIES } from '../data/edukasiData';
 
 const categoryI18nKeyMap: Record<string, string> = {
   "Gerak Kasar": "questionnaire.category.gross_motor",
@@ -403,6 +405,13 @@ export default function ResultView({
         </div>
       </div>
 
+      {/* Fitur Edukasi & Rekomendasi Aktivitas Orang Tua Berdasarkan Kategori Skrining */}
+      <EdukasiTumbuhKembang 
+        initialCategory={kpspStatus} 
+        isEmbeddedInResult={true} 
+        onGoToChat={onGoToChat} 
+      />
+
       {/* Medical Disclaimer per Design System */}
       <DisclaimerNote />
 
@@ -483,6 +492,27 @@ export default function ResultView({
                 <div className="text-5xl font-extrabold mb-2" style={{ color: '#1e293b' }}>{totalScore}<span className="text-xl" style={{ color: '#94a3b8' }}>/10</span></div>
                 <div className="font-bold text-lg mb-1" style={{ color: '#0F766E' }}>{statusTitle}</div>
                 <p className="text-xs px-4" style={{ color: '#475569' }}>{statusSubtitle}</p>
+             </div>
+           </div>
+
+           {/* Edukasi & Rekomendasi Stimulasi di PDF */}
+           <div className="mb-8 p-6 rounded-xl border" style={{ backgroundColor: '#f0fdf4', borderColor: '#dcfce7' }}>
+             <h3 className="text-base font-bold mb-3" style={{ color: '#166534' }}>
+               Panduan Stimulasi & Rekomendasi Aktivitas ({EDUKASI_CATEGORIES[kpspStatus].title})
+             </h3>
+             <p className="text-xs mb-3 leading-relaxed" style={{ color: '#14532d' }}>
+               {language === 'en' ? EDUKASI_CATEGORIES[kpspStatus].summaryEn : EDUKASI_CATEGORIES[kpspStatus].summary}
+             </p>
+             <div className="space-y-2 mb-4">
+               {EDUKASI_CATEGORIES[kpspStatus].recommendedActivities.slice(0, 3).map((act, idx) => (
+                 <div key={idx} className="p-3 rounded-lg border text-xs" style={{ backgroundColor: '#ffffff', borderColor: '#bbf7d0' }}>
+                   <strong style={{ color: '#166534' }}>{language === 'en' ? act.titleEn : act.title} ({language === 'en' ? act.aspectLabelEn : act.aspectLabel}): </strong>
+                   <span style={{ color: '#334155' }}>{language === 'en' ? act.descriptionEn : act.description}</span>
+                 </div>
+               ))}
+             </div>
+             <div className="text-[11px] pt-3 border-t" style={{ borderColor: '#bbf7d0', color: '#166534' }}>
+               <strong>Sumber Daya Resmi Tepercaya:</strong> Buku KIA Kemenkes RI (ayosehat.kemkes.go.id), Ikatan Dokter Anak Indonesia (idai.or.id), WHO Child Standards, dan UNICEF Indonesia.
              </div>
            </div>
 

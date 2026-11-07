@@ -47,7 +47,11 @@ import {
   Loader2,
   User,
   RefreshCw,
-  Languages
+  Languages,
+  Lock,
+  AlertCircle,
+  Info,
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import dayjs from 'dayjs';
@@ -353,7 +357,38 @@ const KONSULTASI_I18N = {
     emptySelectPromptDesc: 'Pilih kontak tenaga kesehatan atau orang tua di daftar sebelah kiri untuk membuka percakapan konsultasi langsung dari database.',
     medicalEncryptedBadge: 'Terenkripsi Medis',
     youBadge: 'Anda',
-    cameraOffBadge: 'Kamera Mati'
+    cameraOffBadge: 'Kamera Mati',
+    badgeNeedReferral: 'Perlu Rujukan',
+    badgeNotReferred: 'Bukan Nakes Rujukan',
+    lockedChatBannerTitle: 'Konsultasi Terkunci: Khusus Nakes Rujukan',
+    lockedChatBannerDesc: 'Sesuai regulasi medis resmi, pasien hanya dapat melakukan interaksi chat klinis kepada Tenaga Kesehatan yang telah merujuk dan mendampingi ananda. Rujukan diterbitkan langsung oleh pihak Tenaga Kesehatan, bukan dari pasien.',
+    noReferralAlertTitle: 'Belum Ada Nakes Rujukan',
+    noReferralAlertDesc: 'Surat rujukan klinis hanya dapat diterbitkan langsung oleh Tenaga Kesehatan pendamping (dokter/bidan/posyandu) berdasarkan hasil evaluasi tumbuh kembang atau skrining KPSP. Pasien tidak dapat memilih nakes rujukan secara mandiri.',
+    switchToReferredAction: 'Buka Chat Nakes Rujukan',
+    callRestricted: 'Panggilan suara dan telekonsultasi hanya dapat dilakukan kepada Tenaga Medis rujukan pendamping ananda.',
+    officialReferralTitle: 'Tenaga Medis Rujukan Resmi Terverifikasi',
+    officialReferralDesc: 'Anda terhubung langsung dengan Nakes rujukan pendamping ananda untuk pemantauan tumbuh kembang dan konsultasi klinis.',
+    awaitingNakesReferral: 'Menunggu Surat Rujukan dari Nakes',
+    awaitingNakesReferralNote: 'Tenaga Kesehatan wilayah/Posyandu akan meninjau kondisi ananda dan menerbitkan rujukan pendampingan secara langsung.',
+    parentHeaderTitle: 'Nakes Rujukan Anda',
+    parentHeaderSubtitle: 'Komunikasi privat dengan dokter / bidan pendamping',
+    emptyReferralTitle: 'Belum Ada Nakes Rujukan',
+    emptyReferralSubtitle: 'Layanan konsultasi chat langsung hanya tersedia untuk Tenaga Medis (Dokter/Bidan) yang telah memberikan rujukan pendampingan resmi untuk ananda.',
+    howToGetReferralTitle: 'Alur Penerbitan Rujukan:',
+    step1Title: 'Skrining KPSP Balita',
+    step1Desc: 'Lakukan skrining berkala 10 pertanyaan perkembangan anak di menu Dashboard.',
+    step2Title: 'Tinjauan Klinis Nakes',
+    step2Desc: 'Tenaga Medis Posyandu/Puskesmas memeriksa hasil evaluasi dan kurva pertumbuhan.',
+    step3Title: 'Rujukan Otomatis Terhubung',
+    step3Desc: 'Nakes menerbitkan rujukan dan ruang chat konsultasi langsung otomatis terbuka.',
+    backToDashboardAction: 'Buka Dashboard & Skrining',
+    referralOnlyBadge: 'Khusus Rujukan Resmi',
+    featureKmsTitle: 'Evaluasi Kurva KMS',
+    featureKmsDesc: 'Pantau grafik berat dan tinggi badan bersama dokter anak / bidan pendamping.',
+    featureKpspTitle: 'Bimbingan Skrining KPSP',
+    featureKpspDesc: 'Konsultasikan stimulasi 4 aspek perkembangan bila ada indikasi meragukan.',
+    featureCallTitle: 'Telemedis Terjadwal',
+    featureCallDesc: 'Sesi panggilan suara dan telekonsultasi sesuai jam praktik resmi.'
   },
   en: {
     headerTitle: 'Health Worker Consultation',
@@ -428,7 +463,38 @@ const KONSULTASI_I18N = {
     emptySelectPromptDesc: 'Select a health worker or parent contact on the left to start a direct consultation from the database.',
     medicalEncryptedBadge: 'Medically Encrypted',
     youBadge: 'You',
-    cameraOffBadge: 'Camera Off'
+    cameraOffBadge: 'Camera Off',
+    badgeNeedReferral: 'Referral Required',
+    badgeNotReferred: 'Not Referred Worker',
+    lockedChatBannerTitle: 'Consultation Locked: Referred Nakes Only',
+    lockedChatBannerDesc: 'Under clinical medical regulations, patients can only chat with the official health worker who directly assigned a referral to supervise your child. Referrals are strictly issued by health workers.',
+    noReferralAlertTitle: 'No Referred Health Worker Yet',
+    noReferralAlertDesc: 'Clinical referrals can only be directly issued by your healthcare provider (doctor/midwife/health center) based on child evaluation or KPSP screening. Parents cannot assign referrals themselves.',
+    switchToReferredAction: 'Open Referred Chat',
+    callRestricted: 'Voice and video calls are strictly restricted to your officially assigned referral health worker.',
+    officialReferralTitle: 'Official Verified Referral Health Worker',
+    officialReferralDesc: 'You are directly connected with your assigned referral health worker for developmental monitoring and clinical consultation.',
+    awaitingNakesReferral: 'Awaiting Referral from Health Worker',
+    awaitingNakesReferralNote: 'Your local health worker or health post will review your child\'s records and issue an official referral directly.',
+    parentHeaderTitle: 'Your Referred Health Worker',
+    parentHeaderSubtitle: 'Private consultation with your assigned doctor/midwife',
+    emptyReferralTitle: 'No Referred Health Worker Yet',
+    emptyReferralSubtitle: 'Direct chat consultation is exclusively available for health workers who have officially issued a referral to supervise your child.',
+    howToGetReferralTitle: 'Referral Issuance Flow:',
+    step1Title: 'Toddler KPSP Screening',
+    step1Desc: 'Complete periodic 10-question development questionnaires on the Dashboard.',
+    step2Title: 'Clinical Review by Health Worker',
+    step2Desc: 'Health center / Posyandu doctors review the growth evaluation data.',
+    step3Title: 'Automatic Referral Connection',
+    step3Desc: 'Your health worker claims the referral and direct chat unlocks right here.',
+    backToDashboardAction: 'Open Dashboard & Screening',
+    referralOnlyBadge: 'Official Referral Only',
+    featureKmsTitle: 'KMS Growth Curve Evaluation',
+    featureKmsDesc: 'Monitor weight and height curves directly with your assigned pediatrician / midwife.',
+    featureKpspTitle: 'KPSP Screening Guidance',
+    featureKpspDesc: 'Consult 4 developmental aspects stimulation if any milestones are in doubt.',
+    featureCallTitle: 'Scheduled Telemedicine',
+    featureCallDesc: 'Direct voice and video consultations during official health facility service hours.'
   }
 };
 
@@ -468,6 +534,12 @@ export default function KonsultasiNakesView({
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [selectedContact, setSelectedContact] = useState<ContactItem | null>(() => {
     if (initialTargetUser) {
+      if (currentUser.role === 'orang_tua') {
+        const assignedId = currentUser.assignedNakesId;
+        if (!assignedId || (assignedId !== initialTargetUser.uid && (initialTargetUser as any).id !== assignedId)) {
+          return null;
+        }
+      }
       return {
         id: initialTargetUser.uid,
         uid: initialTargetUser.uid,
@@ -479,7 +551,8 @@ export default function KonsultasiNakesView({
           : getNakesPlaceholder('dokter', (initialTargetUser as any).name),
         lastMessage: 'Memulai sesi konsultasi...',
         timestamp: '',
-        online: Boolean((initialTargetUser as any).isOnline)
+        online: Boolean((initialTargetUser as any).isOnline),
+        isAssignedNakes: true
       };
     }
     return null;
@@ -499,6 +572,23 @@ export default function KonsultasiNakesView({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [voiceSeconds, setVoiceSeconds] = useState(0);
+
+  // Live Referral & Assignment state (managed authoritatively by healthcare providers)
+  const [liveAssignedNakesId, setLiveAssignedNakesId] = useState<string | null>(currentUser.assignedNakesId || null);
+
+  // Keep current user's assigned referral in sync live with Firestore
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    const unsub = onSnapshot(doc(db, 'users', currentUser.uid), (docSnap) => {
+      if (docSnap.exists()) {
+        const d = docSnap.data();
+        if (d.assignedNakesId !== undefined) {
+          setLiveAssignedNakesId(d.assignedNakesId || null);
+        }
+      }
+    });
+    return () => unsub();
+  }, [currentUser?.uid]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -531,11 +621,12 @@ export default function KonsultasiNakesView({
         }));
 
         // If current user is parent with an assigned nakes, ensure the assigned nakes is included
-        if (currentUser.role === 'orang_tua' && currentUser.assignedNakesId) {
-          const alreadyHas = userDocs.some(u => u.data.uid === currentUser.assignedNakesId || u.docId === currentUser.assignedNakesId);
+        const effectiveAssignedNakesId = currentUser.role === 'orang_tua' ? liveAssignedNakesId : currentUser.assignedNakesId;
+        if (currentUser.role === 'orang_tua' && effectiveAssignedNakesId) {
+          const alreadyHas = userDocs.some(u => u.data.uid === effectiveAssignedNakesId || u.docId === effectiveAssignedNakesId);
           if (!alreadyHas) {
             try {
-              const assignedSnap = await getDoc(doc(db, 'users', currentUser.assignedNakesId));
+              const assignedSnap = await getDoc(doc(db, 'users', effectiveAssignedNakesId));
               if (assignedSnap.exists()) {
                 userDocs.unshift({
                   docId: assignedSnap.id,
@@ -600,7 +691,7 @@ export default function KonsultasiNakesView({
         const dbContacts: ContactItem[] = userDocs.map(({ docId, data }, idx) => {
           const uid = data.uid || docId;
           const isAssigned = currentUser.role === 'orang_tua' 
-            ? currentUser.assignedNakesId === uid
+            ? Boolean(liveAssignedNakesId && (liveAssignedNakesId === uid || liveAssignedNakesId === docId))
             : data.assignedNakesId === currentUser.uid;
 
           const msgMeta = messageMetaMap[uid];
@@ -621,7 +712,7 @@ export default function KonsultasiNakesView({
           const roleDisplay = currentUser.role === 'nakes'
             ? (childMap[uid] ? `Orang Tua • Balita: ${childMap[uid]}` : 'Orang Tua Balita')
             : (isAssigned 
-                ? 'Nakes Pendamping Anda (Utama)' 
+                ? (language === 'en' ? 'Official Referral Health Worker' : 'Nakes Rujukan Anda (Aktif)')
                 : (data.sip ? `Tenaga Medis (SIP: ${data.sip})` : (data.isVerified ? 'Tenaga Medis Terverifikasi' : 'Tenaga Kesehatan')));
 
           // Avatar assignment: every nakes strictly uses the standardized placeholder
@@ -699,6 +790,10 @@ export default function KonsultasiNakesView({
 
         // Update selected contact
         setSelectedContact(prev => {
+          if (currentUser.role === 'orang_tua') {
+            const assigned = dbContacts.find(c => c.isAssignedNakes);
+            return assigned || null;
+          }
           if (initialTargetUser) {
             const foundInitial = dbContacts.find(c => c.uid === initialTargetUser.uid);
             if (foundInitial) return foundInitial;
@@ -707,8 +802,7 @@ export default function KonsultasiNakesView({
             const foundExisting = dbContacts.find(c => c.uid === prev.uid || c.id === prev.id);
             if (foundExisting) return foundExisting;
           }
-          const assigned = dbContacts.find(c => c.isAssignedNakes);
-          return assigned || dbContacts[0] || null;
+          return dbContacts[0] || null;
         });
 
       } catch (err) {
@@ -820,7 +914,16 @@ export default function KonsultasiNakesView({
     return () => clearInterval(timer);
   }, [isRecordingVoice]);
 
+  // Referral states for patient (orang_tua)
+  const referredContact = React.useMemo(() => {
+    if (currentUser.role !== 'orang_tua') return null;
+    return contacts.find(c => c.isAssignedNakes) || null;
+  }, [contacts, currentUser.role]);
+
+  const isChatAllowed = currentUser.role !== 'orang_tua' || Boolean(selectedContact?.isAssignedNakes);
+
   const handleSendMessage = async (customText?: string) => {
+    if (!isChatAllowed) return;
     const textToSend = (customText || inputText).trim();
     if (!textToSend) return;
 
@@ -856,6 +959,7 @@ export default function KonsultasiNakesView({
   };
 
   const handleVoiceSend = async () => {
+    if (!isChatAllowed) return;
     setIsRecordingVoice(false);
     const durationFormatted = `0:${voiceSeconds < 10 ? '0' : ''}${voiceSeconds}`;
     const voiceMsg: ChatMessage = {
@@ -892,6 +996,7 @@ export default function KonsultasiNakesView({
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isChatAllowed) return;
     const file = e.target.files?.[0];
     if (!file) return;
     const isImg = file.type.startsWith('image/');
@@ -903,8 +1008,12 @@ export default function KonsultasiNakesView({
 
   const onlineCount = contacts.filter(c => c.online).length;
 
-  // Filter contacts
+  // Filter contacts: for patients (orang_tua), strictly show only the officially referred health worker
   const filteredContacts = contacts.filter(c => {
+    if (currentUser.role === 'orang_tua') {
+      return Boolean(c.isAssignedNakes);
+    }
+
     const matchesSearch = 
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       c.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -936,10 +1045,10 @@ export default function KonsultasiNakesView({
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
                 <Stethoscope className="w-5 h-5 text-[#1b4332] dark:text-emerald-400" />
-                {txt.headerTitle}
+                {currentUser.role === 'orang_tua' ? txt.parentHeaderTitle : txt.headerTitle}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {txt.headerSubtitle}
+                {currentUser.role === 'orang_tua' ? txt.parentHeaderSubtitle : txt.headerSubtitle}
               </p>
             </div>
             
@@ -984,53 +1093,77 @@ export default function KonsultasiNakesView({
             </div>
           </div>
 
-
-          {/* Search Box */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input 
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={txt.searchPlaceholder}
-              className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2.5 text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#1b4332]/20 dark:focus:ring-emerald-500/20 transition-all"
-            />
-            {searchQuery && (
-              <button 
-                type="button" 
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar pt-1">
-            {[
-              { id: 'all', label: txt.categories.all },
-              { id: 'online', label: `🟢 Online (${onlineCount})` },
-              { id: 'dokter', label: txt.categories.dokter },
-              { id: 'bidan', label: txt.categories.bidan },
-              { id: 'gizi', label: txt.categories.gizi },
-              { id: 'posyandu', label: txt.categories.posyandu }
-            ].map(tab => (
-              <button
-                type="button"
-                key={tab.id}
-                onClick={() => setFilterCategory(tab.id as any)}
-                className={cn(
-                  "text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap",
-                  filterCategory === tab.id
-                    ? "bg-[#1b4332] text-white shadow-xs"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+          {currentUser.role === 'nakes' ? (
+            <>
+              {/* Search Box */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input 
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={txt.searchPlaceholder}
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2.5 text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#1b4332]/20 dark:focus:ring-emerald-500/20 transition-all"
+                />
+                {searchQuery && (
+                  <button 
+                    type="button" 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar pt-1">
+                {[
+                  { id: 'all', label: txt.categories.all },
+                  { id: 'online', label: `🟢 Online (${onlineCount})` },
+                  { id: 'dokter', label: txt.categories.dokter },
+                  { id: 'bidan', label: txt.categories.bidan },
+                  { id: 'gizi', label: txt.categories.gizi },
+                  { id: 'posyandu', label: txt.categories.posyandu }
+                ].map(tab => (
+                  <button
+                    type="button"
+                    key={tab.id}
+                    onClick={() => setFilterCategory(tab.id as any)}
+                    className={cn(
+                      "text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap",
+                      filterCategory === tab.id
+                        ? "bg-[#1b4332] text-white shadow-xs"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                {txt.referralOnlyBadge}
+              </span>
+              {referredContact ? (
+                <span className={cn(
+                  "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                  referredContact.online 
+                    ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                )}>
+                  {referredContact.online ? 'Online' : 'Offline'}
+                </span>
+              ) : (
+                <span className="text-[10px] bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-semibold px-2 py-0.5 rounded-full">
+                  {txt.awaitingNakesReferral}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Contacts List Card (Direct Database Integration) */}
@@ -1038,7 +1171,7 @@ export default function KonsultasiNakesView({
           <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2 py-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              {txt.databaseContacts} ({filteredContacts.length})
+              {currentUser.role === 'orang_tua' ? txt.parentHeaderTitle : `${txt.databaseContacts} (${filteredContacts.length})`}
             </span>
             <div className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -1055,17 +1188,59 @@ export default function KonsultasiNakesView({
               <span className="text-[10px] text-slate-400">{txt.syncingDb}</span>
             </div>
           ) : filteredContacts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2.5 text-slate-400">
-                <Users className="w-6 h-6" />
+            currentUser.role === 'orang_tua' ? (
+              <div className="flex flex-col items-center justify-center py-6 px-2 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-950/60 dark:to-teal-950/60 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center mb-3 text-[#1b4332] dark:text-emerald-400 shadow-xs">
+                  <Stethoscope className="w-7 h-7" />
+                </div>
+                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">
+                  {txt.emptyReferralTitle}
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+                  {txt.emptyReferralSubtitle}
+                </p>
+
+                {/* 3 Step Guidance */}
+                <div className="w-full text-left space-y-2 mb-4 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
+                  <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                    {txt.howToGetReferralTitle}
+                  </div>
+                  <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-4 h-4 rounded-full bg-[#1b4332] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+                    <span>{txt.step1Desc}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-4 h-4 rounded-full bg-[#1b4332] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+                    <span>{txt.step2Desc}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-4 h-4 rounded-full bg-[#1b4332] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+                    <span>{txt.step3Desc}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onBackToDashboard}
+                  className="w-full py-2.5 px-3 bg-[#1b4332] hover:bg-[#2d6a4f] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                >
+                  <span>{txt.backToDashboardAction}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
-                {currentUser.role === 'nakes' ? txt.emptyParents : txt.emptyNakes}
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[220px] leading-relaxed">
-                {currentUser.role === 'nakes' ? txt.emptyParentsDesc : txt.emptyNakesDesc}
-              </p>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 px-3 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2.5 text-slate-400">
+                  <Users className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
+                  {txt.emptyParents}
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[220px] leading-relaxed">
+                  {txt.emptyParentsDesc}
+                </p>
+              </div>
+            )
           ) : (
             filteredContacts.map(contact => {
               const isSelected = selectedContact?.id === contact.id || selectedContact?.uid === contact.uid;
@@ -1129,10 +1304,18 @@ export default function KonsultasiNakesView({
                           Offline
                         </span>
                       )}
-                      {contact.isAssignedNakes && (
-                        <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold px-1.5 py-0.2 rounded-full shrink-0">
+                      {contact.isAssignedNakes ? (
+                        <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold px-1.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 border border-emerald-200/80 dark:border-emerald-800">
+                          <ShieldCheck className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
                           {currentUser.role === 'nakes' ? txt.badgeYourPatient : txt.badgeYourNakes}
                         </span>
+                      ) : (
+                        currentUser.role === 'orang_tua' && (
+                          <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium px-1.5 py-0.5 rounded-full shrink-0 flex items-center gap-0.5 border border-slate-200/60 dark:border-slate-700">
+                            <Lock className="w-2.5 h-2.5 text-slate-400" />
+                            {txt.badgeNeedReferral}
+                          </span>
+                        )
                       )}
                     </div>
 
@@ -1163,51 +1346,175 @@ export default function KonsultasiNakesView({
         )}
       >
         {!selectedContact ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/60 dark:bg-slate-950/40 relative">
-            {/* Language Toggle in Empty State */}
-            <div 
-              className="absolute top-4 right-4 flex items-center bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
-              role="group"
-              aria-label={txt.languageToggleTitle}
-            >
-              <button
-                type="button"
-                onClick={() => setLanguage('id')}
-                className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
-                  language === 'id'
-                    ? "bg-[#1b4332] text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                )}
-                title="Bahasa Indonesia"
+          currentUser.role === 'orang_tua' ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-gradient-to-b from-slate-50/70 via-white to-slate-50/50 dark:from-slate-950/60 dark:via-slate-900 dark:to-slate-950/80 relative overflow-y-auto">
+              {/* Language Toggle in Top-Right */}
+              <div 
+                className="absolute top-4 right-4 flex items-center bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                role="group"
+                aria-label={txt.languageToggleTitle}
               >
-                <span>🇮🇩 ID</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage('en')}
-                className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
-                  language === 'en'
-                    ? "bg-[#1b4332] text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                )}
-                title="English"
-              >
-                <span>🇬🇧 EN</span>
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('id')}
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                    language === 'id'
+                      ? "bg-[#1b4332] text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  )}
+                  title="Bahasa Indonesia"
+                >
+                  <span className="text-[10px]">🇮🇩</span>
+                  <span>ID</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                    language === 'en'
+                      ? "bg-[#1b4332] text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  )}
+                  title="English"
+                >
+                  <span className="text-[10px]">🇬🇧</span>
+                  <span>EN</span>
+                </button>
+              </div>
 
-            <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center mb-4 text-[#1b4332] dark:text-emerald-400">
-              <MessageSquare className="w-8 h-8" />
+              {/* Hero Icon with glowing badge */}
+              <div className="relative mb-4 mt-6 sm:mt-0">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#1b4332] to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-900/20">
+                  <Stethoscope className="w-10 h-10" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-900 p-0.5 shadow-md flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                {txt.referralOnlyBadge}
+              </span>
+
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-50 tracking-tight mb-2 max-w-lg">
+                {txt.emptyReferralTitle}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md leading-relaxed mb-6">
+                {txt.emptyReferralSubtitle}
+              </p>
+
+              {/* Feature Preview Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl w-full mb-6 text-left">
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center mb-2.5">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-1">
+                    {txt.featureKmsTitle}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {txt.featureKmsDesc}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-2.5">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-1">
+                    {txt.featureKpspTitle}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {txt.featureKpspDesc}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mb-2.5">
+                    <Video className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-1">
+                    {txt.featureCallTitle}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {txt.featureCallDesc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Referral Notice */}
+              <div className="max-w-xl w-full p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-900/60 rounded-2xl flex items-start gap-3 text-left mb-6 shadow-2xs">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
+                  <span className="font-bold block mb-0.5">{txt.noReferralAlertTitle}</span>
+                  {txt.noReferralAlertDesc}
+                </div>
+              </div>
+
+              {/* CTA Button to return to Dashboard */}
+              <button
+                type="button"
+                onClick={onBackToDashboard}
+                className="py-3 px-6 bg-[#1b4332] hover:bg-[#2d6a4f] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
+              >
+                <span>{txt.backToDashboardAction}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
-              {txt.emptySelectPromptTitle}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
-              {txt.emptySelectPromptDesc}
-            </p>
-          </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/60 dark:bg-slate-950/40 relative">
+              {/* Language Toggle in Empty State */}
+              <div 
+                className="absolute top-4 right-4 flex items-center bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                role="group"
+                aria-label={txt.languageToggleTitle}
+              >
+                <button
+                  type="button"
+                  onClick={() => setLanguage('id')}
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                    language === 'id'
+                      ? "bg-[#1b4332] text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  )}
+                  title="Bahasa Indonesia"
+                >
+                  <span className="text-[10px]">🇮🇩</span>
+                  <span>ID</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
+                    language === 'en'
+                      ? "bg-[#1b4332] text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  )}
+                  title="English"
+                >
+                  <span className="text-[10px]">🇬🇧</span>
+                  <span>EN</span>
+                </button>
+              </div>
+
+              <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center mb-4 text-[#1b4332] dark:text-emerald-400">
+                <MessageSquare className="w-8 h-8" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+                {txt.emptySelectPromptTitle}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+                {txt.emptySelectPromptDesc}
+              </p>
+            </div>
+          )
         ) : (
           <>
             {/* Chat Window Header */}
@@ -1250,8 +1557,18 @@ export default function KonsultasiNakesView({
                     className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-50 cursor-pointer hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 truncate"
                   >
                     <span className="truncate">{selectedContact.name}</span>
-                    {selectedContact.isAssignedNakes && (
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 inline" />
+                    {selectedContact.isAssignedNakes ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] border border-emerald-200/80 dark:border-emerald-800 shrink-0">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{currentUser.role === 'nakes' ? txt.badgeYourPatient : txt.badgeYourNakes}</span>
+                      </span>
+                    ) : (
+                      currentUser.role === 'orang_tua' && (
+                        <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-300 font-bold bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] border border-amber-200 dark:border-amber-800 shrink-0">
+                          <Lock className="w-3 h-3 text-amber-600" />
+                          <span>{txt.badgeNotReferred}</span>
+                        </span>
+                      )
                     )}
                   </h2>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center gap-1.5">
@@ -1310,25 +1627,39 @@ export default function KonsultasiNakesView({
 
             <button
               type="button"
+              disabled={!isChatAllowed}
               onClick={() => {
+                if (!isChatAllowed) return;
                 setActiveCall('audio');
                 setIsMuted(false);
               }}
-              title={txt.callVoice}
-              className="p-2 sm:p-2.5 text-slate-600 dark:text-slate-300 hover:text-[#1b4332] hover:bg-[#1b4332]/10 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 rounded-xl transition-all"
+              title={!isChatAllowed ? txt.callRestricted : txt.callVoice}
+              className={cn(
+                "p-2 sm:p-2.5 rounded-xl transition-all",
+                isChatAllowed 
+                  ? "text-slate-600 dark:text-slate-300 hover:text-[#1b4332] hover:bg-[#1b4332]/10 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30"
+                  : "text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40"
+              )}
             >
               <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             <button
               type="button"
+              disabled={!isChatAllowed}
               onClick={() => {
+                if (!isChatAllowed) return;
                 setActiveCall('video');
                 setIsMuted(false);
                 setIsVideoOff(false);
               }}
-              title={txt.callVideo}
-              className="p-2 sm:p-2.5 text-slate-600 dark:text-slate-300 hover:text-[#1b4332] hover:bg-[#1b4332]/10 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 rounded-xl transition-all"
+              title={!isChatAllowed ? txt.callRestricted : txt.callVideo}
+              className={cn(
+                "p-2 sm:p-2.5 rounded-xl transition-all",
+                isChatAllowed 
+                  ? "text-slate-600 dark:text-slate-300 hover:text-[#1b4332] hover:bg-[#1b4332]/10 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30"
+                  : "text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40"
+              )}
             >
               <Video className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -1345,7 +1676,6 @@ export default function KonsultasiNakesView({
         </header>
 
         {/* Chat Feed Area */}
-        {/* Chat Feed Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/60 dark:bg-slate-950/40">
           
           {/* Emergency Alert Banner - Mandatory per Design System 4.6 */}
@@ -1354,14 +1684,58 @@ export default function KonsultasiNakesView({
             <span>Chat ini bukan untuk kondisi darurat. Hubungi 119 atau datang ke IGD.</span>
           </div>
 
-          {/* Medical Notice Banner */}
-          <div className="max-w-lg mx-auto p-3 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 rounded-2xl text-center text-xs text-emerald-900 dark:text-emerald-300">
-            <span className="font-bold flex items-center justify-center gap-1.5 mb-0.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              {txt.verifiedNoticeTitle}
-            </span>
-            {txt.verifiedNoticeDesc}
-          </div>
+          {/* Referral Status Notice Banner */}
+          {selectedContact.isAssignedNakes ? (
+            <div className="max-w-lg mx-auto p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-center text-xs text-emerald-900 dark:text-emerald-300 shadow-xs">
+              <span className="font-bold flex items-center justify-center gap-1.5 mb-1 text-emerald-800 dark:text-emerald-200">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                {txt.officialReferralTitle}
+              </span>
+              <p className="text-[11px] leading-relaxed text-emerald-700 dark:text-emerald-400">
+                {txt.officialReferralDesc}
+              </p>
+            </div>
+          ) : (
+            currentUser.role === 'orang_tua' && (
+              <div className="max-w-lg mx-auto p-4 bg-amber-50/95 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 rounded-2xl text-amber-900 dark:text-amber-200 shadow-xs">
+                <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-amber-800 dark:text-amber-300 mb-1.5">
+                  <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>{txt.lockedChatBannerTitle}</span>
+                </div>
+                <p className="text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed mb-3">
+                  {txt.lockedChatBannerDesc}
+                </p>
+                
+                {/* Dynamic Actions */}
+                <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-amber-200/60 dark:border-amber-800/50">
+                  <button
+                    type="button"
+                    onClick={() => setShowInfoModal(true)}
+                    className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 rounded-xl border border-amber-200 dark:border-amber-700 hover:bg-amber-100/50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                    <span>{txt.practiceProfile}</span>
+                  </button>
+
+                  {referredContact ? (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedContact(referredContact)}
+                      className="text-xs font-bold px-3 py-1.5 bg-[#0F766E] text-white rounded-xl hover:bg-[#115E59] transition-colors flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Stethoscope className="w-3.5 h-3.5" />
+                      <span>{txt.switchToReferredAction} ({referredContact.name.split(',')[0]})</span>
+                    </button>
+                  ) : (
+                    <div className="w-full mt-1 p-2.5 bg-amber-100/70 dark:bg-amber-900/30 rounded-xl border border-amber-200/80 dark:border-amber-800/50 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1 shrink-0" />
+                      <span>{txt.awaitingNakesReferralNote}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          )}
 
           {/* Offline Health Worker Notice Banner */}
           {!selectedContact.online && (
@@ -1419,157 +1793,203 @@ export default function KonsultasiNakesView({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Consultation Chips */}
-        <div className="px-4 sm:px-6 py-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
-            {txt.quickQuestionsLabel}
-          </span>
-          {txt.quickQuestions.map((topic) => (
-            <button
-              type="button"
-              key={topic}
-              onClick={() => handleSendMessage(topic)}
-              className="text-xs font-medium px-3 py-1.5 bg-slate-100 hover:bg-[#1b4332]/10 dark:bg-slate-800 dark:hover:bg-emerald-950/50 text-slate-700 hover:text-[#1b4332] dark:text-slate-300 dark:hover:text-emerald-300 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200/60 dark:border-slate-700"
-            >
-              {topic}
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom Message Input Capsule Bar */}
-        <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSendMessage();
-            }}
-            className="bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl p-1.5 sm:p-2 pl-3 sm:pl-4 flex items-center gap-2 border border-slate-200 dark:border-slate-700 shadow-xs"
-          >
-            {/* Attachment Button */}
-            <input 
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              title={txt.attachTooltip}
-              className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors"
-            >
-              <Paperclip className="w-5 h-5" />
-            </button>
-
-            {/* Input Box */}
-            <input 
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder={txt.chatPlaceholder}
-              className="flex-1 bg-transparent border-none outline-none text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-            />
-
-            {/* Camera Button */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              title={txt.cameraTooltip}
-              className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors hidden sm:block"
-            >
-              <Camera className="w-5 h-5" />
-            </button>
-
-            {/* Emoji Button */}
-            <button
-              type="button"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              title="Emoji"
-              className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors relative"
-            >
-              <Smile className="w-5 h-5" />
-
-              {showEmojiPicker && (
-                <div 
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute bottom-12 right-0 bg-white dark:bg-slate-800 p-2.5 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 flex items-center gap-2 z-30"
-                >
-                  {['👍', '❤️', '👶', '🥛', '🍎', '🩺', '🙏', '😊'].map(emoji => (
-                    <button
-                      type="button"
-                      key={emoji}
-                      onClick={() => {
-                        setInputText(prev => prev + emoji);
-                        setShowEmojiPicker(false);
-                      }}
-                      className="text-base hover:scale-125 transition-transform p-1"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </button>
-
-            {/* Send / Microphone Button in Brand Green */}
-            {inputText.trim() ? (
-              <button
-                type="submit"
-                title={txt.sendMessageTooltip}
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105"
-              >
-                <Send className="w-4 h-4 ml-0.5" />
-              </button>
-            ) : (
+        {/* Quick Consultation Chips (Only when chat is allowed) */}
+        {isChatAllowed && (
+          <div className="px-4 sm:px-6 py-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+              {txt.quickQuestionsLabel}
+            </span>
+            {txt.quickQuestions.map((topic) => (
               <button
                 type="button"
-                onClick={() => {
-                  if (isRecordingVoice) {
-                    handleVoiceSend();
-                  } else {
-                    setIsRecordingVoice(true);
-                  }
-                }}
-                title={isRecordingVoice ? txt.sendVoiceTooltip : txt.recordVoiceTooltip}
-                className={cn(
-                  "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105",
-                  isRecordingVoice 
-                    ? "bg-rose-600 text-white animate-pulse" 
-                    : "bg-[#1b4332] hover:bg-[#143527] text-white"
-                )}
+                key={topic}
+                onClick={() => handleSendMessage(topic)}
+                className="text-xs font-medium px-3 py-1.5 bg-slate-100 hover:bg-[#1b4332]/10 dark:bg-slate-800 dark:hover:bg-emerald-950/50 text-slate-700 hover:text-[#1b4332] dark:text-slate-300 dark:hover:text-emerald-300 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200/60 dark:border-slate-700"
               >
-                <Mic className="w-4 h-4" />
+                {topic}
               </button>
-            )}
-          </form>
+            ))}
+          </div>
+        )}
 
-          {/* Voice recording alert */}
-          {isRecordingVoice && (
-            <div className="mt-2 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
-              <span className="flex items-center gap-2 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                {txt.recordingVoice} (0:{voiceSeconds < 10 ? '0' : ''}{voiceSeconds})
-              </span>
-              <div className="flex items-center gap-2">
+        {/* Bottom Message Input Capsule Bar vs Locked State */}
+        {isChatAllowed ? (
+          <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              className="bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl p-1.5 sm:p-2 pl-3 sm:pl-4 flex items-center gap-2 border border-slate-200 dark:border-slate-700 shadow-xs"
+            >
+              {/* Attachment Button */}
+              <input 
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                title={txt.attachTooltip}
+                className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors"
+              >
+                <Paperclip className="w-5 h-5" />
+              </button>
+
+              {/* Input Box */}
+              <input 
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder={txt.chatPlaceholder}
+                className="flex-1 bg-transparent border-none outline-none text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              />
+
+              {/* Camera Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                title={txt.cameraTooltip}
+                className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors hidden sm:block"
+              >
+                <Camera className="w-5 h-5" />
+              </button>
+
+              {/* Emoji Button */}
+              <button
+                type="button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                title="Emoji"
+                className="p-1.5 text-slate-500 hover:text-[#1b4332] dark:hover:text-emerald-400 transition-colors relative"
+              >
+                <Smile className="w-5 h-5" />
+
+                {showEmojiPicker && (
+                  <div 
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute bottom-12 right-0 bg-white dark:bg-slate-800 p-2.5 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 flex items-center gap-2 z-30"
+                  >
+                    {['👍', '❤️', '👶', '🥛', '🍎', '🩺', '🙏', '😊'].map(emoji => (
+                      <button
+                        type="button"
+                        key={emoji}
+                        onClick={() => {
+                          setInputText(prev => prev + emoji);
+                          setShowEmojiPicker(false);
+                        }}
+                        className="text-base hover:scale-125 transition-transform p-1"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </button>
+
+              {/* Send / Microphone Button in Brand Green */}
+              {inputText.trim() ? (
+                <button
+                  type="submit"
+                  title={txt.sendMessageTooltip}
+                  className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105"
+                >
+                  <Send className="w-4 h-4 ml-0.5" />
+                </button>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setIsRecordingVoice(false)}
-                  className="text-slate-500 hover:text-slate-800 text-[11px] underline"
+                  onClick={() => {
+                    if (isRecordingVoice) {
+                      handleVoiceSend();
+                    } else {
+                      setIsRecordingVoice(true);
+                    }
+                  }}
+                  title={isRecordingVoice ? txt.sendVoiceTooltip : txt.recordVoiceTooltip}
+                  className={cn(
+                    "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all shadow-sm shrink-0 hover:scale-105",
+                    isRecordingVoice 
+                      ? "bg-rose-600 text-white animate-pulse" 
+                      : "bg-[#1b4332] hover:bg-[#143527] text-white"
+                  )}
                 >
-                  {txt.cancel}
+                  <Mic className="w-4 h-4" />
                 </button>
-                <button
-                  type="button"
-                  onClick={handleVoiceSend}
-                  className="bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-[11px]"
-                >
-                  {txt.send}
-                </button>
+              )}
+            </form>
+
+            {/* Voice recording alert */}
+            {isRecordingVoice && (
+              <div className="mt-2 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
+                <span className="flex items-center gap-2 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                  {txt.recordingVoice} (0:{voiceSeconds < 10 ? '0' : ''}{voiceSeconds})
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsRecordingVoice(false)}
+                    className="text-slate-500 hover:text-slate-800 text-[11px] underline"
+                  >
+                    {txt.cancel}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleVoiceSend}
+                    className="bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-[11px]"
+                  >
+                    {txt.send}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 shrink-0">
+            <div className="bg-white dark:bg-slate-800 border border-amber-200/80 dark:border-amber-900/60 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200 dark:border-amber-800">
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate flex items-center gap-1.5">
+                    <span>{txt.lockedChatBannerTitle}</span>
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                    {referredContact 
+                      ? `${txt.badgeYourNakes}: ${referredContact.name}` 
+                      : txt.awaitingNakesReferral}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                {referredContact ? (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedContact(referredContact)}
+                    className="px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>{txt.switchToReferredAction}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowInfoModal(true)}
+                    className="px-3.5 py-2 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                    <span>{txt.practiceProfile}</span>
+                  </button>
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         </>
         )}
       </section>

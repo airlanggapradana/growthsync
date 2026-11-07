@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AgeCategory, Answer, ChildProfile, UserProfile } from './types';
 import { QUESTIONS_DATA, AGE_EQUIPMENT_DATA } from './data/questions';
 import { cn, formatIndonesianName } from './lib/utils';
-import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages, PanelLeftClose, PanelLeftOpen, Menu, X } from 'lucide-react';
+import { Baby, Info, CheckCircle2, AlertCircle, RefreshCcw, ArrowRight, Activity, Smile, ArrowLeft, Check, LogOut, Loader2, Sparkles, Moon, Sun, Users, MessageSquare, Download, MapPin, Languages, PanelLeftClose, PanelLeftOpen, Menu, X, BookOpen } from 'lucide-react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
@@ -19,11 +19,12 @@ import ParentChatList from './components/ParentChatList';
 import KonsultasiNakesView from './components/KonsultasiNakesView';
 import QuestionnaireView from './components/QuestionnaireView';
 import ResultView from './components/ResultView';
+import EdukasiTumbuhKembang from './components/EdukasiTumbuhKembang';
 import BottomNav from './components/domain/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import { applySEO, PAGE_SEO } from './lib/seo';
 
-type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
+type ViewState = 'HOME' | 'ONBOARDING' | 'DASHBOARD' | 'QUESTIONNAIRE' | 'RESULT' | 'HISTORY_DETAIL' | 'EDUKASI' | 'NAKES_DASHBOARD' | 'NAKES_CHAT' | 'PARENT_CHAT_LIST' | 'PARENT_CHAT' | 'ADMIN_DASHBOARD';
 
 export default function App() {
   const navigate = useNavigate();
@@ -344,6 +345,18 @@ export default function App() {
                  {userProfile?.role === 'orang_tua' && (
                    <button 
                      onClick={() => {
+                       setView('EDUKASI');
+                       setMobileMenuOpen(false);
+                     }}
+                     className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'EDUKASI' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                   >
+                     <BookOpen className={cn("w-5 h-5", view === 'EDUKASI' ? "text-white" : "opacity-70")} />
+                     {t('Edukasi')}
+                   </button>
+                 )}
+                 {userProfile?.role === 'orang_tua' && (
+                   <button 
+                     onClick={() => {
                        setView('PARENT_CHAT_LIST');
                        setMobileMenuOpen(false);
                      }}
@@ -538,6 +551,36 @@ export default function App() {
             )
           )}
 
+          {/* Edukasi Tumbuh Kembang */}
+          {userProfile?.role === 'orang_tua' && (
+            !isSidebarCollapsed ? (
+              <button 
+                onClick={() => setView('EDUKASI')}
+                className={cn("flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'EDUKASI' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+              >
+                <BookOpen className={cn("w-5 h-5", view === 'EDUKASI' ? "text-white" : "opacity-70")} />
+                <span>{t('Edukasi')}</span>
+              </button>
+            ) : (
+              <div className="relative group w-full flex justify-center">
+                <button 
+                  onClick={() => setView('EDUKASI')}
+                  className={cn(
+                    "w-11 h-11 flex items-center justify-center rounded-xl transition-all",
+                    view === 'EDUKASI' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}
+                  title={t('sidebar.education')}
+                  aria-label="Edukasi Tumbuh Kembang"
+                >
+                  <BookOpen className={cn("w-5 h-5", view === 'EDUKASI' ? "text-white" : "opacity-80")} />
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                  {t('sidebar.education')}
+                </div>
+              </div>
+            )
+          )}
+
           {/* Chat / Konsultasi */}
           {userProfile?.role === 'orang_tua' && (
             !isSidebarCollapsed ? (
@@ -685,7 +728,12 @@ export default function App() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Kuisioner Anak Logo" className="h-8 w-auto object-contain" />
+            <img 
+              src="https://res.cloudinary.com/airlanggapradana/image/upload/v1793887621/Smiling_Child_Growth_Healthcare_Logo_bwwi6q.png" 
+              alt="Kuisioner Anak Logo" 
+              className="h-9 w-auto object-contain" 
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 bg-slate-50 dark:bg-slate-800 rounded-lg">
@@ -783,6 +831,7 @@ export default function App() {
                 setView('HISTORY_DETAIL');
               }}
               onUpdateProfile={handleUpdateProfile}
+              onOpenEdukasi={() => setView('EDUKASI')}
             />
           )}
           {view === 'QUESTIONNAIRE' && age && (
@@ -841,6 +890,33 @@ export default function App() {
               }}
               isHistoryMode={true}
             />
+          )}
+          {view === 'EDUKASI' && (
+            <motion.div
+              key="edukasi"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+              className="max-w-5xl mx-auto pb-16 space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setView('DASHBOARD')}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>{t('app.back_to_dashboard')}</span>
+                </button>
+              </div>
+
+              <EdukasiTumbuhKembang 
+                initialCategory="sesuai"
+                isEmbeddedInResult={false}
+                onGoToChat={() => setView('PARENT_CHAT_LIST')}
+              />
+            </motion.div>
           )}
           {view === 'ADMIN_DASHBOARD' && userProfile && (
              <AdminDashboardView key="admin_dashboard" userProfile={userProfile} />
