@@ -356,6 +356,18 @@ async function startServer() {
 
   const SITE_URL = 'https://kindo.fun';
 
+  // ── Canonical domain redirect: www → non-www ────────────────────────────────
+  // Ensures Google always sees kindo.fun (non-www) as the canonical domain.
+  // This matches the GSC property and all canonical tags in the codebase.
+  app.use((req, res, next) => {
+    const host = req.hostname;
+    if (host && host.startsWith('www.')) {
+      const nonWwwHost = host.slice(4);
+      return res.redirect(301, `https://${nonWwwHost}${req.originalUrl}`);
+    }
+    next();
+  });
+
   // ── Static SEO files: registered FIRST, before ALL middleware ──────────────
   // Must be at the top so neither Vite nor express.static can intercept them.
   app.get('/sitemap.xml', (_req, res) => {

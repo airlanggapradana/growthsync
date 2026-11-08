@@ -6,7 +6,7 @@
   <!-- Halaman Beranda (Landing Page) -->
   <url>
     <loc>https://kindo.fun/</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="id" href="https://kindo.fun/"/>
@@ -21,7 +21,7 @@
   <!-- Halaman Kebijakan Privasi -->
   <url>
     <loc>https://kindo.fun/privacy-policy</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -29,7 +29,7 @@
   <!-- Halaman Syarat dan Ketentuan -->
   <url>
     <loc>https://kindo.fun/terms-of-service</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
