@@ -131,8 +131,6 @@ export const PAGE_SEO = {
     canonical: `${BASE_URL}/`,
     robots: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
     ogType: 'website',
-    // Landing page JSON-LD is handled statically in index.html for initial load.
-    // No dynamic override needed here.
   }),
 
   login: (): SEOMeta => ({

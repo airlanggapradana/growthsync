@@ -160,7 +160,7 @@ export default function LandingView() {
             Kesehatan yang <span className="italic font-serif text-[#d9f99d] pr-2">tumbuh</span> bersama anak Anda.
           </h1>
           
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed hero-description">
+          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
             Platform komprehensif bagi orang tua yang mendambakan kejelasan, kecepatan, dan pertumbuhan berkelanjutan dalam memantau perkembangan buah hati.
           </p>
 
