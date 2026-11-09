@@ -173,16 +173,17 @@ export default function App() {
         }
         setLoadingProfile(true);
         try {
-          // Fetch user profile to get role
-          const userDocSnap = await getDoc(doc(db, 'users', currentUser.uid));
+          // Fetch user profile to get role (support quick_login_override_uid for accounts with temporary auth rate limits)
+          const targetUid = sessionStorage.getItem('quick_login_override_uid') || currentUser.uid;
+          const userDocSnap = await getDoc(doc(db, 'users', targetUid));
           let currentRole = 'orang_tua'; // default
           if (userDocSnap.exists()) {
             const data = userDocSnap.data();
             currentRole = data.role || 'orang_tua';
-            setUserProfile(data as UserProfile);
+            setUserProfile({ ...data, uid: targetUid } as UserProfile);
           } else {
             // Provide a default user profile if none exists
-            const fallbackProfile: UserProfile = { uid: currentUser.uid, email: currentUser.email || '', role: 'orang_tua' };
+            const fallbackProfile: UserProfile = { uid: targetUid, email: currentUser.email || '', role: 'orang_tua' };
             setUserProfile(fallbackProfile);
           }
 
@@ -244,7 +245,10 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
+      sessionStorage.removeItem('quick_login_override_uid');
       await signOut(auth);
+      setUser(null);
+      setUserProfile(null);
       setAge(null);
       setAnswers({});
       setView('HOME');
