@@ -1,6 +1,0 @@
-{
-  "summary": "Rencana implementasi menyeluruh untuk mengeksekusi Design System GrowthSync (KINDO) pada seluruh halaman selain Landing Page, mencakup integrasi token Tailwind v4 (Teal #0F766E, WCAG AA), tipografi Plus Jakarta Sans, Bottom Navigation bar mobile, Bento Box hasil skrining dengan ScoreRing dan accordion AI, alur skrining KPSP per pertanyaan, visualisasi pertumbuhan WHO, serta dashboard Orang Tua, Nakes, dan Admin.",
-  "updatedAt": "2026-11-05T12:21:34.299319694Z",
-  "requestFeedback": true,
-  "userFacing": true
-}
