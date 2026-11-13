@@ -28,7 +28,7 @@ export default function BottomNav({
 
   const items = userRole === 'nakes' ? [
     { id: 'dashboard' as BottomNavTab, label: t('Dashboard'), icon: Activity },
-    { id: 'chat' as BottomNavTab, label: t('sidebar.chat'), icon: MessageSquare, badge: unreadCount },
+    { id: 'chat' as BottomNavTab, label: 'Konsultasi', icon: MessageSquare, badge: unreadCount },
     { id: 'profile' as BottomNavTab, label: t('Profil'), icon: User }
   ] : [
     { id: 'screening' as BottomNavTab, label: 'Skrining', icon: ClipboardCheck },

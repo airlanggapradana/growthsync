@@ -388,7 +388,40 @@ const KONSULTASI_I18N = {
     featureKpspTitle: 'Bimbingan Skrining KPSP',
     featureKpspDesc: 'Konsultasikan stimulasi 4 aspek perkembangan bila ada indikasi meragukan.',
     featureCallTitle: 'Telemedis Terjadwal',
-    featureCallDesc: 'Sesi panggilan suara dan telekonsultasi sesuai jam praktik resmi.'
+    featureCallDesc: 'Sesi panggilan suara dan telekonsultasi sesuai jam praktik resmi.',
+    nakesClinicalBadge: 'Panel Klinis Nakes',
+    nakesHeaderTitle: 'Konsultasi Pasien',
+    nakesHeaderSubtitle: 'Ruang komunikasi & pendampingan orang tua balita',
+    nakesSearchPlaceholder: 'Cari nama orang tua atau balita...',
+    nakesListTitle: 'Daftar Pasien & Orang Tua',
+    nakesFilterAssigned: 'Pasien Anda',
+    nakesFilterUnread: 'Belum Dibaca',
+    nakesClickProfile: 'Klik untuk melihat data orang tua & balita',
+    nakesEmergencyNotice: 'Panel Klinis Nakes • Untuk kondisi darurat balita, arahkan orang tua menghubungi 119 atau ke IGD.',
+    nakesAssignedBannerTitle: 'Pasien Dampingan Resmi Anda',
+    nakesAssignedBannerDesc: 'Anda terdaftar sebagai Nakes pendamping resmi untuk pasien ini. Berikan evaluasi KPSP, saran stimulasi, atau tindak lanjut gizi balita.',
+    nakesUnassignedBannerTitle: 'Orang Tua Belum Dirujuk ke Anda',
+    nakesUnassignedBannerDesc: 'Akun orang tua ini belum masuk daftar rujukan Anda. Anda dapat menerbitkan rujukan pendampingan melalui Dashboard Nakes.',
+    nakesOfflineTitle: 'Orang Tua / Pasien Sedang Offline',
+    nakesOfflineFallbackDesc: 'Pesan arahan klinis Anda akan tersimpan dan diterima saat orang tua membuka aplikasi kembali.',
+    nakesQuickRepliesLabel: 'Balasan Cepat:',
+    nakesQuickReplies: [
+      'Halo Ayah/Bunda, bagaimana perkembangan si kecil hari ini?',
+      'Mohon kirimkan hasil skrining KPSP terbaru untuk dievaluasi.',
+      'Tingkatkan asupan protein hewani (telur, ikan, daging) pada MPASI.',
+      'Jadwalkan kunjungan penimbangan ke Posyandu/Puskesmas terdekat.'
+    ],
+    nakesChatPlaceholder: 'Ketik arahan medis, evaluasi KPSP, atau saran untuk orang tua...',
+    nakesPatientProfileTitle: 'Rincian Profil Orang Tua & Balita',
+    nakesChildDataLabel: 'Data Balita Terdaftar',
+    nakesNoChildData: 'Belum ada profil balita tertaut',
+    nakesMentoringStatusLabel: 'Status Pendampingan',
+    nakesMentoringAssigned: 'Pasien Rujukan Resmi Anda',
+    nakesMentoringUnassigned: 'Belum Dirujuk ke Anda',
+    nakesDomicileLabel: 'Wilayah / Domisili',
+    nakesDomicileEmpty: 'Wilayah belum diisi',
+    nakesPresenceLabel: 'Status Kehadiran Pasien',
+    parentCameraActive: 'Kamera Orang Tua / Pasien Aktif'
   },
   en: {
     headerTitle: 'Health Worker Consultation',
@@ -494,7 +527,40 @@ const KONSULTASI_I18N = {
     featureKpspTitle: 'KPSP Screening Guidance',
     featureKpspDesc: 'Consult 4 developmental aspects stimulation if any milestones are in doubt.',
     featureCallTitle: 'Scheduled Telemedicine',
-    featureCallDesc: 'Direct voice and video consultations during official health facility service hours.'
+    featureCallDesc: 'Direct voice and video consultations during official health facility service hours.',
+    nakesClinicalBadge: 'Clinician Panel',
+    nakesHeaderTitle: 'Patient Consultation',
+    nakesHeaderSubtitle: 'Parent communication & toddler clinical mentoring',
+    nakesSearchPlaceholder: 'Search parent or toddler name...',
+    nakesListTitle: 'Patients & Parents',
+    nakesFilterAssigned: 'Your Patients',
+    nakesFilterUnread: 'Unread',
+    nakesClickProfile: 'Click to view parent & toddler details',
+    nakesEmergencyNotice: 'Clinician Panel • For pediatric emergencies, direct parents to call 119 or visit the ER.',
+    nakesAssignedBannerTitle: 'Your Officially Referred Patient',
+    nakesAssignedBannerDesc: 'You are registered as the official supervising health worker for this patient. Provide KPSP review, stimulation advice, or nutrition follow-up.',
+    nakesUnassignedBannerTitle: 'Parent Not Yet Referred to You',
+    nakesUnassignedBannerDesc: 'This parent account is not yet in your official referral list. You can issue a supervising referral from the Nakes Dashboard.',
+    nakesOfflineTitle: 'Parent / Patient is Currently Offline',
+    nakesOfflineFallbackDesc: 'Your clinical guidance will be saved and delivered when the parent returns.',
+    nakesQuickRepliesLabel: 'Quick Replies:',
+    nakesQuickReplies: [
+      'Hello Parent, how is your child doing today?',
+      'Please share the latest KPSP screening results for review.',
+      'Increase animal protein (eggs, fish, meat) in complementary meals.',
+      'Schedule a weighing checkup at the nearest Posyandu/Health Center.'
+    ],
+    nakesChatPlaceholder: 'Type medical guidance, KPSP review, or advice for parent...',
+    nakesPatientProfileTitle: 'Parent & Toddler Profile Details',
+    nakesChildDataLabel: 'Registered Toddler Data',
+    nakesNoChildData: 'No linked toddler profile yet',
+    nakesMentoringStatusLabel: 'Mentoring Status',
+    nakesMentoringAssigned: 'Your Officially Referred Patient',
+    nakesMentoringUnassigned: 'Not Yet Referred to You',
+    nakesDomicileLabel: 'Area / Domicile',
+    nakesDomicileEmpty: 'Domicile not specified',
+    nakesPresenceLabel: 'Patient Presence Status',
+    parentCameraActive: 'Parent / Patient Camera Active'
   }
 };
 
@@ -529,9 +595,15 @@ export default function KonsultasiNakesView({
   const txt = KONSULTASI_I18N[language] || KONSULTASI_I18N.id;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<'all' | 'online' | 'dokter' | 'bidan' | 'gizi' | 'posyandu'>('all');
+  const [filterCategory, setFilterCategory] = useState<'all' | 'online' | 'assigned' | 'unread' | 'dokter' | 'bidan' | 'gizi' | 'posyandu'>('all');
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [rawUserDocs, setRawUserDocs] = useState<{ docId: string; data: any }[]>([]);
+  const [extraAssignedNakesDoc, setExtraAssignedNakesDoc] = useState<{ docId: string; data: any } | null>(null);
+  const [childMap, setChildMap] = useState<Record<string, string>>({});
+  const [sentMessagesRaw, setSentMessagesRaw] = useState<any[]>([]);
+  const [receivedMessagesRaw, setReceivedMessagesRaw] = useState<any[]>([]);
+  const [presenceTick, setPresenceTick] = useState(0);
   const [selectedContact, setSelectedContact] = useState<ContactItem | null>(() => {
     if (initialTargetUser) {
       if (currentUser.role === 'orang_tua') {
@@ -590,6 +662,14 @@ export default function KonsultasiNakesView({
     return () => unsub();
   }, [currentUser?.uid]);
 
+  // Periodic presence re-evaluation tick every 30s
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setPresenceTick(t => t + 1);
+    }, 30000);
+    return () => window.clearInterval(interval);
+  }, []);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -605,222 +685,265 @@ export default function KonsultasiNakesView({
     }
   }, [language, selectedContact]);
 
-  // Directly fetch & sync contacts from Firestore database
+  // 1. Live Firestore listener for target users
   useEffect(() => {
     setLoadingContacts(true);
     const targetRole = currentUser.role === 'nakes' ? 'orang_tua' : 'nakes';
-
-    // 1. Live listener for target users from Firestore
     const qUsers = query(collection(db, 'users'), where('role', '==', targetRole));
-    
-    const unsubscribeUsers = onSnapshot(qUsers, async (snapshot) => {
-      try {
-        const userDocs: { docId: string; data: any }[] = snapshot.docs.map(docSnap => ({
-          docId: docSnap.id,
-          data: docSnap.data()
-        }));
 
-        // If current user is parent with an assigned nakes, ensure the assigned nakes is included
-        const effectiveAssignedNakesId = currentUser.role === 'orang_tua' ? liveAssignedNakesId : currentUser.assignedNakesId;
-        if (currentUser.role === 'orang_tua' && effectiveAssignedNakesId) {
-          const alreadyHas = userDocs.some(u => u.data.uid === effectiveAssignedNakesId || u.docId === effectiveAssignedNakesId);
-          if (!alreadyHas) {
-            try {
-              const assignedSnap = await getDoc(doc(db, 'users', effectiveAssignedNakesId));
-              if (assignedSnap.exists()) {
-                userDocs.unshift({
-                  docId: assignedSnap.id,
-                  data: assignedSnap.data()
-                });
-              }
-            } catch (err) {
-              console.warn('Error fetching assigned nakes user:', err);
-            }
-          }
-        }
-
-        // 2. If target users are parents, fetch child profiles to show children's names
-        let childMap: Record<string, string> = {};
-        if (currentUser.role === 'nakes') {
-          try {
-            const childSnap = await getDocs(collection(db, 'childProfiles'));
-            childSnap.docs.forEach(cDoc => {
-              const cData = cDoc.data();
-              if (cData.userId) {
-                const existing = childMap[cData.userId];
-                childMap[cData.userId] = existing 
-                  ? `${existing}, ${cData.name}` 
-                  : `${cData.name} (${cData.ageInMonths || 0} bln)`;
-              }
-            });
-          } catch (cErr) {
-            console.warn('Error fetching child profiles:', cErr);
-          }
-        }
-
-        // 3. Query recent messages to compute real lastMessage, real timestamp, and unreadCount from Firestore
-        const messageMetaMap: Record<string, { lastText: string; timeStr: string; unread: number; timestampMs: number }> = {};
-        try {
-          const msgsSnap = await getDocs(collection(db, 'messages'));
-          msgsSnap.docs.forEach(mDoc => {
-            const m = mDoc.data();
-            const otherUid = m.senderId === currentUser.uid ? m.receiverId : (m.receiverId === currentUser.uid ? m.senderId : null);
-            if (otherUid) {
-              const mDate = m.createdAt?.toDate ? m.createdAt.toDate() : new Date(m.createdAt || Date.now());
-              const mTimeMs = mDate.getTime();
-              const existing = messageMetaMap[otherUid];
-              const isUnread = m.receiverId === currentUser.uid && m.read === false;
-
-              if (!existing || mTimeMs > existing.timestampMs) {
-                messageMetaMap[otherUid] = {
-                  lastText: m.text || (m.isVoice ? 'Pesan suara' : 'Lampiran berkas'),
-                  timeStr: dayjs(mDate).format('HH:mm'),
-                  unread: (existing ? existing.unread : 0) + (isUnread ? 1 : 0),
-                  timestampMs: mTimeMs
-                };
-              } else if (isUnread) {
-                existing.unread += 1;
-              }
-            }
-          });
-        } catch (mErr) {
-          console.warn('Error fetching messages metadata:', mErr);
-        }
-
-        // 4. Map Firestore user documents directly to ContactItem
-        const dbContacts: ContactItem[] = userDocs.map(({ docId, data }, idx) => {
-          const uid = data.uid || docId;
-          const isAssigned = currentUser.role === 'orang_tua' 
-            ? Boolean(liveAssignedNakesId && (liveAssignedNakesId === uid || liveAssignedNakesId === docId))
-            : data.assignedNakesId === currentUser.uid;
-
-          const msgMeta = messageMetaMap[uid];
-
-          // Determine category
-          let category: 'dokter' | 'bidan' | 'gizi' | 'posyandu' = 'dokter';
-          const nameLower = (data.name || '').toLowerCase();
-          const roleLower = (data.role || '').toLowerCase();
-          const specLower = (data.specialty || '').toLowerCase();
-          if (nameLower.includes('bidan') || nameLower.includes('bdn') || specLower.includes('bidan') || roleLower.includes('bidan')) {
-            category = 'bidan';
-          } else if (nameLower.includes('gizi') || nameLower.includes('nutrisi') || specLower.includes('gizi') || roleLower.includes('gizi')) {
-            category = 'gizi';
-          } else if (nameLower.includes('posyandu') || roleLower.includes('posyandu')) {
-            category = 'posyandu';
-          }
-
-          const roleDisplay = currentUser.role === 'nakes'
-            ? (childMap[uid] ? `Orang Tua • Balita: ${childMap[uid]}` : 'Orang Tua Balita')
-            : (isAssigned 
-                ? (language === 'en' ? 'Official Referral Health Worker' : 'Nakes Rujukan Anda (Aktif)')
-                : (data.sip ? `Tenaga Medis (SIP: ${data.sip})` : (data.isVerified ? 'Tenaga Medis Terverifikasi' : 'Tenaga Kesehatan')));
-
-          // Avatar assignment: every nakes strictly uses the standardized placeholder
-          const isTargetNakes = currentUser.role !== 'nakes' || data.role === 'nakes';
-          const avatar = isTargetNakes
-            ? getNakesPlaceholder(category, data.name || (data.email ? data.email.split('@')[0] : ''))
-            : (data.photoURL || data.avatar || getParentPlaceholder(data.name || (data.email ? data.email.split('@')[0] : '')));
-
-          // Real-time automatic live presence from Firestore
-          // Genuinely online only when the nakes account is logged in and active in Firestore
-          let isOnline = false;
-          let statusText = '';
-          if (data.isOnline === true) {
-            if (data.lastActive) {
-              const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
-              const diffMinutes = (Date.now() - actDate.getTime()) / (1000 * 60);
-              // Active within the last 5 minutes
-              isOnline = diffMinutes <= 5;
-            } else {
-              isOnline = true;
-            }
-          } else {
-            isOnline = false;
-          }
-
-          if (isOnline) {
-            statusText = isAssigned 
-              ? (language === 'en' ? 'Online • Your Primary Health Worker' : 'Online • Nakes Pendamping Profil Anda')
-              : (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi');
-          } else {
-            if (data.lastActive) {
-              const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
-              const timeFormatted = dayjs(actDate).format('HH:mm');
-              const isToday = dayjs(actDate).isSame(dayjs(), 'day');
-              statusText = isToday 
-                ? (language === 'en' ? `Last active today ${timeFormatted}` : `Terakhir aktif hari ini ${timeFormatted}`)
-                : (language === 'en' ? `Last active ${dayjs(actDate).format('DD MMM')}` : `Terakhir aktif ${dayjs(actDate).format('DD MMM')}`);
-            } else {
-              statusText = language === 'en' ? 'Offline • Outside service hours' : 'Offline • Di luar jam praktik';
-            }
-          }
-
-          return {
-            id: docId,
-            uid: uid,
-            name: data.name || (data.email ? data.email.split('@')[0] : `Pengguna ${idx + 1}`),
-            role: roleDisplay,
-            category: category,
-            avatar: avatar,
-            lastMessage: msgMeta ? msgMeta.lastText : (isAssigned ? 'Konsultasi nakes aktif' : 'Belum ada riwayat pesan'),
-            timestamp: msgMeta ? msgMeta.timeStr : '',
-            unreadCount: msgMeta ? msgMeta.unread : 0,
-            online: isOnline,
-            statusText: statusText,
-            isAssignedNakes: isAssigned,
-            specialty: data.specialty || (data.role === 'nakes' ? 'Pemantauan Antropometri & Skrining KPSP' : 'Tumbuh Kembang Balita'),
-            sipNumber: data.sip || '-',
-            facility: [data.village, data.district, data.regency].filter(Boolean).join(', ') || 'Puskesmas Wilayah',
-            activeHours: 'Senin - Jumat, 08:00 - 15:00 WIB',
-            childrenNames: childMap[uid]
-          };
-        });
-
-        // Sort: assigned nakes first, then latest message time, then name
-        dbContacts.sort((a, b) => {
-          if (a.isAssignedNakes && !b.isAssignedNakes) return -1;
-          if (!a.isAssignedNakes && b.isAssignedNakes) return 1;
-          const aTime = messageMetaMap[a.uid]?.timestampMs || 0;
-          const bTime = messageMetaMap[b.uid]?.timestampMs || 0;
-          if (aTime !== bTime) return bTime - aTime;
-          return a.name.localeCompare(b.name);
-        });
-
-        setContacts(dbContacts);
-
-        // Update selected contact
-        setSelectedContact(prev => {
-          if (currentUser.role === 'orang_tua') {
-            const assigned = dbContacts.find(c => c.isAssignedNakes);
-            return assigned || null;
-          }
-          if (initialTargetUser) {
-            const foundInitial = dbContacts.find(c => c.uid === initialTargetUser.uid);
-            if (foundInitial) return foundInitial;
-          }
-          if (prev) {
-            const foundExisting = dbContacts.find(c => c.uid === prev.uid || c.id === prev.id);
-            if (foundExisting) return foundExisting;
-          }
-          return dbContacts[0] || null;
-        });
-
-      } catch (err) {
-        console.error('Error fetching database contacts:', err);
-      } finally {
-        setLoadingContacts(false);
-      }
+    const unsubscribeUsers = onSnapshot(qUsers, (snapshot) => {
+      const docs = snapshot.docs.map(docSnap => ({
+        docId: docSnap.id,
+        data: docSnap.data()
+      }));
+      setRawUserDocs(docs);
+      setLoadingContacts(false);
     }, (err) => {
       console.error('Firestore users onSnapshot error:', err);
       setLoadingContacts(false);
     });
 
     return () => unsubscribeUsers();
-  }, [currentUser, initialTargetUser]);
+  }, [currentUser.role]);
+
+  // 1b. Live listener on assigned nakes document for parent (ensures live presence even if outside query)
+  useEffect(() => {
+    if (currentUser.role !== 'orang_tua' || !liveAssignedNakesId) {
+      setExtraAssignedNakesDoc(null);
+      return;
+    }
+    const unsubAssigned = onSnapshot(doc(db, 'users', liveAssignedNakesId), (docSnap) => {
+      if (docSnap.exists()) {
+        setExtraAssignedNakesDoc({ docId: docSnap.id, data: docSnap.data() });
+      } else {
+        setExtraAssignedNakesDoc(null);
+      }
+    }, () => {});
+    return () => unsubAssigned();
+  }, [currentUser.role, liveAssignedNakesId]);
+
+  // 2. Live listener for childProfiles when Nakes is logged in
+  useEffect(() => {
+    if (currentUser.role !== 'nakes') {
+      setChildMap({});
+      return;
+    }
+    const unsubChildren = onSnapshot(collection(db, 'childProfiles'), (childSnap) => {
+      const nextMap: Record<string, string> = {};
+      childSnap.docs.forEach(cDoc => {
+        const cData = cDoc.data();
+        if (cData.userId) {
+          const existing = nextMap[cData.userId];
+          nextMap[cData.userId] = existing
+            ? `${existing}, ${cData.name}`
+            : `${cData.name} (${cData.ageInMonths || 0} bln)`;
+        }
+      });
+      setChildMap(nextMap);
+    }, (cErr) => {
+      console.warn('Error listening child profiles:', cErr);
+    });
+    return () => unsubChildren();
+  }, [currentUser.role]);
+
+  // 3. Real-time listeners for sent & received messages to keep lastMessage, timestamp, and unreadCount live
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    const qSent = query(collection(db, 'messages'), where('senderId', '==', currentUser.uid));
+    const qRecv = query(collection(db, 'messages'), where('receiverId', '==', currentUser.uid));
+
+    const unsubSent = onSnapshot(qSent, (snap) => {
+      setSentMessagesRaw(snap.docs.map(d => d.data()));
+    }, (err) => {
+      console.warn('Sent messages listener error:', err);
+    });
+
+    const unsubRecv = onSnapshot(qRecv, (snap) => {
+      setReceivedMessagesRaw(snap.docs.map(d => d.data()));
+    }, (err) => {
+      console.warn('Received messages listener error:', err);
+    });
+
+    return () => {
+      unsubSent();
+      unsubRecv();
+    };
+  }, [currentUser?.uid]);
+
+  // 4. Derive live contacts & sync selectedContact whenever Firestore users, messages, or presence tick updates
+  useEffect(() => {
+    const userDocs = [...rawUserDocs];
+    if (currentUser.role === 'orang_tua' && extraAssignedNakesDoc) {
+      const existingIdx = userDocs.findIndex(
+        u => u.data.uid === extraAssignedNakesDoc.docId || u.docId === extraAssignedNakesDoc.docId
+      );
+      if (existingIdx >= 0) {
+        userDocs[existingIdx] = extraAssignedNakesDoc;
+      } else {
+        userDocs.unshift(extraAssignedNakesDoc);
+      }
+    }
+
+    const messageMetaMap: Record<string, { lastText: string; timeStr: string; unread: number; timestampMs: number }> = {};
+    [...sentMessagesRaw, ...receivedMessagesRaw].forEach(m => {
+      const otherUid = m.senderId === currentUser.uid ? m.receiverId : (m.receiverId === currentUser.uid ? m.senderId : null);
+      if (!otherUid) return;
+      const mDate = m.createdAt?.toDate ? m.createdAt.toDate() : new Date(m.createdAt || Date.now());
+      const mTimeMs = mDate.getTime();
+      const existing = messageMetaMap[otherUid];
+      const isUnread = m.receiverId === currentUser.uid && m.read === false;
+
+      if (!existing || mTimeMs >= existing.timestampMs) {
+        messageMetaMap[otherUid] = {
+          lastText: m.text || (m.isVoice ? 'Pesan suara' : 'Lampiran berkas'),
+          timeStr: dayjs(mDate).format('HH:mm'),
+          unread: (existing ? existing.unread : 0) + (isUnread ? 1 : 0),
+          timestampMs: mTimeMs
+        };
+      } else if (isUnread) {
+        existing.unread += 1;
+      }
+    });
+
+    const dbContacts: ContactItem[] = userDocs.map(({ docId, data }, idx) => {
+      const uid = data.uid || docId;
+      const isAssigned = currentUser.role === 'orang_tua'
+        ? Boolean(liveAssignedNakesId && (liveAssignedNakesId === uid || liveAssignedNakesId === docId))
+        : data.assignedNakesId === currentUser.uid;
+
+      const msgMeta = messageMetaMap[uid];
+
+      let category: 'dokter' | 'bidan' | 'gizi' | 'posyandu' = 'dokter';
+      const nameLower = (data.name || '').toLowerCase();
+      const roleLower = (data.role || '').toLowerCase();
+      const specLower = (data.specialty || '').toLowerCase();
+      if (nameLower.includes('bidan') || nameLower.includes('bdn') || specLower.includes('bidan') || roleLower.includes('bidan')) {
+        category = 'bidan';
+      } else if (nameLower.includes('gizi') || nameLower.includes('nutrisi') || specLower.includes('gizi') || roleLower.includes('gizi')) {
+        category = 'gizi';
+      } else if (nameLower.includes('posyandu') || roleLower.includes('posyandu')) {
+        category = 'posyandu';
+      }
+
+      const roleDisplay = currentUser.role === 'nakes'
+        ? (childMap[uid] ? `Orang Tua • Balita: ${childMap[uid]}` : 'Orang Tua Balita')
+        : (isAssigned
+            ? (language === 'en' ? 'Official Referral Health Worker' : 'Nakes Rujukan Anda (Aktif)')
+            : (data.sip ? `Tenaga Medis (SIP: ${data.sip})` : (data.isVerified ? 'Tenaga Medis Terverifikasi' : 'Tenaga Kesehatan')));
+
+      const isTargetNakes = currentUser.role !== 'nakes' || data.role === 'nakes';
+      const avatar = isTargetNakes
+        ? getNakesPlaceholder(category, data.name || (data.email ? data.email.split('@')[0] : ''))
+        : (data.photoURL || data.avatar || getParentPlaceholder(data.name || (data.email ? data.email.split('@')[0] : '')));
+
+      // Real-time live presence from Firestore
+      let isOnline = false;
+      if (data.isOnline === true) {
+        if (data.lastActive) {
+          const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
+          const diffMinutes = (Date.now() - actDate.getTime()) / (1000 * 60);
+          isOnline = diffMinutes <= 10;
+        } else {
+          isOnline = true;
+        }
+      }
+
+      let statusText = '';
+      if (isOnline) {
+        if (currentUser.role === 'nakes') {
+          statusText = isAssigned
+            ? (language === 'en' ? 'Online • Active Referred Patient' : 'Online • Pasien Dampingan Aktif')
+            : (language === 'en' ? 'Online • Parent Active' : 'Online • Orang Tua Aktif');
+        } else {
+          statusText = isAssigned
+            ? (language === 'en' ? 'Online • Your Primary Health Worker' : 'Online • Nakes Pendamping Profil Anda')
+            : (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi');
+        }
+      } else if (data.lastActive) {
+        const actDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
+        const timeFormatted = dayjs(actDate).format('HH:mm');
+        const isToday = dayjs(actDate).isSame(dayjs(), 'day');
+        statusText = isToday
+          ? (language === 'en' ? `Last active today ${timeFormatted}` : `Terakhir aktif hari ini ${timeFormatted}`)
+          : (language === 'en' ? `Last active ${dayjs(actDate).format('DD MMM')}` : `Terakhir aktif ${dayjs(actDate).format('DD MMM')}`);
+      } else {
+        statusText = currentUser.role === 'nakes'
+          ? (language === 'en' ? 'Offline • Parent currently inactive' : 'Offline • Orang tua sedang tidak aktif')
+          : (language === 'en' ? 'Offline • Outside service hours' : 'Offline • Di luar jam praktik');
+      }
+
+      const defaultFacility = currentUser.role === 'nakes'
+        ? (language === 'en' ? 'Domicile not specified' : 'Wilayah belum diisi')
+        : 'Puskesmas Wilayah';
+
+      return {
+        id: docId,
+        uid: uid,
+        name: data.name || (data.email ? data.email.split('@')[0] : `Pengguna ${idx + 1}`),
+        role: roleDisplay,
+        category: category,
+        avatar: avatar,
+        lastMessage: msgMeta
+          ? msgMeta.lastText
+          : (currentUser.role === 'nakes'
+              ? (isAssigned ? 'Pasien rujukan aktif' : 'Belum ada riwayat pesan')
+              : (isAssigned ? 'Konsultasi nakes aktif' : 'Belum ada riwayat pesan')),
+        timestamp: msgMeta ? msgMeta.timeStr : '',
+        unreadCount: msgMeta ? msgMeta.unread : 0,
+        online: isOnline,
+        statusText: statusText,
+        isAssignedNakes: isAssigned,
+        specialty: data.specialty || (data.role === 'nakes' ? 'Pemantauan Antropometri & Skrining KPSP' : 'Tumbuh Kembang Balita'),
+        sipNumber: data.sip || '-',
+        facility: [data.village, data.district, data.regency].filter(Boolean).join(', ') || defaultFacility,
+        activeHours: 'Senin - Jumat, 08:00 - 15:00 WIB',
+        childrenNames: childMap[uid]
+      };
+    });
+
+    dbContacts.sort((a, b) => {
+      if (a.isAssignedNakes && !b.isAssignedNakes) return -1;
+      if (!a.isAssignedNakes && b.isAssignedNakes) return 1;
+      const aTime = messageMetaMap[a.uid]?.timestampMs || 0;
+      const bTime = messageMetaMap[b.uid]?.timestampMs || 0;
+      if (aTime !== bTime) return bTime - aTime;
+      return a.name.localeCompare(b.name);
+    });
+
+    setContacts(dbContacts);
+
+    setSelectedContact(prev => {
+      if (currentUser.role === 'orang_tua') {
+        const assigned = dbContacts.find(c => c.isAssignedNakes);
+        return assigned || null;
+      }
+      if (prev) {
+        const foundExisting = dbContacts.find(c => c.uid === prev.uid || c.id === prev.id);
+        if (foundExisting) return foundExisting;
+      }
+      if (initialTargetUser) {
+        const foundInitial = dbContacts.find(c => c.uid === initialTargetUser.uid);
+        if (foundInitial) return foundInitial;
+      }
+      return dbContacts[0] || null;
+    });
+  }, [
+    rawUserDocs,
+    extraAssignedNakesDoc,
+    childMap,
+    sentMessagesRaw,
+    receivedMessagesRaw,
+    liveAssignedNakesId,
+    currentUser.role,
+    currentUser.uid,
+    initialTargetUser,
+    language,
+    presenceTick
+  ]);
 
   // Firestore live message listener
   useEffect(() => {
-    if (!selectedContact) return;
+    if (!selectedContact?.uid) return;
 
     const targetUid = selectedContact.uid;
     const chatId = currentUser.role === 'nakes'
@@ -855,9 +978,10 @@ export default function KonsultasiNakesView({
         });
         setMessages(liveMsgs);
       } else {
-        // Fallback realistic dialogue for Dr. Airlangga
         if (selectedContact.id === 'c-airlangga' || selectedContact.uid === 'nakes_airlangga') {
           setMessages(language === 'en' ? INITIAL_CONSULTATION_MESSAGES_EN : INITIAL_CONSULTATION_MESSAGES);
+        } else if (currentUser.role === 'nakes') {
+          setMessages([]);
         } else {
           setMessages([
             {
@@ -873,7 +997,7 @@ export default function KonsultasiNakesView({
         }
       }
 
-      // Mark unread messages
+      // Mark unread messages directed to current user as read
       snapshot.docs.forEach(docSnap => {
         const msgData = docSnap.data();
         if (msgData.senderId !== currentUser.uid && msgData.read === false) {
@@ -885,7 +1009,7 @@ export default function KonsultasiNakesView({
     });
 
     return () => unsubscribe();
-  }, [selectedContact, currentUser]);
+  }, [selectedContact?.uid, selectedContact?.id, selectedContact?.name, currentUser.uid, currentUser.role, language]);
 
   // Scroll to bottom
   useEffect(() => {
@@ -1007,6 +1131,8 @@ export default function KonsultasiNakesView({
   };
 
   const onlineCount = contacts.filter(c => c.online).length;
+  const assignedCount = contacts.filter(c => c.isAssignedNakes).length;
+  const unreadContactsCount = contacts.filter(c => (c.unreadCount || 0) > 0).length;
 
   // Filter contacts: for patients (orang_tua), strictly show only the officially referred health worker
   const filteredContacts = contacts.filter(c => {
@@ -1014,14 +1140,18 @@ export default function KonsultasiNakesView({
       return Boolean(c.isAssignedNakes);
     }
 
+    const q = searchQuery.toLowerCase();
     const matchesSearch = 
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      c.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.specialty && c.specialty.toLowerCase().includes(searchQuery.toLowerCase()));
+      c.name.toLowerCase().includes(q) || 
+      c.role.toLowerCase().includes(q) ||
+      (c.childrenNames && c.childrenNames.toLowerCase().includes(q)) ||
+      (c.specialty && c.specialty.toLowerCase().includes(q));
 
     const matchesCategory = 
       filterCategory === 'all' ? true :
       filterCategory === 'online' ? c.online :
+      filterCategory === 'assigned' ? Boolean(c.isAssignedNakes) :
+      filterCategory === 'unread' ? Boolean(c.unreadCount && c.unreadCount > 0) :
       filterCategory === 'posyandu' ? (c.category === 'posyandu' || c.isGroup) :
       c.category === filterCategory;
 
@@ -1031,7 +1161,7 @@ export default function KonsultasiNakesView({
   return (
     <div className="w-full h-full flex flex-col md:flex-row gap-4 lg:gap-6 overflow-hidden select-none font-sans">
       
-      {/* LEFT PANEL: Contacts & Posyandu Consultation Channels */}
+      {/* LEFT PANEL: Contacts & Consultation Channels */}
       <aside 
         aria-label="Daftar Kontak dan Saluran Konsultasi"
         className={cn(
@@ -1040,15 +1170,36 @@ export default function KonsultasiNakesView({
         )}
       >
         {/* Top Header Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs shrink-0">
+        <div className={cn(
+          "bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border shadow-xs shrink-0",
+          currentUser.role === 'nakes'
+            ? "border-indigo-200/80 dark:border-indigo-900/60"
+            : "border-slate-200 dark:border-slate-800"
+        )}>
+          {currentUser.role === 'nakes' && (
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
+                <Stethoscope className="w-3 h-3" />
+                {txt.nakesClinicalBadge}
+              </span>
+              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                {onlineCount} Online
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-3 gap-2">
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
-                <Stethoscope className="w-5 h-5 text-[#1b4332] dark:text-emerald-400" />
-                {currentUser.role === 'orang_tua' ? txt.parentHeaderTitle : txt.headerTitle}
+                {currentUser.role === 'nakes' ? (
+                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                ) : (
+                  <Stethoscope className="w-5 h-5 text-[#1b4332] dark:text-emerald-400 shrink-0" />
+                )}
+                {currentUser.role === 'nakes' ? txt.nakesHeaderTitle : txt.parentHeaderTitle}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {currentUser.role === 'orang_tua' ? txt.parentHeaderSubtitle : txt.headerSubtitle}
+                {currentUser.role === 'nakes' ? txt.nakesHeaderSubtitle : txt.parentHeaderSubtitle}
               </p>
             </div>
             
@@ -1065,7 +1216,7 @@ export default function KonsultasiNakesView({
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
                     language === 'id'
-                      ? "bg-[#1b4332] text-white shadow-xs"
+                      ? (currentUser.role === 'nakes' ? "bg-indigo-600 text-white shadow-xs" : "bg-[#1b4332] text-white shadow-xs")
                       : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                   )}
                   title="Bahasa Indonesia"
@@ -1079,7 +1230,7 @@ export default function KonsultasiNakesView({
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all",
                     language === 'en'
-                      ? "bg-[#1b4332] text-white shadow-xs"
+                      ? (currentUser.role === 'nakes' ? "bg-indigo-600 text-white shadow-xs" : "bg-[#1b4332] text-white shadow-xs")
                       : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                   )}
                   title="English"
@@ -1095,15 +1246,15 @@ export default function KonsultasiNakesView({
 
           {currentUser.role === 'nakes' ? (
             <>
-              {/* Search Box */}
+              {/* Search Box (Patient / Parent Search) */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input 
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={txt.searchPlaceholder}
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2.5 text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#1b4332]/20 dark:focus:ring-emerald-500/20 transition-all"
+                  placeholder={txt.nakesSearchPlaceholder}
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2.5 text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
                 />
                 {searchQuery && (
                   <button 
@@ -1116,15 +1267,13 @@ export default function KonsultasiNakesView({
                 )}
               </div>
 
-              {/* Category Filter Pills */}
+              {/* Patient-Centric Filter Pills for Nakes */}
               <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar pt-1">
                 {[
-                  { id: 'all', label: txt.categories.all },
+                  { id: 'all', label: `${txt.categories.all} (${contacts.length})` },
                   { id: 'online', label: `🟢 Online (${onlineCount})` },
-                  { id: 'dokter', label: txt.categories.dokter },
-                  { id: 'bidan', label: txt.categories.bidan },
-                  { id: 'gizi', label: txt.categories.gizi },
-                  { id: 'posyandu', label: txt.categories.posyandu }
+                  { id: 'assigned', label: `${txt.nakesFilterAssigned} (${assignedCount})` },
+                  { id: 'unread', label: `${txt.nakesFilterUnread}${unreadContactsCount > 0 ? ` (${unreadContactsCount})` : ''}` }
                 ].map(tab => (
                   <button
                     type="button"
@@ -1133,7 +1282,7 @@ export default function KonsultasiNakesView({
                     className={cn(
                       "text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap",
                       filterCategory === tab.id
-                        ? "bg-[#1b4332] text-white shadow-xs"
+                        ? "bg-indigo-600 text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     )}
                   >
@@ -1170,8 +1319,8 @@ export default function KonsultasiNakesView({
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex-1 overflow-y-auto space-y-1.5">
           <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2 py-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              {currentUser.role === 'orang_tua' ? txt.parentHeaderTitle : `${txt.databaseContacts} (${filteredContacts.length})`}
+              <Database className={cn("w-3.5 h-3.5", currentUser.role === 'nakes' ? "text-indigo-600 dark:text-indigo-400" : "text-emerald-600 dark:text-emerald-400")} />
+              {currentUser.role === 'orang_tua' ? txt.parentHeaderTitle : `${txt.nakesListTitle} (${filteredContacts.length})`}
             </span>
             <div className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -1535,11 +1684,11 @@ export default function KonsultasiNakesView({
                   <ChevronLeft className="w-5 h-5" />
                 </button>
 
-                {/* Doctor/Nakes Avatar with Live Indicator */}
+                {/* Contact Avatar with Live Indicator */}
                 <div 
                   className="relative cursor-pointer shrink-0"
                   onClick={() => setShowInfoModal(true)}
-                  title={txt.clickProfile}
+                  title={currentUser.role === 'nakes' ? txt.nakesClickProfile : txt.clickProfile}
                 >
                   <img 
                     src={selectedContact.avatar} 
@@ -1683,14 +1832,43 @@ export default function KonsultasiNakesView({
         {/* Chat Feed Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/60 dark:bg-slate-950/40">
           
-          {/* Emergency Alert Banner - Mandatory per Design System 4.6 */}
-          <div className="max-w-lg mx-auto p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-center justify-center gap-2 text-xs text-[#B91C1C] dark:text-rose-300 font-semibold text-center shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-            <span>Chat ini bukan untuk kondisi darurat. Hubungi 119 atau datang ke IGD.</span>
-          </div>
+          {/* Emergency Alert Banner - Role-aware */}
+          {currentUser.role === 'nakes' ? (
+            <div className="max-w-lg mx-auto p-3 bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 rounded-2xl flex items-center justify-center gap-2 text-xs text-indigo-800 dark:text-indigo-200 font-semibold text-center shadow-xs">
+              <Stethoscope className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span>{txt.nakesEmergencyNotice}</span>
+            </div>
+          ) : (
+            <div className="max-w-lg mx-auto p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-center justify-center gap-2 text-xs text-[#B91C1C] dark:text-rose-300 font-semibold text-center shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span>Chat ini bukan untuk kondisi darurat. Hubungi 119 atau datang ke IGD.</span>
+            </div>
+          )}
 
-          {/* Referral Status Notice Banner */}
-          {selectedContact.isAssignedNakes ? (
+          {/* Referral / Mentoring Status Notice Banner */}
+          {currentUser.role === 'nakes' ? (
+            selectedContact.isAssignedNakes ? (
+              <div className="max-w-lg mx-auto p-3.5 bg-slate-100/90 dark:bg-slate-800/70 border border-indigo-200/80 dark:border-indigo-800/60 rounded-2xl text-center text-xs text-slate-800 dark:text-slate-200 shadow-xs">
+                <span className="font-bold flex items-center justify-center gap-1.5 mb-1 text-indigo-800 dark:text-indigo-300">
+                  <UserCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  {txt.nakesAssignedBannerTitle}
+                </span>
+                <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                  {txt.nakesAssignedBannerDesc}
+                </p>
+              </div>
+            ) : (
+              <div className="max-w-lg mx-auto p-3.5 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-center text-xs text-amber-900 dark:text-amber-200 shadow-xs">
+                <span className="font-bold flex items-center justify-center gap-1.5 mb-1 text-amber-800 dark:text-amber-300">
+                  <Info className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  {txt.nakesUnassignedBannerTitle}
+                </span>
+                <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
+                  {txt.nakesUnassignedBannerDesc}
+                </p>
+              </div>
+            )
+          ) : selectedContact.isAssignedNakes ? (
             <div className="max-w-lg mx-auto p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-center text-xs text-emerald-900 dark:text-emerald-300 shadow-xs">
               <span className="font-bold flex items-center justify-center gap-1.5 mb-1 text-emerald-800 dark:text-emerald-200">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -1742,16 +1920,20 @@ export default function KonsultasiNakesView({
             )
           )}
 
-          {/* Offline Health Worker Notice Banner */}
+          {/* Offline Notice Banner (Role-aware) */}
           {!selectedContact.online && (
             <div className="max-w-lg mx-auto p-3.5 bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-start gap-3 text-xs text-slate-700 dark:text-slate-300 shadow-2xs">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-400 mt-1 shrink-0" />
               <div className="flex-1">
                 <span className="font-bold text-slate-800 dark:text-slate-200 block">
-                  {language === 'en' ? 'Health Worker is currently Offline' : 'Tenaga Medis Sedang Offline'}
+                  {currentUser.role === 'nakes'
+                    ? txt.nakesOfflineTitle
+                    : (language === 'en' ? 'Health Worker is currently Offline' : 'Tenaga Medis Sedang Offline')}
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
-                  {selectedContact.statusText || (language === 'en' ? 'You can still leave messages or submit KPSP records. The health worker will reply once online.' : 'Anda tetap dapat mengirimkan pesan konsultasi atau data skrining. Tenaga medis akan merespons saat kembali bertugas.')}
+                  {currentUser.role === 'nakes'
+                    ? `${selectedContact.statusText ? `${selectedContact.statusText}. ` : ''}${txt.nakesOfflineFallbackDesc}`
+                    : (selectedContact.statusText || (language === 'en' ? 'You can still leave messages or submit KPSP records. The health worker will reply once online.' : 'Anda tetap dapat mengirimkan pesan konsultasi atau data skrining. Tenaga medis akan merespons saat kembali bertugas.'))}
                 </span>
               </div>
             </div>
@@ -1798,18 +1980,23 @@ export default function KonsultasiNakesView({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Consultation Chips (Only when chat is allowed) */}
+        {/* Quick Consultation Chips (Role-aware) */}
         {isChatAllowed && (
           <div className="px-4 sm:px-6 py-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
-              {txt.quickQuestionsLabel}
+              {currentUser.role === 'nakes' ? txt.nakesQuickRepliesLabel : txt.quickQuestionsLabel}
             </span>
-            {txt.quickQuestions.map((topic) => (
+            {(currentUser.role === 'nakes' ? txt.nakesQuickReplies : txt.quickQuestions).map((topic) => (
               <button
                 type="button"
                 key={topic}
                 onClick={() => handleSendMessage(topic)}
-                className="text-xs font-medium px-3 py-1.5 bg-slate-100 hover:bg-[#1b4332]/10 dark:bg-slate-800 dark:hover:bg-emerald-950/50 text-slate-700 hover:text-[#1b4332] dark:text-slate-300 dark:hover:text-emerald-300 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200/60 dark:border-slate-700"
+                className={cn(
+                  "text-xs font-medium px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200/60 dark:border-slate-700",
+                  currentUser.role === 'nakes'
+                    ? "hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-indigo-950/50 dark:hover:text-indigo-300"
+                    : "hover:bg-[#1b4332]/10 hover:text-[#1b4332] dark:hover:bg-emerald-950/50 dark:hover:text-emerald-300"
+                )}
               >
                 {topic}
               </button>
@@ -1849,7 +2036,7 @@ export default function KonsultasiNakesView({
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={txt.chatPlaceholder}
+                placeholder={currentUser.role === 'nakes' ? txt.nakesChatPlaceholder : txt.chatPlaceholder}
                 className="flex-1 bg-transparent border-none outline-none text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
               />
 
@@ -2064,7 +2251,9 @@ export default function KonsultasiNakesView({
                 <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full animate-pulse" />
               </div>
               <p className="text-sm font-semibold text-white/90">{selectedContact.name}</p>
-              <p className="text-xs text-emerald-400/80 font-medium">{txt.doctorCameraActive}</p>
+              <p className="text-xs text-emerald-400/80 font-medium">
+                {currentUser.role === 'nakes' ? txt.parentCameraActive : txt.doctorCameraActive}
+              </p>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
             </div>
 
@@ -2088,7 +2277,9 @@ export default function KonsultasiNakesView({
                 </div>
               ) : (
                 <img 
-                  src={getParentPlaceholder(currentUser.name || currentUser.email)} 
+                  src={currentUser.role === 'nakes'
+                    ? getNakesPlaceholder('dokter', currentUser.name || currentUser.email)
+                    : getParentPlaceholder(currentUser.name || currentUser.email)} 
                   alt="Self Camera" 
                   className="w-full h-full object-cover" 
                 />
@@ -2136,13 +2327,13 @@ export default function KonsultasiNakesView({
         </div>
       )}
 
-      {/* --- MODAL 3: Contact & SIP Details Modal --- */}
+      {/* --- MODAL 3: Contact / Profile Details Modal (Role-aware) --- */}
       {showInfoModal && selectedContact && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-5">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                {txt.profileDetailsTitle}
+                {currentUser.role === 'nakes' ? txt.nakesPatientProfileTitle : txt.profileDetailsTitle}
               </h3>
               <button 
                 type="button" 
@@ -2157,81 +2348,145 @@ export default function KonsultasiNakesView({
               <img 
                 src={selectedContact.avatar} 
                 alt={selectedContact.name} 
-                className="w-18 h-18 rounded-full object-cover border-2 border-[#1b4332] shadow-sm mb-2.5"
+                className={cn(
+                  "w-18 h-18 rounded-full object-cover border-2 shadow-sm mb-2.5",
+                  currentUser.role === 'nakes' ? "border-indigo-600" : "border-[#1b4332]"
+                )}
               />
               <h4 className="text-base font-bold text-slate-900 dark:text-white">
                 {selectedContact.name}
               </h4>
-              <p className="text-xs font-semibold text-[#1b4332] dark:text-emerald-400">
+              <p className={cn(
+                "text-xs font-semibold",
+                currentUser.role === 'nakes' ? "text-indigo-600 dark:text-indigo-400" : "text-[#1b4332] dark:text-emerald-400"
+              )}>
                 {getTranslatedRole(selectedContact.role, language)}
               </p>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
-                <Award className="w-4 h-4 text-[#1b4332] dark:text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.specialtyLabel}</span>
-                  <span>{selectedContact.specialty || (language === 'en' ? 'Child Growth, Nutrition & Stimulation' : 'Tumbuh Kembang, Nutrisi & Stimulasi Balita')}</span>
+            {currentUser.role === 'nakes' ? (
+              <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <Baby className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.nakesChildDataLabel}</span>
+                    <span>{selectedContact.childrenNames || txt.nakesNoChildData}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.sipLabel}</span>
-                  <span>{selectedContact.sipNumber || (language === 'en' ? 'SIP.440/1082/DS-A/2024 (Verified)' : 'SIP.440/1082/DS-A/2024 (Terverifikasi)')}</span>
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.nakesMentoringStatusLabel}</span>
+                    <span>{selectedContact.isAssignedNakes ? txt.nakesMentoringAssigned : txt.nakesMentoringUnassigned}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.facilityLabel}</span>
-                  <span>{selectedContact.facility || (language === 'en' ? 'UMS Hospital & Primary Community Health Center' : 'RS UMS & Puskesmas Pembina')}</span>
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.nakesDomicileLabel}</span>
+                    <span>{selectedContact.facility || txt.nakesDomicileEmpty}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
-                <Clock className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.hoursLabel}</span>
-                  <span>{selectedContact.activeHours || (language === 'en' ? 'Monday - Friday, 08:00 - 15:00 WIB' : 'Senin - Jumat, 08:00 - 15:00 WIB')}</span>
-                </div>
-              </div>
-
-              {/* Live Presence Status in Profile Modal (Real-time read-only) */}
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block text-xs">
-                    Status Layanan Nakes
-                  </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
-                    {selectedContact.statusText || (selectedContact.online 
-                      ? (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi') 
-                      : (language === 'en' ? 'Offline • Outside Service Hours' : 'Offline • Di Luar Jam Pelayanan'))}
-                  </span>
-                </div>
-                <div className="shrink-0">
-                  {selectedContact.online ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      Online
+                {/* Live Presence Status in Patient Profile Modal */}
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block text-xs">
+                      {txt.nakesPresenceLabel}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                      <span className="w-2 h-2 rounded-full bg-slate-400" />
-                      Offline
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
+                      {selectedContact.statusText || (selectedContact.online 
+                        ? (language === 'en' ? 'Online • Parent Active' : 'Online • Orang Tua Aktif') 
+                        : (language === 'en' ? 'Offline • Parent Inactive' : 'Offline • Orang Tua Tidak Aktif'))}
                     </span>
-                  )}
+                  </div>
+                  <div className="shrink-0">
+                    {selectedContact.online ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Online
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        <span className="w-2 h-2 rounded-full bg-slate-400" />
+                        Offline
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <Award className="w-4 h-4 text-[#1b4332] dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.specialtyLabel}</span>
+                    <span>{selectedContact.specialty || (language === 'en' ? 'Child Growth, Nutrition & Stimulation' : 'Tumbuh Kembang, Nutrisi & Stimulasi Balita')}</span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.sipLabel}</span>
+                    <span>{selectedContact.sipNumber || (language === 'en' ? 'SIP.440/1082/DS-A/2024 (Verified)' : 'SIP.440/1082/DS-A/2024 (Terverifikasi)')}</span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.facilityLabel}</span>
+                    <span>{selectedContact.facility || (language === 'en' ? 'UMS Hospital & Primary Community Health Center' : 'RS UMS & Puskesmas Pembina')}</span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-start gap-2.5">
+                  <Clock className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{txt.hoursLabel}</span>
+                    <span>{selectedContact.activeHours || (language === 'en' ? 'Monday - Friday, 08:00 - 15:00 WIB' : 'Senin - Jumat, 08:00 - 15:00 WIB')}</span>
+                  </div>
+                </div>
+
+                {/* Live Presence Status in Profile Modal (Real-time read-only) */}
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block text-xs">
+                      Status Layanan Nakes
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
+                      {selectedContact.statusText || (selectedContact.online 
+                        ? (language === 'en' ? 'Online • Ready for Consultation' : 'Online • Siap Melayani Konsultasi') 
+                        : (language === 'en' ? 'Offline • Outside Service Hours' : 'Offline • Di Luar Jam Pelayanan'))}
+                    </span>
+                  </div>
+                  <div className="shrink-0">
+                    {selectedContact.online ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Online
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        <span className="w-2 h-2 rounded-full bg-slate-400" />
+                        Offline
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <button
               type="button"
               onClick={() => setShowInfoModal(false)}
-              className="mt-5 w-full py-2.5 bg-[#1b4332] hover:bg-[#143527] text-white font-semibold rounded-xl text-xs transition-colors"
+              className={cn(
+                "mt-5 w-full py-2.5 text-white font-semibold rounded-xl text-xs transition-colors",
+                currentUser.role === 'nakes' ? "bg-indigo-600 hover:bg-indigo-700" : "bg-[#1b4332] hover:bg-[#143527]"
+              )}
             >
               {txt.closeInfo}
             </button>

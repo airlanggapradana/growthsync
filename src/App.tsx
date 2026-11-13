@@ -102,13 +102,15 @@ export default function App() {
     }
   }, [view, age, user]);
 
+  const effectiveUid = userProfile?.uid || (typeof window !== 'undefined' ? sessionStorage.getItem('quick_login_override_uid') : null) || user?.uid;
+
   useEffect(() => {
-    if (!user) {
+    if (!user || !effectiveUid) {
       setUnreadCount(0);
       setUnreadCountsBySender({});
       return;
     }
-    const qUnread = query(collection(db, 'messages'), where('receiverId', '==', user.uid), where('read', '==', false));
+    const qUnread = query(collection(db, 'messages'), where('receiverId', '==', effectiveUid), where('read', '==', false));
     const unsubscribeUnread = onSnapshot(qUnread, (snap) => {
       setUnreadCount(snap.docs.length);
       const counts: Record<string, number> = {};
@@ -119,50 +121,73 @@ export default function App() {
       setUnreadCountsBySender(counts);
     });
     return () => unsubscribeUnread();
-  }, [user]);
+  }, [user, effectiveUid]);
 
-  // Live user presence tracking in Firestore
+  // Live user presence tracking in Firestore (with heartbeat & visibility sync)
   useEffect(() => {
-    if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
-    updateDoc(userRef, {
-      isOnline: true,
-      lastActive: serverTimestamp()
-    }).catch(() => {});
+    if (!user || !effectiveUid) return;
+    const userRef = doc(db, 'users', effectiveUid);
+
+    const markOnline = () => {
+      if (!auth.currentUser) return;
+      updateDoc(userRef, {
+        isOnline: true,
+        lastActive: serverTimestamp()
+      }).catch(() => {});
+    };
+
+    const markOffline = () => {
+      if (!auth.currentUser) return;
+      updateDoc(userRef, {
+        isOnline: false,
+        lastActive: serverTimestamp()
+      }).catch(() => {});
+    };
+
+    if (document.visibilityState !== 'hidden') {
+      markOnline();
+    } else {
+      markOffline();
+    }
+
+    const heartbeatInterval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        markOnline();
+      }
+    }, 45000);
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        updateDoc(userRef, {
-          isOnline: true,
-          lastActive: serverTimestamp()
-        }).catch(() => {});
+        markOnline();
       } else {
-        updateDoc(userRef, {
-          isOnline: false,
-          lastActive: serverTimestamp()
-        }).catch(() => {});
+        markOffline();
       }
     };
 
-    const handleBeforeUnload = () => {
-      updateDoc(userRef, {
-        isOnline: false,
-        lastActive: serverTimestamp()
-      }).catch(() => {});
+    const handleFocus = () => {
+      markOnline();
+    };
+
+    const handlePageHide = () => {
+      markOffline();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('beforeunload', handlePageHide);
+    window.addEventListener('pagehide', handlePageHide);
 
     return () => {
+      window.clearInterval(heartbeatInterval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      updateDoc(userRef, {
-        isOnline: false,
-        lastActive: serverTimestamp()
-      }).catch(() => {});
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('beforeunload', handlePageHide);
+      window.removeEventListener('pagehide', handlePageHide);
+      if (auth.currentUser) {
+        markOffline();
+      }
     };
-  }, [user]);
+  }, [user, effectiveUid]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -192,7 +217,7 @@ export default function App() {
           } else if (currentRole === 'nakes') {
              setView('NAKES_DASHBOARD');
           } else {
-            const q = query(collection(db, 'childProfiles'), where('userId', '==', currentUser.uid));
+            const q = query(collection(db, 'childProfiles'), where('userId', '==', targetUid));
             const querySnapshot = await getDocs(q);
             const profiles: ChildProfile[] = [];
             querySnapshot.forEach((docSnap) => {
@@ -245,10 +270,17 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
+      if (effectiveUid && auth.currentUser) {
+        await updateDoc(doc(db, 'users', effectiveUid), {
+          isOnline: false,
+          lastActive: serverTimestamp()
+        }).catch(() => {});
+      }
       sessionStorage.removeItem('quick_login_override_uid');
       await signOut(auth);
       setUser(null);
       setUserProfile(null);
+      setTargetChatUser(null);
       setAge(null);
       setAnswers({});
       setView('HOME');
@@ -334,17 +366,12 @@ export default function App() {
                      setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD');
                      setMobileMenuOpen(false);
                    }}
-                   className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                   className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
                  >
                    <div className="flex items-center gap-3">
-                     <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-white" : "opacity-70")} />
+                     <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' ? "text-white" : "opacity-70")} />
                      {t('Dashboard')}
                    </div>
-                   {unreadCount > 0 && userProfile?.role === 'nakes' && (
-                     <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                       {unreadCount > 99 ? '99+' : unreadCount}
-                     </span>
-                   )}
                  </button>
                  {userProfile?.role === 'orang_tua' && (
                    <button 
@@ -381,6 +408,25 @@ export default function App() {
                      <div className="flex items-center gap-3">
                        <MessageSquare className={cn("w-5 h-5", view === 'PARENT_CHAT_LIST' || view === 'PARENT_CHAT' ? "text-white" : "opacity-70")} />
                        {t('sidebar.chat')}
+                     </div>
+                     {unreadCount > 0 && (
+                       <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                         {unreadCount > 99 ? '99+' : unreadCount}
+                       </span>
+                     )}
+                   </button>
+                 )}
+                 {userProfile?.role === 'nakes' && (
+                   <button 
+                     onClick={() => {
+                       setView('NAKES_CHAT');
+                       setMobileMenuOpen(false);
+                     }}
+                     className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'NAKES_CHAT' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                   >
+                     <div className="flex items-center gap-3">
+                       <MessageSquare className={cn("w-5 h-5", view === 'NAKES_CHAT' ? "text-white" : "opacity-70")} />
+                       {language === 'en' ? 'Patient Chat' : 'Konsultasi Pasien'}
                      </div>
                      {unreadCount > 0 && (
                        <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
@@ -473,17 +519,12 @@ export default function App() {
           {!isSidebarCollapsed ? (
             <button 
               onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
-              className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+              className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
             >
               <div className="flex items-center gap-3">
-                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-white" : "opacity-70")} />
+                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' ? "text-white" : "opacity-70")} />
                 <span>{t('Dashboard')}</span>
               </div>
-              {unreadCount > 0 && userProfile?.role === 'nakes' && (
-                <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
             </button>
           ) : (
             <div className="relative group w-full flex justify-center">
@@ -491,19 +532,14 @@ export default function App() {
                 onClick={() => setView(userProfile?.role === 'admin' ? 'ADMIN_DASHBOARD' : userProfile?.role === 'nakes' ? 'NAKES_DASHBOARD' : 'DASHBOARD')}
                 className={cn(
                   "w-11 h-11 flex items-center justify-center rounded-xl transition-all relative",
-                  view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT'
+                  view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD'
                     ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" 
                     : "text-white/70 hover:bg-white/10 hover:text-white"
                 )}
                 title={t('Dashboard')}
                 aria-label="Dashboard"
               >
-                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' || view === 'NAKES_CHAT' ? "text-white" : "opacity-80")} />
-                {unreadCount > 0 && userProfile?.role === 'nakes' && (
-                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full ring-2 ring-[#0F766E]">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
+                <Activity className={cn("w-5 h-5", view === 'ADMIN_DASHBOARD' || view === 'DASHBOARD' || view === 'HISTORY_DETAIL' || view === 'QUESTIONNAIRE' || view === 'RESULT' || view === 'NAKES_DASHBOARD' ? "text-white" : "opacity-80")} />
               </button>
               <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
                 {t('Dashboard')}
@@ -634,6 +670,48 @@ export default function App() {
                 </button>
                 <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
                   {t('sidebar.chat')}
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Chat Pasien untuk Nakes */}
+          {userProfile?.role === 'nakes' && (
+            !isSidebarCollapsed ? (
+              <button 
+                onClick={() => setView('NAKES_CHAT')}
+                className={cn("flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors", view === 'NAKES_CHAT' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white")}
+              >
+                <div className="flex items-center gap-3">
+                  <MessageSquare className={cn("w-5 h-5", view === 'NAKES_CHAT' ? "text-white" : "opacity-70")} />
+                  <span>{language === 'en' ? 'Patient Chat' : 'Konsultasi Pasien'}</span>
+                </div>
+                {unreadCount > 0 && (
+                  <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <div className="relative group w-full flex justify-center">
+                <button 
+                  onClick={() => setView('NAKES_CHAT')}
+                  className={cn(
+                    "w-11 h-11 flex items-center justify-center rounded-xl transition-all relative",
+                    view === 'NAKES_CHAT' ? "bg-white/20 text-white font-bold shadow-sm ring-1 ring-white/20" : "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}
+                  title={language === 'en' ? 'Patient Chat' : 'Konsultasi Pasien'}
+                  aria-label="Konsultasi Pasien"
+                >
+                  <MessageSquare className={cn("w-5 h-5", view === 'NAKES_CHAT' ? "text-white" : "opacity-80")} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full ring-2 ring-[#0F766E]">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none border border-white/10">
+                  {language === 'en' ? 'Patient Chat' : 'Konsultasi Pasien'}
                 </div>
               </div>
             )
@@ -948,7 +1026,7 @@ export default function App() {
                }}
              />
           )}
-          {view === 'NAKES_CHAT' && userProfile && targetChatUser && (
+          {view === 'NAKES_CHAT' && userProfile && (
              <KonsultasiNakesView 
                key="nakes_chat"
                currentUser={userProfile}
