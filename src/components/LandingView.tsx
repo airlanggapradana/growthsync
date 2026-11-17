@@ -1,16 +1,25 @@
 import React from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react';
 import { Shield, Sparkles, Activity, ArrowRight, HeartPulse, LineChart, Stethoscope, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
-import ThreeBackground from './ThreeBackground';
 import { applySEO, PAGE_SEO } from '../lib/seo';
 import { KINDO_LOGO_URL } from './PageTransition';
 
 export default function LandingView() {
   const navigate = useNavigate();
-  const { scrollY } = useScroll();
-  const backgroundY = useTransform(scrollY, [0, 4000], ['0%', '-20%']);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 130,
+    damping: 26,
+    mass: 0.25,
+    restDelta: 0.0005,
+  });
+  const backgroundY = useTransform(smoothProgress, [0, 1], [0, -180]);
+  const heroY = useTransform(smoothProgress, [0, 0.35], [0, 56]);
+  const heroScale = useTransform(smoothProgress, [0, 0.35], [1, 0.96]);
+  const heroOpacity = useTransform(smoothProgress, [0, 0.28], [1, 0.2]);
 
   const [activeSection, setActiveSection] = React.useState('beranda');
 
@@ -19,29 +28,29 @@ export default function LandingView() {
     applySEO(PAGE_SEO.landing());
   }, []);
 
+  // Track active section with IntersectionObserver (zero main-thread reflow on scroll)
   React.useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['beranda', 'fitur', 'cara-kerja', 'tim-kami'];
-      let current = 'beranda';
-
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          // Adjust threshold based on navigation height or preference
-          if (rect.top <= window.innerHeight * 0.4 && rect.bottom >= window.innerHeight * 0.4) {
-            current = section;
+    const sections = ['beranda', 'fitur', 'cara-kerja', 'tim-kami'];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection((prev) => (prev !== entry.target.id ? entry.target.id : prev));
           }
         }
+      },
+      {
+        rootMargin: '-35% 0px -35% 0px',
+        threshold: 0,
       }
-      
-      setActiveSection((prev) => (prev !== current ? current : prev));
-    };
+    );
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => observer.disconnect();
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -52,56 +61,55 @@ export default function LandingView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050A07] font-sans text-slate-50 relative overflow-hidden selection:bg-[#d9f99d] selection:text-[#050A07]">
-      {/* Background Image Layer */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.img 
-          src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp" 
-          alt="Latar belakang alam hijau yang menenangkan"
-          width={1920}
-          height={1080}
-          className="w-full h-[130vh] object-cover absolute top-0 left-0"
-          style={{ y: backgroundY }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/10 to-[#050A07] z-10" />
+    <div className="min-h-screen bg-[#050A07] font-sans text-slate-50 relative overflow-x-clip selection:bg-[#d9f99d] selection:text-[#050A07]">
+      {/* GPU-Composited Parallax Background Image Layer */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{ contain: 'strict' }}
+      >
+        <motion.div
+          className="absolute -top-[5vh] left-0 w-full h-[125vh] will-change-transform"
+          style={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  y: backgroundY,
+                  backfaceVisibility: 'hidden',
+                }
+          }
+        >
+          <img
+            src="https://res.cloudinary.com/airlanggapradana/image/upload/v1780067014/Gemini_Generated_Image_vsgdkrvsgdkrvsgd_pugw7v.webp"
+            alt=""
+            width={1920}
+            height={1080}
+            decoding="async"
+            className="w-full h-full object-cover transform-gpu"
+          />
+        </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050A07] via-[#050A07]/15 to-[#050A07] z-10" />
       </div>
 
-      <ThreeBackground />
-
-      {/* Ambient Background Glows */}
-      <motion.div 
-        animate={{ 
-          opacity: [0.02, 0.04, 0.02],
-          scale: [0.95, 1.05, 0.95]
+      {/* Lightweight Radial Ambient Glows (zero blur-filter repaint cost on scroll) */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          contain: 'strict',
+          backgroundImage:
+            'radial-gradient(680px 380px at 50% 6%, rgba(217, 249, 157, 0.05), transparent 70%), radial-gradient(620px 620px at 5% 95%, rgba(6, 78, 59, 0.22), transparent 70%), radial-gradient(520px 520px at 96% 52%, rgba(140, 198, 63, 0.06), transparent 70%)',
         }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#d9f99d] opacity-[0.03] blur-[120px] rounded-full pointer-events-none" 
-      />
-      <motion.div 
-        animate={{ 
-          opacity: [0.05, 0.1, 0.05],
-          rotate: [0, 5, 0]
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="fixed bottom-0 left-0 w-[800px] h-[800px] bg-emerald-900 opacity-[0.1] blur-[150px] rounded-full pointer-events-none" 
-      />
-      <motion.div 
-        animate={{ 
-          opacity: [0.03, 0.06, 0.03],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="fixed top-1/2 right-0 w-[600px] h-[600px] bg-[#8cc63f] opacity-[0.05] blur-[150px] rounded-full pointer-events-none" 
       />
 
       {/* Navigation (Floating Pill) */}
       <motion.div 
-        initial={{ y: -100, opacity: 0 }}
+        initial={prefersReducedMotion ? false : { y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="fixed top-6 inset-x-0 z-50 flex justify-center px-4"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 will-change-transform"
       >
-        <nav aria-label="Navigasi utama Kindo" className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
+        <nav aria-label="Navigasi utama Kindo" className="bg-[#0B1410]/80 backdrop-blur-md border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50 transform-gpu">
           <div className="flex items-center gap-3 pl-2">
              <div className="w-8 h-8 rounded-lg bg-white p-0.5 shadow-sm flex items-center justify-center shrink-0">
                <img src={KINDO_LOGO_URL} alt="Logo Kindo" width={32} height={32} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
@@ -147,10 +155,23 @@ export default function LandingView() {
 
       {/* Hero Section */}
       <section id="beranda" aria-label="Beranda Kindo" className="pt-40 pb-20 px-6 min-h-[85vh] flex flex-col items-center justify-center relative z-10 text-center">
+        <motion.div
+          style={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  y: heroY,
+                  scale: heroScale,
+                  opacity: heroOpacity,
+                  willChange: 'transform, opacity',
+                }
+          }
+          className="w-full"
+        >
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center max-w-4xl mx-auto space-y-8"
         >
           {/* Top Badge */}
@@ -181,6 +202,7 @@ export default function LandingView() {
             </div>
           </div>
         </motion.div>
+        </motion.div>
       </section>
 
       {/* Glowing Cards / Features Section */}
@@ -201,10 +223,10 @@ export default function LandingView() {
           {/* Card 1 */}
           <motion.div 
             variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
             }}
-            className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] hover:bg-white/10 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden"
+            className="bg-[#0B1510]/85 border border-white/10 p-8 rounded-[32px] hover:bg-[#101E17]/90 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden transform-gpu"
           >
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#d9f99d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="flex items-center gap-4 mb-4">
@@ -225,10 +247,10 @@ export default function LandingView() {
           {/* Card 2 */}
           <motion.div 
             variants={{
-              hidden: { opacity: 0, y: 40 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+              hidden: { opacity: 0, y: 30 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
             }}
-            className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] hover:bg-white/10 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden md:-mt-8"
+            className="bg-[#0B1510]/85 border border-white/10 p-8 rounded-[32px] hover:bg-[#101E17]/90 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden md:-mt-8 transform-gpu"
           >
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#d9f99d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="flex items-center gap-4 mb-4">
@@ -252,10 +274,10 @@ export default function LandingView() {
           {/* Card 3 */}
           <motion.div 
             variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
             }}
-            className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] hover:bg-white/10 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden"
+            className="bg-[#0B1510]/85 border border-white/10 p-8 rounded-[32px] hover:bg-[#101E17]/90 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden transform-gpu"
           >
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#d9f99d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="flex items-center gap-4 mb-4">
@@ -319,7 +341,7 @@ export default function LandingView() {
                     hidden: { opacity: 0, x: 30 },
                     visible: { opacity: 1, x: 0, transition: { duration: 0.6 } }
                   }}
-                  className="flex gap-6 p-6 rounded-[24px] bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-sm"
+                  className="flex gap-6 p-6 rounded-[24px] bg-[#0B1510]/80 border border-white/10 hover:bg-[#101E17]/90 transition-colors transform-gpu"
                 >
                   <div className="text-xl font-serif italic text-[#d9f99d]/50 pt-1">{item.step}</div>
                   <div>

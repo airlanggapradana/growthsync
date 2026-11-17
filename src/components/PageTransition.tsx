@@ -36,24 +36,20 @@ export function KindoTransitionCurtain({
           aria-label="Memuat halaman Kindo"
           initial={
             prefersReducedMotion
-              ? { opacity: 0 }
+              ? { opacity: variant === 'boot' ? 1 : 0 }
               : variant === 'boot'
-              ? { y: '0%' }
-              : { y: '100%' }
-          }
-          animate={
-            prefersReducedMotion
               ? { opacity: 1 }
-              : { y: '0%' }
+              : { opacity: 0 }
           }
+          animate={{ opacity: 1 }}
           exit={
             prefersReducedMotion
               ? { opacity: 0, transition: { duration: 0.24 } }
               : {
-                  y: '-108%',
+                  opacity: 0,
                   transition: {
-                    duration: 0.72,
-                    ease: [0.76, 0, 0.24, 1],
+                    duration: 0.65,
+                    ease: [0.4, 0, 0.2, 1],
                   },
                 }
           }
@@ -61,67 +57,41 @@ export function KindoTransitionCurtain({
             prefersReducedMotion
               ? { duration: 0.22 }
               : {
-                  duration: 0.58,
+                  duration: 0.45,
                   ease: [0.22, 1, 0.36, 1],
                 }
           }
-          className="fixed inset-0 z-[120] flex flex-col items-center justify-center overflow-hidden select-none"
+          className="fixed inset-0 z-[120] flex flex-col items-center justify-center overflow-hidden select-none will-change-[opacity]"
           style={{
             pointerEvents: active ? 'auto' : 'none',
           }}
         >
-          {/* Leading Soft Organic Wave Cap (Top Edge) */}
-          {!prefersReducedMotion && (
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 1440 90"
-              preserveAspectRatio="none"
-              className="absolute -top-[58px] left-0 w-full h-[60px] text-[#0D9488] pointer-events-none"
-            >
-              <path
-                fill="currentColor"
-                d="M0,90 L0,48 C280,0 520,82 860,36 C1140,-2 1320,28 1440,54 L1440,90 Z"
-              />
-            </svg>
-          )}
-
           {/* Primary Curtain Surface */}
           <div
             className="absolute inset-0 bg-gradient-to-br from-[#064E3B] via-[#0F766E] to-[#134E4A]"
             aria-hidden="true"
           />
 
-          {/* Trailing Accent Wave Band (Bottom Edge on Exit) */}
-          {!prefersReducedMotion && (
-            <motion.div
-              aria-hidden="true"
-              initial={{ opacity: 0.35 }}
-              animate={{ opacity: 0.65 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#14B8A6]/30 to-transparent pointer-events-none"
-            />
-          )}
-
           {/* Subtle Ambient Radial Mesh */}
           <motion.div
             aria-hidden="true"
-            initial={prefersReducedMotion ? false : { scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1.08, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            initial={prefersReducedMotion ? false : { scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1.06, opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.5 } }}
             transition={{ duration: 0.85, ease: 'easeOut' }}
             className="absolute w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] rounded-full bg-emerald-300/15 blur-3xl pointer-events-none"
           />
 
           {/* Center Brand Lockup: Kindo Logo + "KINDO" text underneath */}
           <motion.div
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.88, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={
               prefersReducedMotion
                 ? { opacity: 0 }
-                : { opacity: 0, scale: 0.92, y: -22, transition: { duration: 0.38, ease: 'easeIn' } }
+                : { opacity: 0, scale: 0.96, transition: { duration: 0.42, ease: 'easeOut' } }
             }
-            transition={{ duration: 0.55, delay: variant === 'boot' ? 0.05 : 0.16, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, delay: variant === 'boot' ? 0.05 : 0.12, ease: [0.22, 1, 0.36, 1] }}
             className="relative z-10 flex flex-col items-center justify-center px-6 text-center"
           >
             {/* Orbital Rings + Logo Emblem */}
@@ -216,21 +186,6 @@ export function KindoTransitionCurtain({
               Tumbuh Kembang Anak
             </motion.p>
           </motion.div>
-
-          {/* Bottom Organic Wave Edge (visible as curtain lifts upward) */}
-          {!prefersReducedMotion && (
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 1440 90"
-              preserveAspectRatio="none"
-              className="absolute -bottom-[58px] left-0 w-full h-[60px] text-[#134E4A] pointer-events-none"
-            >
-              <path
-                fill="currentColor"
-                d="M0,0 L0,42 C300,90 580,8 900,52 C1160,88 1340,56 1440,30 L1440,0 Z"
-              />
-            </svg>
-          )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -248,36 +203,20 @@ export function PageMotionWrapper({
   pageKey,
   children,
   className,
-  disableTransform = false,
 }: PageMotionWrapperProps) {
   const prefersReducedMotion = useReducedMotion();
-  const simpleFade = prefersReducedMotion || disableTransform;
 
   return (
     <motion.div
       key={pageKey}
-      initial={
-        simpleFade
-          ? { opacity: 0 }
-          : { opacity: 0, y: 14, scale: 0.992 }
-      }
-      animate={
-        simpleFade
-          ? { opacity: 1 }
-          : { opacity: 1, y: 0, scale: 1 }
-      }
-      exit={
-        simpleFade
-          ? { opacity: 0, transition: { duration: 0.22 } }
-          : {
-              opacity: 0,
-              y: -12,
-              scale: 0.994,
-              transition: { duration: 0.28, ease: [0.4, 0, 1, 1] },
-            }
-      }
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{
+        opacity: 0,
+        transition: { duration: prefersReducedMotion ? 0.2 : 0.28, ease: 'easeInOut' },
+      }}
       transition={{
-        duration: 0.55,
+        duration: prefersReducedMotion ? 0.22 : 0.48,
         ease: [0.22, 1, 0.36, 1],
       }}
       className={cn(className)}
