@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, FileText, CheckCircle2, AlertTriangle, Scale, Stethoscope, Home } from 'lucide-react';
 import { applySEO, PAGE_SEO } from '../lib/seo';
+import { KINDO_LOGO_URL } from './PageTransition';
 
 export default function TermsOfServiceView() {
   const navigate = useNavigate();
@@ -20,13 +21,16 @@ export default function TermsOfServiceView() {
             to="/"
             className="flex items-center gap-3 text-white/80 hover:text-white transition-colors"
           >
-            <img
-              src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp"
-              alt="Logo Kindo"
-              width={28}
-              height={28}
-              className="h-7 w-auto object-contain brightness-0 invert"
-            />
+            <div className="w-7 h-7 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0">
+              <img
+                src={KINDO_LOGO_URL}
+                alt="Logo Kindo"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
             <span className="font-bold tracking-wider text-sm">KINDO</span>
           </Link>
 

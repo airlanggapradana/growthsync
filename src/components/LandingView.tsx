@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import ThreeBackground from './ThreeBackground';
 import { applySEO, PAGE_SEO } from '../lib/seo';
+import { KINDO_LOGO_URL } from './PageTransition';
 
 export default function LandingView() {
   const navigate = useNavigate();
@@ -102,7 +103,9 @@ export default function LandingView() {
       >
         <nav aria-label="Navigasi utama Kindo" className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full w-full max-w-5xl px-4 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
           <div className="flex items-center gap-3 pl-2">
-             <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo Kindo" width={32} height={32} className="h-8 w-auto object-contain brightness-0 invert" />
+             <div className="w-8 h-8 rounded-lg bg-white p-0.5 shadow-sm flex items-center justify-center shrink-0">
+               <img src={KINDO_LOGO_URL} alt="Logo Kindo" width={32} height={32} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+             </div>
              <span className="font-bold tracking-widest text-sm text-white/90 hidden sm:block">KINDO</span>
           </div>
           
@@ -402,7 +405,9 @@ export default function LandingView() {
         
         <div className="w-full max-w-5xl border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 px-6 text-xs text-white/40">
            <div className="flex items-center gap-2">
-              <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779549262/ChatGPT_Image_May_23__2026__10_10_14_PM-removebg-preview_k2cxf5.webp" alt="Logo Kindo" width={24} height={24} loading="lazy" className="w-6 h-6 brightness-0 invert opacity-50" />
+              <div className="w-6 h-6 rounded-md bg-white/90 p-0.5 flex items-center justify-center shrink-0">
+                <img src={KINDO_LOGO_URL} alt="Logo Kindo" width={24} height={24} loading="lazy" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+              </div>
               <span>© {new Date().getFullYear()} Kindo. All rights reserved.</span>
            </div>
            <nav aria-label="Footer links" className="flex gap-6">

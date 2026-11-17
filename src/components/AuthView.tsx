@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { UserRole } from '../types';
 import { applySEO, PAGE_SEO } from '../lib/seo';
+import { KINDO_LOGO_URL } from './PageTransition';
 
 interface QuickLoginAccount {
   role: 'orang_tua' | 'nakes' | 'admin';
@@ -256,7 +257,7 @@ export default function AuthView({ onBack, initialMode = 'login' }: { onBack?: (
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <img 
-              src="/Resmi_Logo_UMS_Color.png" 
+              src={KINDO_LOGO_URL} 
               alt="Kindo Logo" 
               className="w-10 h-10 object-contain drop-shadow-xs" 
               referrerPolicy="no-referrer"

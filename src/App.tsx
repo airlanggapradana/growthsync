@@ -23,6 +23,7 @@ import EdukasiTumbuhKembang from './components/EdukasiTumbuhKembang';
 import PrivacyPolicyView from './components/PrivacyPolicyView';
 import TermsOfServiceView from './components/TermsOfServiceView';
 import BottomNav from './components/domain/BottomNav';
+import { KindoTransitionCurtain, PageMotionWrapper, KINDO_LOGO_URL } from './components/PageTransition';
 import { useLanguage } from './contexts/LanguageContext';
 import { applySEO, PAGE_SEO } from './lib/seo';
 
@@ -300,36 +301,115 @@ export default function App() {
     setChildProfiles(prev => prev.map(p => p.id === updatedProfile.id ? updatedProfile : p));
   };
 
-  if (loadingUser || loadingProfile) {
+  const isLoadingState = loadingUser || loadingProfile;
+  const currentPageKey = isLoadingState
+    ? '__boot__'
+    : location.pathname === '/privacy-policy' || location.pathname === '/terms-of-service'
+    ? `legal:${location.pathname}`
+    : !user
+    ? `public:${location.pathname}`
+    : `app:${view}`;
+
+  const [curtainActive, setCurtainActive] = useState(true);
+  const [curtainVariant, setCurtainVariant] = useState<'boot' | 'navigate'>('boot');
+  const prevPageKeyRef = useRef<string | null>(null);
+  const curtainTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (curtainTimerRef.current) {
+      window.clearTimeout(curtainTimerRef.current);
+      curtainTimerRef.current = null;
+    }
+
+    if (isLoadingState) {
+      setCurtainVariant('boot');
+      setCurtainActive(true);
+      prevPageKeyRef.current = '__boot__';
+      return;
+    }
+
+    const prev = prevPageKeyRef.current;
+    prevPageKeyRef.current = currentPageKey;
+
+    if (prev === null || prev === '__boot__') {
+      setCurtainVariant('boot');
+      setCurtainActive(true);
+      curtainTimerRef.current = window.setTimeout(() => {
+        setCurtainActive(false);
+      }, 1150);
+    } else if (prev !== currentPageKey) {
+      setCurtainVariant('navigate');
+      setCurtainActive(true);
+      curtainTimerRef.current = window.setTimeout(() => {
+        setCurtainActive(false);
+      }, 1250);
+    }
+
+    return () => {
+      if (curtainTimerRef.current) {
+        window.clearTimeout(curtainTimerRef.current);
+      }
+    };
+  }, [currentPageKey, isLoadingState]);
+
+  if (isLoadingState) {
     return (
-      <div className="min-h-screen bg-[#FCFCFD] dark:bg-slate-950 flex items-center justify-center font-sans">
-        <Loader2 className="w-6 h-6 animate-spin text-slate-700 dark:text-slate-300" />
-      </div>
+      <>
+        <KindoTransitionCurtain active={curtainActive} variant={curtainVariant} />
+        <div className="min-h-screen bg-[#064E3B]" />
+      </>
     );
   }
 
   if (location.pathname === '/privacy-policy') {
-    return <PrivacyPolicyView />;
+    return (
+      <>
+        <KindoTransitionCurtain active={curtainActive} variant={curtainVariant} />
+        <AnimatePresence mode="wait">
+          <PageMotionWrapper pageKey="legal:/privacy-policy" disableTransform>
+            <PrivacyPolicyView />
+          </PageMotionWrapper>
+        </AnimatePresence>
+      </>
+    );
   }
   if (location.pathname === '/terms-of-service') {
-    return <TermsOfServiceView />;
+    return (
+      <>
+        <KindoTransitionCurtain active={curtainActive} variant={curtainVariant} />
+        <AnimatePresence mode="wait">
+          <PageMotionWrapper pageKey="legal:/terms-of-service" disableTransform>
+            <TermsOfServiceView />
+          </PageMotionWrapper>
+        </AnimatePresence>
+      </>
+    );
   }
 
   if (!user) {
     return (
-      <Routes>
-        <Route path="/" element={<LandingView />} />
-        <Route path="/auth/login" element={<AuthView initialMode="login" onBack={() => navigate('/')} />} />
-        <Route path="/auth/register" element={<AuthView initialMode="register" onBack={() => navigate('/')} />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyView />} />
-        <Route path="/terms-of-service" element={<TermsOfServiceView />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <>
+        <KindoTransitionCurtain active={curtainActive} variant={curtainVariant} />
+        <AnimatePresence mode="wait">
+          <PageMotionWrapper key={location.pathname} pageKey={location.pathname} disableTransform>
+            <Routes location={location}>
+              <Route path="/" element={<LandingView />} />
+              <Route path="/auth/login" element={<AuthView initialMode="login" onBack={() => navigate('/')} />} />
+              <Route path="/auth/register" element={<AuthView initialMode="register" onBack={() => navigate('/')} />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyView />} />
+              <Route path="/terms-of-service" element={<TermsOfServiceView />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </PageMotionWrapper>
+        </AnimatePresence>
+      </>
     );
   }
 
   // Wrapped content component goes here...
   return (
+    <>
+    <KindoTransitionCurtain active={curtainActive} variant={curtainVariant} />
     <div className="flex h-screen bg-[#0F766E] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 overflow-hidden">
       {/* Mobile Navigation Drawer */}
       <AnimatePresence>
@@ -350,7 +430,20 @@ export default function App() {
               className="relative w-4/5 max-w-xs bg-[#0F766E] text-white flex flex-col p-6 shadow-2xl h-full overflow-y-auto z-10"
             >
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
-                <img src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" alt="Kuisioner Anak Logo" className="h-10 w-auto object-contain" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white p-1 shadow-sm flex items-center justify-center shrink-0">
+                    <img
+                      src={KINDO_LOGO_URL}
+                      alt="Kindo Logo"
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold tracking-wider text-white leading-tight">KINDO</div>
+                    <div className="text-[11px] font-medium text-emerald-100/85">Tumbuh Kembang Anak</div>
+                  </div>
+                </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
@@ -477,28 +570,34 @@ export default function App() {
         )}
       >
         {/* Top Logo Header */}
-        <div className={cn("w-full flex items-center mb-6", isSidebarCollapsed ? "justify-center px-1" : "justify-center px-2")}>
+        <div className={cn("w-full flex items-center mb-6", isSidebarCollapsed ? "justify-center px-1" : "justify-start px-2")}>
           {!isSidebarCollapsed ? (
-            <div className="flex items-center justify-center w-full overflow-hidden">
-              <img 
-                src="https://res.cloudinary.com/airlanggapradana/image/upload/v1779886057/Resmi_Logo_UMS_White_FullText_1_pygmt0.webp" 
-                alt="Kuisioner Anak Logo" 
-                className="h-14 w-auto object-contain transition-all duration-300" 
-                referrerPolicy="no-referrer"
-              />
+            <div className="flex items-center gap-3 w-full overflow-hidden">
+              <div className="w-11 h-11 rounded-2xl bg-white p-1.5 shadow-sm flex items-center justify-center shrink-0">
+                <img 
+                  src={KINDO_LOGO_URL} 
+                  alt="Kindo Logo" 
+                  className="w-full h-full object-contain" 
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="min-w-0">
+                <div className="text-lg font-extrabold tracking-wider text-white leading-tight">KINDO</div>
+                <div className="text-[11px] font-medium text-emerald-100/85 truncate">Tumbuh Kembang Anak</div>
+              </div>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => setIsSidebarCollapsed(false)}
-              className="w-12 h-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform hover:scale-105 cursor-pointer focus:outline-none"
+              className="w-11 h-11 rounded-2xl bg-white shadow-sm flex items-center justify-center p-1.5 transition-transform hover:scale-105 cursor-pointer focus:outline-none"
               title="Perluas Navbar"
               aria-label="Perluas Navbar"
             >
               <img 
-                src="/Resmi_Logo_UMS_Color.png" 
-                alt="Universitas Muhammadiyah Surakarta Logo" 
-                className="w-full h-full object-contain drop-shadow-sm" 
+                src={KINDO_LOGO_URL} 
+                alt="Kindo Logo" 
+                className="w-full h-full object-contain" 
                 referrerPolicy="no-referrer"
               />
             </button>
@@ -823,8 +922,8 @@ export default function App() {
               <Menu className="w-5 h-5" />
             </button>
             <img 
-              src="https://res.cloudinary.com/airlanggapradana/image/upload/v1793887621/Smiling_Child_Growth_Healthcare_Logo_bwwi6q.png" 
-              alt="Kuisioner Anak Logo" 
+              src={KINDO_LOGO_URL} 
+              alt="Kindo Logo" 
               className="h-9 w-auto object-contain" 
               referrerPolicy="no-referrer"
             />
@@ -909,151 +1008,156 @@ export default function App() {
         )}>
           <AnimatePresence mode="wait">
             {view === 'ONBOARDING' && (
-            <ChildOnboardingView key="onboarding" user={user} onComplete={handleProfileComplete} />
-          )}
-          {view === 'DASHBOARD' && activeProfile && (
-            <DashboardView 
-              key="dashboard" 
-              profiles={childProfiles}
-              activeProfileId={activeProfileId}
-              userProfile={userProfile}
-              onSelectProfile={setActiveProfileId}
-              onAddProfile={() => setView('ONBOARDING')}
-              onStartQuestionnaire={handleStartQuestionnaire}
-              onViewHistoryDetail={(history) => {
-                setSelectedHistory(history);
-                setView('HISTORY_DETAIL');
-              }}
-              onUpdateProfile={handleUpdateProfile}
-              onOpenEdukasi={() => setView('EDUKASI')}
-            />
-          )}
-          {view === 'QUESTIONNAIRE' && age && (
-            <QuestionnaireView
-              key="questionnaire"
-              age={age}
-              answers={answers}
-              onAnswer={handleAnswer}
-              onSubmit={handleSubmit}
-            />
-          )}
-          {view === 'RESULT' && age && (
-            <ResultView
-              key="result"
-              age={age}
-              answers={answers}
-              profile={activeProfile}
-              onClose={handleResetToDashboard}
-              isHistoryMode={false}
-              onSaveResult={async (analysis, analysisEn) => {
-                if (user && activeProfileId && age) {
-                  const totalScore = Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
-                  const resultId = user.uid + '_' + Date.now().toString();
-                  try {
-                    await setDoc(doc(db, 'questionnaireResults', resultId), {
-                      userId: user.uid,
-                      profileId: activeProfileId,
-                      ageCategory: age,
-                      answers: answers,
-                      totalScore: totalScore,
-                      aiAnalysis: analysis,
-                      aiAnalysisEn: analysisEn || '',
-                      createdAt: serverTimestamp()
-                    });
-                    handleResetToDashboard();
-                  } catch (e) {
-                    console.error('Failed to save AI analysis', e);
-                    alert(t('app.save_error'));
-                  }
-                }
-              }}
-              onGoToChat={() => setView('PARENT_CHAT_LIST')}
-            />
-          )}
-          {view === 'HISTORY_DETAIL' && selectedHistory && (
-            <ResultView
-              key="history_detail"
-              age={selectedHistory.ageCategory as AgeCategory}
-              answers={selectedHistory.answers}
-              profile={childProfiles.find(p => p.id === selectedHistory.profileId) || activeProfile}
-              existingAnalysis={selectedHistory.aiAnalysis}
-              existingAnalysisEn={selectedHistory.aiAnalysisEn}
-              onClose={() => {
-                setSelectedHistory(null);
-                setView('DASHBOARD');
-              }}
-              isHistoryMode={true}
-            />
-          )}
-          {view === 'EDUKASI' && (
-            <motion.div
-              key="edukasi"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.3 }}
-              className="max-w-5xl mx-auto pb-16 space-y-6"
-            >
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setView('DASHBOARD')}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>{t('app.back_to_dashboard')}</span>
-                </button>
-              </div>
+              <PageMotionWrapper key="onboarding" pageKey="onboarding">
+                <ChildOnboardingView user={user} onComplete={handleProfileComplete} />
+              </PageMotionWrapper>
+            )}
+            {view === 'DASHBOARD' && activeProfile && (
+              <PageMotionWrapper key="dashboard" pageKey="dashboard">
+                <DashboardView 
+                  profiles={childProfiles}
+                  activeProfileId={activeProfileId}
+                  userProfile={userProfile}
+                  onSelectProfile={setActiveProfileId}
+                  onAddProfile={() => setView('ONBOARDING')}
+                  onStartQuestionnaire={handleStartQuestionnaire}
+                  onViewHistoryDetail={(history) => {
+                    setSelectedHistory(history);
+                    setView('HISTORY_DETAIL');
+                  }}
+                  onUpdateProfile={handleUpdateProfile}
+                  onOpenEdukasi={() => setView('EDUKASI')}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'QUESTIONNAIRE' && age && (
+              <PageMotionWrapper key="questionnaire" pageKey="questionnaire">
+                <QuestionnaireView
+                  age={age}
+                  answers={answers}
+                  onAnswer={handleAnswer}
+                  onSubmit={handleSubmit}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'RESULT' && age && (
+              <PageMotionWrapper key="result" pageKey="result">
+                <ResultView
+                  age={age}
+                  answers={answers}
+                  profile={activeProfile}
+                  onClose={handleResetToDashboard}
+                  isHistoryMode={false}
+                  onSaveResult={async (analysis, analysisEn) => {
+                    if (user && activeProfileId && age) {
+                      const totalScore = Object.values(answers).reduce((acc: number, score: number) => acc + score, 0);
+                      const resultId = user.uid + '_' + Date.now().toString();
+                      try {
+                        await setDoc(doc(db, 'questionnaireResults', resultId), {
+                          userId: user.uid,
+                          profileId: activeProfileId,
+                          ageCategory: age,
+                          answers: answers,
+                          totalScore: totalScore,
+                          aiAnalysis: analysis,
+                          aiAnalysisEn: analysisEn || '',
+                          createdAt: serverTimestamp()
+                        });
+                        handleResetToDashboard();
+                      } catch (e) {
+                        console.error('Failed to save AI analysis', e);
+                        alert(t('app.save_error'));
+                      }
+                    }
+                  }}
+                  onGoToChat={() => setView('PARENT_CHAT_LIST')}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'HISTORY_DETAIL' && selectedHistory && (
+              <PageMotionWrapper key="history_detail" pageKey="history_detail">
+                <ResultView
+                  age={selectedHistory.ageCategory as AgeCategory}
+                  answers={selectedHistory.answers}
+                  profile={childProfiles.find(p => p.id === selectedHistory.profileId) || activeProfile}
+                  existingAnalysis={selectedHistory.aiAnalysis}
+                  existingAnalysisEn={selectedHistory.aiAnalysisEn}
+                  onClose={() => {
+                    setSelectedHistory(null);
+                    setView('DASHBOARD');
+                  }}
+                  isHistoryMode={true}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'EDUKASI' && (
+              <PageMotionWrapper key="edukasi" pageKey="edukasi" className="max-w-5xl mx-auto pb-16 space-y-6">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setView('DASHBOARD')}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>{t('app.back_to_dashboard')}</span>
+                  </button>
+                </div>
 
-              <EdukasiTumbuhKembang 
-                initialCategory="sesuai"
-                isEmbeddedInResult={false}
-                onGoToChat={() => setView('PARENT_CHAT_LIST')}
-              />
-            </motion.div>
-          )}
-          {view === 'ADMIN_DASHBOARD' && userProfile && (
-             <AdminDashboardView key="admin_dashboard" userProfile={userProfile} />
-          )}
-          {view === 'NAKES_DASHBOARD' && userProfile && (
-             <NakesDashboardView 
-               key="nakes_dashboard"
-               userProfile={userProfile}
-               unreadCountsBySender={unreadCountsBySender}
-               onOpenChat={(targetParent) => {
-                 setTargetChatUser(targetParent);
-                 setView('NAKES_CHAT');
-               }}
-             />
-          )}
-          {view === 'NAKES_CHAT' && userProfile && (
-             <KonsultasiNakesView 
-               key="nakes_chat"
-               currentUser={userProfile}
-               initialTargetUser={targetChatUser}
-               unreadCount={unreadCount}
-               onBackToDashboard={() => setView('NAKES_DASHBOARD')}
-             />
-          )}
-          {view === 'PARENT_CHAT_LIST' && userProfile && (
-             <KonsultasiNakesView 
-               key="parent_chat_list"
-               currentUser={userProfile}
-               initialTargetUser={targetChatUser}
-               unreadCount={unreadCount}
-               onBackToDashboard={() => setView('DASHBOARD')}
-             />
-          )}
-          {view === 'PARENT_CHAT' && userProfile && (
-             <KonsultasiNakesView 
-               key="parent_chat"
-               currentUser={userProfile}
-               initialTargetUser={targetChatUser}
-               unreadCount={unreadCount}
-               onBackToDashboard={() => setView('DASHBOARD')}
-             />
-          )}
-        </AnimatePresence>
+                <EdukasiTumbuhKembang 
+                  initialCategory="sesuai"
+                  isEmbeddedInResult={false}
+                  onGoToChat={() => setView('PARENT_CHAT_LIST')}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'ADMIN_DASHBOARD' && userProfile && (
+              <PageMotionWrapper key="admin_dashboard" pageKey="admin_dashboard">
+                <AdminDashboardView userProfile={userProfile} />
+              </PageMotionWrapper>
+            )}
+            {view === 'NAKES_DASHBOARD' && userProfile && (
+              <PageMotionWrapper key="nakes_dashboard" pageKey="nakes_dashboard">
+                <NakesDashboardView 
+                  userProfile={userProfile}
+                  unreadCountsBySender={unreadCountsBySender}
+                  onOpenChat={(targetParent) => {
+                    setTargetChatUser(targetParent);
+                    setView('NAKES_CHAT');
+                  }}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'NAKES_CHAT' && userProfile && (
+              <PageMotionWrapper key="nakes_chat" pageKey="nakes_chat" className="h-full w-full flex flex-col">
+                <KonsultasiNakesView 
+                  currentUser={userProfile}
+                  initialTargetUser={targetChatUser}
+                  unreadCount={unreadCount}
+                  onBackToDashboard={() => setView('NAKES_DASHBOARD')}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'PARENT_CHAT_LIST' && userProfile && (
+              <PageMotionWrapper key="parent_chat_list" pageKey="parent_chat_list" className="h-full w-full flex flex-col">
+                <KonsultasiNakesView 
+                  currentUser={userProfile}
+                  initialTargetUser={targetChatUser}
+                  unreadCount={unreadCount}
+                  onBackToDashboard={() => setView('DASHBOARD')}
+                />
+              </PageMotionWrapper>
+            )}
+            {view === 'PARENT_CHAT' && userProfile && (
+              <PageMotionWrapper key="parent_chat" pageKey="parent_chat" className="h-full w-full flex flex-col">
+                <KonsultasiNakesView 
+                  currentUser={userProfile}
+                  initialTargetUser={targetChatUser}
+                  unreadCount={unreadCount}
+                  onBackToDashboard={() => setView('DASHBOARD')}
+                />
+              </PageMotionWrapper>
+            )}
+          </AnimatePresence>
         </div>
       </main>
 
@@ -1091,6 +1195,7 @@ export default function App() {
         />
       )}
     </div>
+    </>
   );
 }
 
